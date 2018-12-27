@@ -332,6 +332,12 @@
         
           <blockquote>
 <p>HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。</p>
+<ol>
+<li>HashMap<strong>非线程安全</strong>，可以用<strong>Collection的synchronized</strong>方法来使HashMap线程安全，或者使<strong>用ConcurrentHashMap</strong>。</li>
+<li>HashTable：HashTable是遗留类，实现了Map类，因此具备了许多和HashMap相同操作。但是它继承自Dictionary类，并且是线程安全的。任意时间，只允许一个写进程。<strong>ConcurrentHashMap引入了分段锁</strong>机制，效率更高。不建议使用HashTable，线程安全场景下使用ConcurrentHashMap，其他场景HashMap。</li>
+<li>LinkedHashMap继承自HashMap，记录了元素插入链表的顺序。</li>
+<li>TreeMap实现了SortedMap接口，能够把保存的数据根据键排序，默认按照键升序排。当用Iterator遍历TreeMap时，得到的记录是排过序的。如果使用排序的映射，建议使用TreeMap。在使用TreeMap时，key必须实现Comparable接口或者在构造TreeMap传入自定义的Comparator，否则会在运行时抛出java.lang.ClassCastException类型的异常。</li>
+</ol>
 </blockquote>
           <!--noindex-->
           <div class="post-button text-center">

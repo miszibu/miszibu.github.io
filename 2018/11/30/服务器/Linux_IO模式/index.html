@@ -104,7 +104,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/1485056-9d17cf698a3f0dbc.png">
 <meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/blockingIO.gif">
-<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/nonBlockingIO.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/nonBlockingIO.gif">
 <meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/IOMultiplexing.gif">
 <meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Asynchronous%20I:O.gif">
 <meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/compare.gif">
@@ -365,7 +365,7 @@
 <p>Tips: 一次网络请求结束后，或者缓存大小到一定程度时，才会返回。</p>
 <p>​          在阻塞IO中，用户线程在数据准备和数据拷贝阶段都被阻塞。</p>
 </blockquote>
-<h4 id="2-2非阻塞IO-Non-blocking-IO"><a href="#2-2非阻塞IO-Non-blocking-IO" class="headerlink" title="2.2非阻塞IO(Non-blocking IO)"></a>2.2非阻塞IO(Non-blocking IO)</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/./Linux_IO模式/nonBlockingIO.gif" alt=""></p>
+<h4 id="2-2非阻塞IO-Non-blocking-IO"><a href="#2-2非阻塞IO-Non-blocking-IO" class="headerlink" title="2.2非阻塞IO(Non-blocking IO)"></a>2.2非阻塞IO(Non-blocking IO)</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/nonBlockingIO.gif" alt=""></p>
 <p>如图所示，非阻塞IO发送recvfrom请求后,若Kernel没有数据准备好，直接返回EWOULDBLOCK。</p>
 <p>用户进程收到后，不阻塞，继续请求Kernel，直至数据准备好，read操作转移数据到用户内存，然后返回。</p>
 <blockquote>

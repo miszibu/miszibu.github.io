@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="ASR：将语音信息转为文本">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/21/杂谈/img/状态网路搜索.img">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/21/杂谈/ASR语音识别/img/状态网路搜索.img">
 <meta property="og:updated_time" content="2018-12-04T03:58:22.678Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASR语音识别">
 <meta name="twitter:description" content="ASR：将语音信息转为文本">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/04/21/杂谈/img/状态网路搜索.img">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/04/21/杂谈/ASR语音识别/img/状态网路搜索.img">
 
 
 
@@ -356,7 +356,7 @@
 </li>
 <li><p>2：从状态网络中寻找与声音最匹配的路径</p>
 <p> 状态网络中，我们需要把文字的状态路径加入预先设置的网络中，然而这里就需要我们已经录入足够的文本内容，然后才能将音频校验到合适的文本，若目标文本不存在路径中，则无法识别到。但是如果目标文本过多，这就会导致查询的命中率降低。因此要选择合适大小的状态网络。</p>
-<p> 搭建状态网络，是由单词级网络展开成音素网络，再展开成状态网络。语音识别过程其实就是在状态网络中搜索一条最佳路径，语音对应这条路径的概率最大，这称之为解码。路径搜索的算法是一种动态规划剪枝的算法，称作Viterbi算法，用于寻找全局最优路径。<img src="/2018/04/21/杂谈/ASR语音识别/../img/状态网路搜索.img" alt="状态网络搜索">这里又用到了三个概率：</p>
+<p> 搭建状态网络，是由单词级网络展开成音素网络，再展开成状态网络。语音识别过程其实就是在状态网络中搜索一条最佳路径，语音对应这条路径的概率最大，这称之为解码。路径搜索的算法是一种动态规划剪枝的算法，称作Viterbi算法，用于寻找全局最优路径。<img src="/2018/04/21/杂谈/ASR语音识别/img/状态网路搜索.img" alt="状态网络搜索">这里又用到了三个概率：</p>
 </li>
 </ul>
 <p>​    1.观察概率：每帧和各个状态对应的概率。</p>

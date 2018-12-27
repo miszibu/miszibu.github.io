@@ -343,7 +343,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">array_linux.go </span><br><span class="line">array_darwin.go </span><br><span class="line">array_windows.go </span><br><span class="line">array_freebsd.go1234</span><br></pre></td></tr></table></figure>
 <p>go build的时候会选择性地编译以系统名结尾的文件（Linux、Darwin、Windows、Freebsd）。例如Linux系统下面编译只会选择array_linux.go文件，其它系统命名后缀文件全部忽略。</p>
 <p><strong>案例</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">首先运行 go build命令需要进入go path的对应项目src文件中</span></span><br><span class="line">go build main.go #go build 加上要编译的文件名 就会得到一个可执行文件</span><br><span class="line">go build -o newName main.go #编译文件并且将编译后的文件改名</span><br><span class="line">go build #默认在目录下执行go build 将会得到一个与目录同名的可执行文件</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>首先运行 go build命令需要进入go path的对应项目src文件中</span><br><span class="line">go build main.go #go build 加上要编译的文件名 就会得到一个可执行文件</span><br><span class="line">go build -o newName main.go #编译文件并且将编译后的文件改名</span><br><span class="line">go build #默认在目录下执行go build 将会得到一个与目录同名的可执行文件</span><br></pre></td></tr></table></figure>
 <h3 id="go-install-build源码并将相关文件安装到约定的目录下"><a href="#go-install-build源码并将相关文件安装到约定的目录下" class="headerlink" title="go install-build源码并将相关文件安装到约定的目录下"></a>go install-build源码并将相关文件安装到约定的目录下</h3><ul>
 <li>go install编译出的可执行文件以其所在目录名(DIR)命名</li>
 <li>go install将可执行文件安装到与src同级别的bin目录下，bin目录由go install自动创建</li>
@@ -404,8 +404,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/03/Golang/Go_chan并发/" rel="prev" title="Go-chan并发">
-                Go-chan并发 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/03/Golang/Go_Bug记录/" rel="prev" title="Go-Bug记录">
+                Go-Bug记录 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>

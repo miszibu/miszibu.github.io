@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="本地的进程间通信（IPC-InterProcess Communication）有很多种方式，但可以总结为下面4类：  消息传递（管道、FIFO、消息队列） 同步（互斥量、条件变量、读写锁、文件和写记录锁、信号量） 共享内存（匿名的和具名的） 远程过程调用（Solaris门和Sun RPC）">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/05/16/操作系统/img/pipe.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/05/16/操作系统/OS_本地进程通信IPC/img/pipe.png">
 <meta property="og:updated_time" content="2018-08-29T01:59:19.775Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="操作系统-本地进程通信IPC">
 <meta name="twitter:description" content="本地的进程间通信（IPC-InterProcess Communication）有很多种方式，但可以总结为下面4类：  消息传递（管道、FIFO、消息队列） 同步（互斥量、条件变量、读写锁、文件和写记录锁、信号量） 共享内存（匿名的和具名的） 远程过程调用（Solaris门和Sun RPC）">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/05/16/操作系统/img/pipe.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/05/16/操作系统/OS_本地进程通信IPC/img/pipe.png">
 
 
 
@@ -346,7 +346,7 @@
 <li>它可以看成是一种<strong>特殊的文件</strong>，对于它的读写也可以使用普通的read、write 等函数。但是它不是普通的文件，并不属于其他任何文件系统，并且<strong>只存在于内存中。</strong></li>
 </ol>
 <p>当一个管道建立时，它会创建两个文件描述符：<code>fd[0]</code>为读而打开，<code>fd[1]</code>为写而打开。如下图：</p>
-<p><img src="/2018/05/16/操作系统/OS_本地进程通信IPC/../img/pipe.png" alt="管道"></p>
+<p><img src="/2018/05/16/操作系统/OS_本地进程通信IPC/img/pipe.png" alt="管道"></p>
 <h3 id="二、FIFO（命名管道）"><a href="#二、FIFO（命名管道）" class="headerlink" title="二、FIFO（命名管道）"></a>二、FIFO（命名管道）</h3><p><strong>FIFO</strong>，也称为<strong>命名管道</strong>，它是一种<strong>文件</strong>类型。</p>
 <p><strong>特点</strong></p>
 <ol>

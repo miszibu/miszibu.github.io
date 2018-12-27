@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="本文记录Nginx相关配置信息和其实现相关技巧。 Nginx作为web服务器来实现反向代理和负载均衡已经是为人所熟悉的操作了，本文会介绍Nginx的配置文件和基本命令，然后引入Nginx实现负载均衡的方式，加深对Nginx的理解。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/03/19/服务器/img/Nginx一致性哈希">
+<meta property="og:image" content="https://miszibu.github.io/2018/03/19/服务器/Nginx/img/Nginx一致性哈希">
 <meta property="og:updated_time" content="2018-12-03T01:23:25.441Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx使用">
 <meta name="twitter:description" content="本文记录Nginx相关配置信息和其实现相关技巧。 Nginx作为web服务器来实现反向代理和负载均衡已经是为人所熟悉的操作了，本文会介绍Nginx的配置文件和基本命令，然后引入Nginx实现负载均衡的方式，加深对Nginx的理解。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/03/19/服务器/img/Nginx一致性哈希">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/03/19/服务器/Nginx/img/Nginx一致性哈希">
 
 
 
@@ -352,7 +352,7 @@
 <p>​     缺点：如果一个节点挂了，那么整个全局都会乱掉。因为整个的节点数变了，因为除数变了。</p>
 <pre><code>**一致性哈希**
 </code></pre><p>​    一致性hash的采用的是除数特别大，假设有一个<strong>hash环</strong>。是个<strong>闭环</strong>。把32位二进制的整数转换为十进制后均匀分布在整个环上。hash结果是除以2的32次方-1（hash是除以）. 那么结果一定是落在环上的。那么，这个点靠近谁，就缓存在谁那里。假设a节点坏了。那么下一次的计算结果就是旁边的邻居。但是邻居的缓存不会受到影响。只是坏掉的A节点会重新去缓存。</p>
-<p>​    <img src="/2018/03/19/服务器/Nginx/../img/Nginx一致性哈希" alt="Nginx一致性哈希"></p>
+<p>​    <img src="/2018/03/19/服务器/Nginx/img/Nginx一致性哈希" alt="Nginx一致性哈希"></p>
 <h2 id="5-负载均衡策略"><a href="#5-负载均衡策略" class="headerlink" title="5.负载均衡策略"></a>5.负载均衡策略</h2><h4 id="5-1-轮询-默认"><a href="#5-1-轮询-默认" class="headerlink" title="5.1 轮询(默认)"></a>5.1 轮询(默认)</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉，能自动剔除。 </span></span><br><span class="line">upstream polling_strategy &#123; </span><br><span class="line">    server glmapper.net:8080; <span class="comment"># 应用服务器1</span></span><br><span class="line">    server glmapper.net:8081; <span class="comment"># 应用服务器2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="5-2-权重"><a href="#5-2-权重" class="headerlink" title="5.2 权重"></a>5.2 权重</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#指定轮询几率，weight和访问比率成正比，用于后端服务器性能不均的情况。 </span></span><br><span class="line">upstream  weight_strategy &#123; </span><br><span class="line">    server glmapper.net:8080 weight=1; <span class="comment"># 应用服务器1</span></span><br><span class="line">    server glmapper.net:8081 weight=9; <span class="comment"># 应用服务器2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="5-3-IPHash"><a href="#5-3-IPHash" class="headerlink" title="5.3 IPHash"></a>5.3 IPHash</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#每个请求按访问ip的hash结果分配，这样每个访客固定访问一个后端服务器，</span></span><br><span class="line"><span class="comment">#可以解决session的问题;在不考虑引入分布式session的情况下，</span></span><br><span class="line"><span class="comment">#原生HttpSession只对当前servlet容器的上下文环境有效</span></span><br><span class="line">upstream ip_hash_strategy &#123; </span><br><span class="line">    ip_hash; </span><br><span class="line">    server glmapper.net:8080; <span class="comment"># 应用服务器1</span></span><br><span class="line">    server glmapper.net:8081; <span class="comment"># 应用服务器2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

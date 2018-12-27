@@ -94,21 +94,22 @@
 
 
 
-<meta name="description" content="HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。">
+<meta name="description" content="HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。  HashMap非线程安全，可以用Collection的synchronized方法来使HashMap线程安全，或者使用ConcurrentHashMap。 HashTable：HashTable是遗留类，实现了Map">
 <meta name="keywords" content="Java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java_HashMap源码解析">
 <meta property="og:url" content="https://miszibu.github.io/2018/12/27/Java/Java-HashMap源码解析/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
-<meta property="og:description" content="HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。">
+<meta property="og:description" content="HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。  HashMap非线程安全，可以用Collection的synchronized方法来使HashMap线程安全，或者使用ConcurrentHashMap。 HashTable：HashTable是遗留类，实现了Map">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2018/12/27/Java/Java-HashMap源码解析/HashMap.jpg">
 <meta property="og:image" content="https://miszibu.github.io/2018/12/27/Java/Java-HashMap源码解析/HashMap构造器.png">
 <meta property="og:image" content="https://miszibu.github.io/2018/12/27/Java/Java-HashMap源码解析/putVal方法.png">
-<meta property="og:updated_time" content="2018-12-27T08:53:53.265Z">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/27/Java/Java-HashMap源码解析/HashMapHashCode.png">
+<meta property="og:updated_time" content="2018-12-27T17:54:30.197Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_HashMap源码解析">
-<meta name="twitter:description" content="HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。">
+<meta name="twitter:description" content="HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。  HashMap非线程安全，可以用Collection的synchronized方法来使HashMap线程安全，或者使用ConcurrentHashMap。 HashTable：HashTable是遗留类，实现了Map">
 <meta name="twitter:image" content="https://miszibu.github.io/2018/12/27/Java/Java-HashMap源码解析/HashMap.jpg">
 
 
@@ -336,6 +337,12 @@
       
         <blockquote>
 <p>HashMap是Java.util包下极为重要的高频数据结构，本文以JDK1.8的HashMap出发，对HashMap的结构和链表延长方式等集中讲解。提高对HashMap的理解。</p>
+<ol>
+<li>HashMap<strong>非线程安全</strong>，可以用<strong>Collection的synchronized</strong>方法来使HashMap线程安全，或者使<strong>用ConcurrentHashMap</strong>。</li>
+<li>HashTable：HashTable是遗留类，实现了Map类，因此具备了许多和HashMap相同操作。但是它继承自Dictionary类，并且是线程安全的。任意时间，只允许一个写进程。<strong>ConcurrentHashMap引入了分段锁</strong>机制，效率更高。不建议使用HashTable，线程安全场景下使用ConcurrentHashMap，其他场景HashMap。</li>
+<li>LinkedHashMap继承自HashMap，记录了元素插入链表的顺序。</li>
+<li>TreeMap实现了SortedMap接口，能够把保存的数据根据键排序，默认按照键升序排。当用Iterator遍历TreeMap时，得到的记录是排过序的。如果使用排序的映射，建议使用TreeMap。在使用TreeMap时，key必须实现Comparable接口或者在构造TreeMap传入自定义的Comparator，否则会在运行时抛出java.lang.ClassCastException类型的异常。</li>
+</ol>
 </blockquote>
 <a id="more"></a>
 <h2 id="类签名"><a href="#类签名" class="headerlink" title="类签名"></a>类签名</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// HashMap定义</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HashMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">Map</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;, <span class="title">Cloneable</span>, <span class="title">Serializable</span> </span></span><br><span class="line"><span class="class">// <span class="title">AbstractMap</span>定义</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">abstract</span> <span class="title">class</span> <span class="title">AbstractMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -394,11 +401,12 @@
 <h3 id="Hash方法"><a href="#Hash方法" class="headerlink" title="Hash方法"></a>Hash方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span> h;</span><br><span class="line">       <span class="comment">// &gt;&gt;&gt; 无符号右移16位 高位0填充</span></span><br><span class="line">    	<span class="comment">// 高位16位不变 低位与高位进行与运算 一次扰动</span></span><br><span class="line">       <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 <p><strong>计算key位置</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// n为HashMap capacity  所以是2的幂次</span></span><br><span class="line"><span class="comment">// 所以位运算结果 肯定落于0-(capacity-1)中，不会超限</span></span><br><span class="line">(n-<span class="number">1</span>)&amp;hash </span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断 resize后 key是否需要double位置移位</span></span><br><span class="line"><span class="comment">// 原理同上 结果只有0 和 非0 </span></span><br><span class="line">n&amp;hash == <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2018/12/27/Java/Java-HashMap源码解析/HashMapHashCode.png" alt=""></p>
 <hr>
 <h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p><a href="https://stackoverflow.com/questions/2165204/why-does-linkedhashsete-extend-hashsete-and-implement-sete" target="_blank" rel="noopener">注1：Why does LinkedHashSet extend HashSet and implement Set</a></p>
 <p><a href="https://www.zhihu.com/question/28197253/answer/39814613" target="_blank" rel="noopener">注2：为什么Java内部类要设计成静态和非静态两种？</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/21673805" target="_blank" rel="noopener">Java 8系列之重新认识HashMap</a></p>
-<p><a href="https://github.com/Snailclimb/JavaGuide/blob/master/Java%E7%9B%B8%E5%85%B3/%E8%BF%99%E5%87%A0%E9%81%93Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E9%9D%A2%E8%AF%95%E9%A2%98%E5%87%A0%E4%B9%8E%E5%BF%85%E9%97%AE.md" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide/blob/master/Java%E7%9B%B8%E5%85%B3/%E8%BF%99%E5%87%A0%E9%81%93Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E9%9D%A2%E8%AF%95%E9%A2%98%E5%87%A0%E4%B9%8E%E5%BF%85%E9%97%AE.md</a></p>
+<p><a href="https://github.com/Snailclimb/JavaGuide/blob/master/Java%E7%9B%B8%E5%85%B3/%E8%BF%99%E5%87%A0%E9%81%93Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E9%9D%A2%E8%AF%95%E9%A2%98%E5%87%A0%E4%B9%8E%E5%BF%85%E9%97%AE.md" target="_blank" rel="noopener">JavaGuide HashMap源码分析</a></p>
 
       
     </div>
