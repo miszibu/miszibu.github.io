@@ -102,16 +102,16 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="SOA综述提到微服务架构就不得不提SOA(Service Oriented Architecture):面向服务架构 SOA是一种粗粒度、松耦合服务架构，服务之间通过简单、精确定义接口进行通讯，不涉及底层编程接口和通讯模型。SOA可以看作是B/S模型(浏览器，服务器)、XML（Extensible Markup Language）/Web Service技术之后的自然延伸。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构/微服务架构-1.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构/微服务架构-2.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构/微服务架构-3.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构/微服务架构-4.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构/微服务架构-5.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构-1.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构-2.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构-3.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构-4.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构-5.png">
 <meta property="og:updated_time" content="2018-12-04T08:15:54.573Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="微服务架构">
 <meta name="twitter:description" content="SOA综述提到微服务架构就不得不提SOA(Service Oriented Architecture):面向服务架构 SOA是一种粗粒度、松耦合服务架构，服务之间通过简单、精确定义接口进行通讯，不涉及底层编程接口和通讯模型。SOA可以看作是B/S模型(浏览器，服务器)、XML（Extensible Markup Language）/Web Service技术之后的自然延伸。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构/微服务架构-1.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/微服务架构-1.png">
 
 
 
@@ -349,7 +349,7 @@
 <p>文章相当精彩，但是实际上架构如此，但是很多情况下并没有这么好的理论场景更多时候小项目不会如此架构，而大项目又臃肿到难以下定决心重构。</p>
 <p>首先我们看看为什么要考虑使用微服务。</p>
 <h4 id="开发单体式应用"><a href="#开发单体式应用" class="headerlink" title="开发单体式应用"></a>开发单体式应用</h4><p>假设你正准备开发一款与Uber和Hailo竞争的出租车调度软件，经过初步会议和需求分析，你可能会手动或者使用基于Rails、Spring Boot、Play或者Maven的生成器开始这个新项目，它的六边形架构是模块化的 ，架构图如下：</p>
-<p><img src="微服务架构/微服务架构-1.png" alt="1.png"></p>
+<p><img src="/2018/04/06/杂谈/微服务架构/微服务架构-1.png" alt="1.png"></p>
 <p>应用核心是业务逻辑，由定义服务、域对象和事件的模块完成。围绕着核心的是与外界打交道的适配器。适配器包括数据库访问组件、生产和处理消息的消息组件，以及提供API或者UI访问支持的web模块等。</p>
 <p>尽管也是模块化逻辑，但是最终它还是会打包并部署为单体式应用。具体的格式依赖于应用语言和框架。例如，许多Java应用会被打包为WAR格式，部署在Tomcat或者Jetty上，而另外一些Java应用会被打包成自包含的JAR格式，同样，Rails和Node.js会被打包成层级目录。</p>
 <p>这种应用开发风格很常见，因为IDE和其它工具都擅长开发一个简单应用，这类应用也很易于调试，只需要简单运行此应用，用Selenium链接UI就可以完成端到端测试。单体式应用也易于部署，只需要把打包应用拷贝到服务器端，通过在负载均衡器后端运行多个拷贝就可以轻松实现应用扩展。在早期这类应用运行的很好。</p>
@@ -367,19 +367,19 @@
 <h4 id="微处理架构——处理复杂事物"><a href="#微处理架构——处理复杂事物" class="headerlink" title="微处理架构——处理复杂事物"></a>微处理架构——处理复杂事物</h4><p>许多公司，比如Amazon、eBay和NetFlix，通过采用微处理结构模式解决了上述问题。其思路不是开发一个巨大的单体式的应用，而是将应用分解为小的、互相连接的微服务。</p>
 <p>一个微服务一般完成某个特定的功能，比如下单管理、客户管理等等。每一个微服务都是微型六角形应用，都有自己的业务逻辑和适配器。一些微服务还会发布API给其它微服务和应用客户端使用。其它微服务完成一个Web UI，运行时，每一个实例可能是一个云VM或者是Docker容器。</p>
 <p>比如，一个前面描述系统可能的分解如下：</p>
-<p><img src="微服务架构/微服务架构-2.png" alt="2.png"></p>
+<p><img src="/2018/04/06/杂谈/微服务架构/微服务架构-2.png" alt="2.png"></p>
 <p>每一个应用功能区都使用微服务完成，另外，Web应用会被拆分成一系列简单的Web应用（比如一个对乘客，一个对出租车驾驶员）。这样的拆分对于不同用户、设备和特殊应用场景部署都更容易。</p>
 <p>每一个后台服务开放一个REST API，许多服务本身也采用了其它服务提供的API。比如，驾驶员管理使用了告知驾驶员一个潜在需求的通知服务。UI服务激活其它服务来更新Web页面。所有服务都是采用异步的，基于消息的通讯。微服务内部机制将会在后续系列中讨论。</p>
 <p>一些REST API也对乘客和驾驶员采用的移动应用开放。这些应用并不直接访问后台服务，而是通过API Gateway来传递中间消息。API Gateway负责负载均衡、缓存、访问控制、API 计费监控等等任务，可以通过NGINX方便实现，后续文章将会介绍到API Gateway。</p>
-<p><img src="微服务架构/微服务架构-3.png" alt="3.png"></p>
+<p><img src="/2018/04/06/杂谈/微服务架构/微服务架构-3.png" alt="3.png"></p>
 <p>微服务架构模式在上图中对应于代表可扩展Scale Cube的Y轴，这是一个在《The Art of Scalability》书中描述过的三维扩展模型。另外两个可扩展轴，X轴由负载均衡器后端运行的多个应用副本组成，Z轴是将需求路由到相关服务。</p>
 <p>应用基本可以用以上三个维度来表示，Y轴代表将应用分解为微服务。运行时，X轴代表运行多个隐藏在负载均衡器之后的实例，提供吞吐能力。一些应用可能还是用Z轴将服务分区。下面的图演示行程管理服务如何部署在运行于AWS EC2上的Docker上。</p>
-<p><img src="微服务架构/微服务架构-4.png" alt="4.png"></p>
+<p><img src="/2018/04/06/杂谈/微服务架构/微服务架构-4.png" alt="4.png"></p>
 <p>运行时，行程管理服务由多个服务实例构成。每一个服务实例都是一个Docker容器。为了保证高可用，这些容器一般都运行在多个云VM上。服务实例前是一层诸如NGINX的负载均衡器，他们负责在各个实例间分发请求。负载均衡器也同时处理其它请求，例如缓存、权限控制、API统计和监控。</p>
 <p>这种微服务架构模式深刻影响了应用和数据库之间的关系，</p>
 <p>不像传统多个服务共享一个数据库，微服务架构每个服务都有自己的数据库</p>
 <p>。另外，这种思路也影响到了企业级数据模式。同时，这种模式意味着多份数据，但是，如果你想获得微服务带来的好处，每个服务独有一个数据库是必须的，因为这种架构需要这种松耦合。下面的图演示示例应用数据库架构。</p>
-<p><img src="微服务架构/微服务架构-5.png" alt="5.png"></p>
+<p><img src="/2018/04/06/杂谈/微服务架构/微服务架构-5.png" alt="5.png"></p>
 <p>每种服务都有自己的数据库，另外，每种服务可以用更适合自己的数据库类型，也被称作多语言一致性架构。比如，驾驶员管理（发现哪个驾驶员更靠近乘客），必须使用支持地理信息查询的数据库。</p>
 <p>表面上看来，微服务架构模式有点像SOA，他们都由多个服务构成。但是，可以从另外一个角度看此问题，微服务架构模式是一个不包含Web服务（WS-）和ESB服务的SOA。微服务应用乐于采用简单轻量级协议，比如REST，而不是WS-，在微服务内部避免使用ESB以及ESB类似功能。微服务架构模式也拒绝使用canonical schema等SOA概念。</p>
 <h4 id="微服务架构的好处"><a href="#微服务架构的好处" class="headerlink" title="微服务架构的好处"></a>微服务架构的好处</h4><p>微服务架构模式有很多好处。首先，通过分解巨大单体式应用为多个服务方法解决了复杂性问题。在功能不变的情况下，应用被分解为多个可管理的分支或服务。每个服务都有一个用RPC-或者消息驱动API定义清楚的边界。微服务架构模式给采用单体式编码方式很难实现的功能提供了模块化的解决方案，由此，单个服务很容易开发、理解和维护。</p>
@@ -430,8 +430,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/01/杂谈/Restful API/" rel="next" title="Restful API">
-                <i class="fa fa-chevron-left"></i> Restful API
+              <a href="/2018/04/01/Java/Java_Java8/" rel="next" title="Java8 新特性">
+                <i class="fa fa-chevron-left"></i> Java8 新特性
               </a>
             
           </div>

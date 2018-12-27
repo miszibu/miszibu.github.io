@@ -102,13 +102,13 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="Java类加载器是Java语言的一个创新，用于动态装载Java字节码文件，最早用于Applet从远程动态下载调用Java文件。 类加载器加载字节码文件，并转换为java.lang.Class类的一个实例。用于标识Java类，使用该示例的newInstance()方法动态创建该类的对象。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/04/Java/Java_类加载机制/Java_类加载机制/800fcstug3.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/04/Java/Java_类加载机制/Java_类加载机制/d330251551f6de988239494ce2773095.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/04/Java/Java_类加载机制/800fcstug3.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/04/Java/Java_类加载机制/d330251551f6de988239494ce2773095.png">
 <meta property="og:updated_time" content="2018-12-18T10:32:19.586Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_类加载机制">
 <meta name="twitter:description" content="Java类加载器是Java语言的一个创新，用于动态装载Java字节码文件，最早用于Applet从远程动态下载调用Java文件。 类加载器加载字节码文件，并转换为java.lang.Class类的一个实例。用于标识Java类，使用该示例的newInstance()方法动态创建该类的对象。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/04/Java/Java_类加载机制/Java_类加载机制/800fcstug3.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/04/Java/Java_类加载机制/800fcstug3.png">
 
 
 
@@ -353,7 +353,7 @@
 <li>使用(Using)</li>
 <li>卸载(Unloading)</li>
 </ul>
-<p><img src="Java_类加载机制/800fcstug3.png" alt="Java_类加载机制"></p>
+<p><img src="/2018/12/04/Java/Java_类加载机制/800fcstug3.png" alt="Java_类加载机制"></p>
 <h3 id="加载-Load"><a href="#加载-Load" class="headerlink" title="加载(Load)"></a>加载(Load)</h3><p>加载是类加载的第一个过程，在加载阶段，虚拟机需要完成以下三件事情：</p>
 <ol>
 <li>通过类的全限定名获取其定义的二进制字节流</li>
@@ -403,7 +403,7 @@
 </ol>
 <hr>
 <h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><h3 id="类加载器-执行顺序-双亲委派模型"><a href="#类加载器-执行顺序-双亲委派模型" class="headerlink" title="类加载器 执行顺序 双亲委派模型"></a>类加载器 执行顺序 双亲委派模型</h3><p>JVM设计团队把加载动作放到JVM外部实现，以便让应用程序决定如何获取所需的类，JVM提供了三种类加载器。</p>
-<p><img src="Java_类加载机制/d330251551f6de988239494ce2773095.png" alt=""></p>
+<p><img src="/2018/12/04/Java/Java_类加载机制/d330251551f6de988239494ce2773095.png" alt=""></p>
 <ul>
 <li><strong>启动类加载器(Bootstrap ClassLoader)</strong>：负责加载 <strong>JAVA_HOME\lib</strong> 目录中的，或通过-Xbootclasspath参数指定路径中的，且被虚拟机认可（按文件名识别，如rt.jar）的类。</li>
 <li><strong>扩展类加载器(Extension ClassLoader)</strong>：负责加载 <strong>JAVA_HOME\lib\ext</strong> 目录中的，或通过java.ext.dirs系统变量指定路径中的类库。</li>

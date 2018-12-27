@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="Java动态代理是什么，优点在哪里，Spring AOP是如何通过动态代理实现AOP的，本文从代理的设计模式出发，引入静态代理，动态代理和CGLIB代理。最终以AOP对动态代理的应用结束文章。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/08/Java/Java_动态代理/Java_动态代理/image001.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/08/Java/Java_动态代理/image001.png">
 <meta property="og:updated_time" content="2018-12-20T04:38:56.588Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_动态代理">
 <meta name="twitter:description" content="Java动态代理是什么，优点在哪里，Spring AOP是如何通过动态代理实现AOP的，本文从代理的设计模式出发，引入静态代理，动态代理和CGLIB代理。最终以AOP对动态代理的应用结束文章。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/08/Java/Java_动态代理/Java_动态代理/image001.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/08/Java/Java_动态代理/image001.png">
 
 
 
@@ -347,7 +347,7 @@
 </ul>
 </li>
 </ul>
-<p><img src="Java_动态代理/image001.png" alt=""></p>
+<p><img src="/2018/12/08/Java/Java_动态代理/image001.png" alt=""></p>
 <hr>
 <h2 id="静态代理—理解代理的优点，-发现静态代理的不足"><a href="#静态代理—理解代理的优点，-发现静态代理的不足" class="headerlink" title="静态代理—理解代理的优点， 发现静态代理的不足"></a>静态代理—理解代理的优点， 发现静态代理的不足</h2><p>在切入本文的正题之前，我们先来实现对一个接口的静态代理，来理解代理模式的具体应用。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Humen</span></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">eat</span><span class="params">(String food)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HumanImpl实现Human接口 </span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HumenImpl</span> <span class="keyword">implements</span> <span class="title">Humen</span></span>&#123;</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">eat</span><span class="params">(String food)</span></span>&#123;</span><br><span class="line"> 	System.out.println(<span class="string">"eat "</span> + food);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

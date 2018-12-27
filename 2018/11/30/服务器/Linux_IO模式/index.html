@@ -102,17 +102,17 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="关于IO这方面，已经有过多次学习，但是一直不成系统，本文将作一个相对全面的总结。 同步、异步IO， 阻塞和非阻塞IO的区别 select,poll,epoll的原理。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/1485056-9d17cf698a3f0dbc.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/blockingIO.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/1485056-9d17cf698a3f0dbc.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/blockingIO.gif">
 <meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/nonBlockingIO.gif">
-<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/IOMultiplexing.gif">
-<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/Asynchronous%20I:O.gif">
-<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/compare.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/IOMultiplexing.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Asynchronous%20I:O.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/compare.gif">
 <meta property="og:updated_time" content="2018-12-24T02:21:22.507Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux_IO模式">
 <meta name="twitter:description" content="关于IO这方面，已经有过多次学习，但是一直不成系统，本文将作一个相对全面的总结。 同步、异步IO， 阻塞和非阻塞IO的区别 select,poll,epoll的原理。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/Linux_IO模式/1485056-9d17cf698a3f0dbc.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/11/30/服务器/Linux_IO模式/1485056-9d17cf698a3f0dbc.png">
 
 
 
@@ -348,7 +348,7 @@
 <li><strong>进程切换</strong>：现代OS通过分时优先级的操作方式，控制进程的切换。然而进程切换需要消耗大量CPU资源。详见文章OS_单核到多核的进程调度。</li>
 <li><strong>进程状态切换</strong>：运行态的进程，当请求资源失败或等待操作完成时，会执行阻塞原语Block进入阻塞态。进程主动进行</li>
 </ul>
-<p><img src="Linux_IO模式/1485056-9d17cf698a3f0dbc.png" alt="111"></p>
+<p><img src="/2018/11/30/服务器/Linux_IO模式/1485056-9d17cf698a3f0dbc.png" alt="111"></p>
 <ul>
 <li><strong>缓存IO</strong>：又称为标准IO，在Linux的缓存IO机制中，OS会将IO的数据缓存在文件系统的页缓存（Page Cache）中，数据会被先拷贝到内核的缓存区中，然后再拷贝到应用程序的地址空间。</li>
 </ul>
@@ -358,26 +358,26 @@
 <li>将数据从内核拷贝到进程中 (Copying the data from the kernel to the process)</li>
 </ol>
 <p>因此，Linux系统产生了以下的几种网络模式的方案</p>
-<h4 id="2-1-阻塞IO-Blocking-IO"><a href="#2-1-阻塞IO-Blocking-IO" class="headerlink" title="2.1 阻塞IO(Blocking IO)"></a>2.1 阻塞IO(Blocking IO)</h4><p><img src="Linux_IO模式/blockingIO.gif" alt="blockingIO"></p>
+<h4 id="2-1-阻塞IO-Blocking-IO"><a href="#2-1-阻塞IO-Blocking-IO" class="headerlink" title="2.1 阻塞IO(Blocking IO)"></a>2.1 阻塞IO(Blocking IO)</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/blockingIO.gif" alt="blockingIO"></p>
 <p>用户进程调用recvfrom这个系统调用，kernel进入IO第一阶段：准备数据。用户进程进入阻塞态，当缓存数据足够时，拷贝缓存数据到用户内存，kernel返回结果，用户进程才解除block状态，进入就绪态。</p>
 <p>Blocking IO:用户进程在两个阶段都被Block了。</p>
 <blockquote>
 <p>Tips: 一次网络请求结束后，或者缓存大小到一定程度时，才会返回。</p>
 <p>​          在阻塞IO中，用户线程在数据准备和数据拷贝阶段都被阻塞。</p>
 </blockquote>
-<h4 id="2-2非阻塞IO-Non-blocking-IO"><a href="#2-2非阻塞IO-Non-blocking-IO" class="headerlink" title="2.2非阻塞IO(Non-blocking IO)"></a>2.2非阻塞IO(Non-blocking IO)</h4><p><img src="./Linux_IO模式/nonBlockingIO.gif" alt=""></p>
+<h4 id="2-2非阻塞IO-Non-blocking-IO"><a href="#2-2非阻塞IO-Non-blocking-IO" class="headerlink" title="2.2非阻塞IO(Non-blocking IO)"></a>2.2非阻塞IO(Non-blocking IO)</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/./Linux_IO模式/nonBlockingIO.gif" alt=""></p>
 <p>如图所示，非阻塞IO发送recvfrom请求后,若Kernel没有数据准备好，直接返回EWOULDBLOCK。</p>
 <p>用户进程收到后，不阻塞，继续请求Kernel，直至数据准备好，read操作转移数据到用户内存，然后返回。</p>
 <blockquote>
 <p>简而言之：非阻塞IO就是不断询问Kernel</p>
 </blockquote>
-<h4 id="2-3-IO多路复用-IO-Multiplexing"><a href="#2-3-IO多路复用-IO-Multiplexing" class="headerlink" title="2.3 IO多路复用(IO Multiplexing)"></a>2.3 IO多路复用(IO Multiplexing)</h4><p><img src="Linux_IO模式/IOMultiplexing.gif" alt=""></p>
+<h4 id="2-3-IO多路复用-IO-Multiplexing"><a href="#2-3-IO多路复用-IO-Multiplexing" class="headerlink" title="2.3 IO多路复用(IO Multiplexing)"></a>2.3 IO多路复用(IO Multiplexing)</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/IOMultiplexing.gif" alt=""></p>
 <p>讲完了阻塞和非阻塞的调用，大家就会发现，大量的进程都需要来读取网络IOBuffer,性能消耗其实很大的。这个时候就应该独立出一个模块来集中负责处理IO调用，这就是IO多路复用，也称为Event Driven IO。</p>
 <p>上图中，用户线程调用Select操作后阻塞，Select作为一个处理进程，不断轮询Kernel缓存区状态。当访问到任一Socket数据准备完成后，通知用户进程，调用recefrom操作，读取并拷贝对应内核缓冲区数据到内存中。</p>
 <blockquote>
 <p>Tips:在IO多路复用的模式中，Socket是被设置为非阻塞的, 因此用户进程在调用recefrom并不会被阻塞，而是调用Select后被阻塞。</p>
 </blockquote>
-<h4 id="Asynchronous-I-O-异步IO"><a href="#Asynchronous-I-O-异步IO" class="headerlink" title="Asynchronous I/O 异步IO"></a><strong>Asynchronous I/O</strong> 异步IO</h4><p><img src="Linux_IO模式/Asynchronous I:O.gif" alt=""></p>
+<h4 id="Asynchronous-I-O-异步IO"><a href="#Asynchronous-I-O-异步IO" class="headerlink" title="Asynchronous I/O 异步IO"></a><strong>Asynchronous I/O</strong> 异步IO</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/Asynchronous I:O.gif" alt=""></p>
 <p>异步IO,使用频率低（原因不清楚，我觉得挺好用的）</p>
 <p>用户进程发起read后，Kernel收到asynchronous read后，直接返回，不阻塞用户进程。等到数据准备完成后，拷贝数据到用户进程内存空间，完成后发送deliver signal。告诉用户进程操作完成。</p>
 <h4 id="Signal-Driven-IO"><a href="#Signal-Driven-IO" class="headerlink" title="Signal Driven IO"></a>Signal Driven IO</h4><p>不常用，不予介绍。</p>
@@ -394,7 +394,7 @@
 <p>只用AsynchronousIO 全称不需要自己操作，直至Kernel发送Singal。全程无阻塞算异步IO。</p>
 </li>
 </ol>
-<h4 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h4><p><img src="Linux_IO模式/compare.gif" alt=""></p>
+<h4 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h4><p><img src="/2018/11/30/服务器/Linux_IO模式/compare.gif" alt=""></p>
 <ol>
 <li><p><strong>Blocking IO</strong> :  发送receform请求，被阻塞，直至完成，读取数据，返回。</p>
 </li>

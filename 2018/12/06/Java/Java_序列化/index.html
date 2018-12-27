@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="在Java程序运行期间，JVM运行时间长于对象存活时间，使用Java序列化机制可以将对象序列化成二进制字节码存储在文件之中，待下次启动时重新读取。序列化对象时保存的是对象的状态，即为他的成员变量，不会关注类中的静态变量。 Java程序RPC调用时或通过网络传输对象，都需要将对象序列化进行传输，接收方再对对象反序列化。(数据在网络中只能以二进制传输)">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/06/Java/Java_序列化/Java_序列化/1544061922271.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/06/Java/Java_序列化/1544061922271.jpg">
 <meta property="og:updated_time" content="2018-12-25T13:06:02.025Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_序列化">
 <meta name="twitter:description" content="在Java程序运行期间，JVM运行时间长于对象存活时间，使用Java序列化机制可以将对象序列化成二进制字节码存储在文件之中，待下次启动时重新读取。序列化对象时保存的是对象的状态，即为他的成员变量，不会关注类中的静态变量。 Java程序RPC调用时或通过网络传输对象，都需要将对象序列化进行传输，接收方再对对象反序列化。(数据在网络中只能以二进制传输)">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/06/Java/Java_序列化/Java_序列化/1544061922271.jpg">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/06/Java/Java_序列化/1544061922271.jpg">
 
 
 
@@ -345,7 +345,7 @@
 <p>Tips: 此处反序列化Person对象时，并没有调用构造函数，直接将字节码还原成对象。</p>
 <p>字节码中存储了Java类的位置，会自动去寻找匹配反序列化，若该类文件不存在，则会报出ClassNotFoundException。</p>
 </blockquote>
-<p><img src="Java_序列化/1544061922271.jpg" alt=""></p>
+<p><img src="/2018/12/06/Java/Java_序列化/1544061922271.jpg" alt=""></p>
 <p>上图为：person对象输出</p>
 <h2 id="序列化知识点"><a href="#序列化知识点" class="headerlink" title="序列化知识点"></a>序列化知识点</h2><h3 id="默认序列化机制"><a href="#默认序列化机制" class="headerlink" title="默认序列化机制"></a>默认序列化机制</h3><p>当一个类实现了Serializable接口，而没有其他处理时，默认使用序列化机制。使用默认机制，在序列化对象时，不仅会序列化当前对象，对其<strong>所引用的其他对象</strong>也会<strong>序列化</strong>。以此类推，当序列化容器类对象时，可能会产生较大开销。</p>
 <p>若引用对象不可序列化，则报出<code>java.io.NotSerializableException</code>异常。</p>

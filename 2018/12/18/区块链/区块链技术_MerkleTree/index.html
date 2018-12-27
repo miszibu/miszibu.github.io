@@ -102,13 +102,13 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="在密码学和CS中，Hash Tree是一种树形数据结构，每个叶节点均以数据块的Hash作为标签,而非叶子节点则以其叶子节点Hash值作为数据，继续向上Hash。Hash Tree能够高效，安全的验证大型数据结构。 HashTree 由Merkle申请专利，又称Merkle Tree">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/18/区块链/区块链技术_MerkleTree/区块链技术_MerkleTree/2Ep7y.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/18/区块链/区块链技术_MerkleTree/区块链技术_MerkleTree/1487247621-7932.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/18/区块链/区块链技术_MerkleTree/2Ep7y.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/18/区块链/区块链技术_MerkleTree/1487247621-7932.png">
 <meta property="og:updated_time" content="2018-12-18T07:09:54.439Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="区块链技术_MerkleTree">
 <meta name="twitter:description" content="在密码学和CS中，Hash Tree是一种树形数据结构，每个叶节点均以数据块的Hash作为标签,而非叶子节点则以其叶子节点Hash值作为数据，继续向上Hash。Hash Tree能够高效，安全的验证大型数据结构。 HashTree 由Merkle申请专利，又称Merkle Tree">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/18/区块链/区块链技术_MerkleTree/区块链技术_MerkleTree/2Ep7y.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/18/区块链/区块链技术_MerkleTree/2Ep7y.png">
 
 
 
@@ -356,7 +356,7 @@
 <li>Merkle Tree的<strong>高度为logn+1</strong>，<strong>时间复杂度为O(n)</strong></li>
 </ol>
 <p>Merkle树选择Hash算法，可以按需选择，比如如果仅需要保证数据不被损坏和篡改。那么CRC循环冗余校验也是可以，效率更高。常用的是SHA-2和MD5。</p>
-<h3 id="创建Merkle-Tree"><a href="#创建Merkle-Tree" class="headerlink" title="创建Merkle Tree"></a>创建Merkle Tree</h3><p><img src="区块链技术_MerkleTree/2Ep7y.png" alt=""></p>
+<h3 id="创建Merkle-Tree"><a href="#创建Merkle-Tree" class="headerlink" title="创建Merkle Tree"></a>创建Merkle Tree</h3><p><img src="/2018/12/18/区块链/区块链技术_MerkleTree/2Ep7y.png" alt=""></p>
 <h3 id="检索Merkle-Tree"><a href="#检索Merkle-Tree" class="headerlink" title="检索Merkle Tree"></a>检索Merkle Tree</h3><p>从上至下检索，当文件Merkle Root不匹配时，向下匹配左右子节点，就可以很快找到错误数据节点。</p>
 <h3 id="更新，插入和删除"><a href="#更新，插入和删除" class="headerlink" title="更新，插入和删除"></a>更新，插入和删除</h3><p>Merkle Tree的更新插入删除 是个 工程上的问题，不同的问题有不同的方法。在AVL，RBT等不同结构中，选择不同的方式。</p>
 <h3 id="Merkle树应用"><a href="#Merkle树应用" class="headerlink" title="Merkle树应用"></a>Merkle树应用</h3><ol>
@@ -365,7 +365,7 @@
 <li>BTC || ETH</li>
 </ol>
 <hr>
-<h2 id="BTC中的Merkle-Tree"><a href="#BTC中的Merkle-Tree" class="headerlink" title="BTC中的Merkle Tree"></a>BTC中的Merkle Tree</h2><p><img src="区块链技术_MerkleTree/1487247621-7932.png" alt=""></p>
+<h2 id="BTC中的Merkle-Tree"><a href="#BTC中的Merkle-Tree" class="headerlink" title="BTC中的Merkle Tree"></a>BTC中的Merkle Tree</h2><p><img src="/2018/12/18/区块链/区块链技术_MerkleTree/1487247621-7932.png" alt=""></p>
 <p><strong>简化支付验证</strong>（Simplified Payment Verification，SPV）的概念:一个“轻客戶端”（light client）可以只下载区块头80byte的数据块，仅包含五個元素。从而使手机端的BTC钱包成为可能</p>
 <ul>
 <li>前置区块Hash</li>

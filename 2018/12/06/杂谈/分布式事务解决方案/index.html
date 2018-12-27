@@ -102,16 +102,16 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="本文转载自 网易云官方账号于知乎的回答 常用的分布式事务解决方案介绍有多少种？">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/分布式事务解决方案/d330251551f6de988239494ce2773095.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/分布式事务解决方案/v2-21a220437e3d499aeada2d20efc7e083_hd.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/分布式事务解决方案/v2-5532dabf9dad7650e892065022de30f8_hd.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/分布式事务解决方案/v2-65ac9055dd96aee7be2984f6093c0933_hd.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/分布式事务解决方案/v2-48e3f206b2b0a8ce1bae05409651ccd8_hd.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/d330251551f6de988239494ce2773095.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/v2-21a220437e3d499aeada2d20efc7e083_hd.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/v2-5532dabf9dad7650e892065022de30f8_hd.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/v2-65ac9055dd96aee7be2984f6093c0933_hd.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/v2-48e3f206b2b0a8ce1bae05409651ccd8_hd.png">
 <meta property="og:updated_time" content="2018-12-07T08:33:07.431Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="分布式事务解决方案">
 <meta name="twitter:description" content="本文转载自 网易云官方账号于知乎的回答 常用的分布式事务解决方案介绍有多少种？">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/分布式事务解决方案/d330251551f6de988239494ce2773095.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/06/杂谈/分布式事务解决方案/d330251551f6de988239494ce2773095.png">
 
 
 
@@ -352,7 +352,7 @@
 <p>两阶段提交协议（简称2PC）是实现分布式事务较为经典的方案，但2PC 的可扩展性很差，在分布式架构下应用代价较大，eBay 架构师Dan Pritchett 提出了BASE 理论，用于解决大规模分布式系统下的数据一致性问题。BASE 理论告诉我们：可以通过放弃系统在每个时刻的强一致性来换取系统的可扩展性。</p>
 <p><strong>1、CAP理论</strong></p>
 <p>在分布式系统中，一致性（Consistency）、可用性（Availability）和分区容忍性（Partition Tolerance）3 个要素最多只能同时满足两个，不可兼得。其中，分区容忍性又是不可或缺的。</p>
-<p><img src="分布式事务解决方案/d330251551f6de988239494ce2773095.png" alt=""></p>
+<p><img src="/2018/12/06/杂谈/分布式事务解决方案/d330251551f6de988239494ce2773095.png" alt=""></p>
 <ul>
 <li>一致性：分布式环境下多个节点的数据是否强一致。</li>
 <li>可用性：分布式服务能一直保证可用状态。当用户发出一个请求后，服务能在有限时间内返回结果。</li>
@@ -375,7 +375,7 @@
 <p>分布式系统数据的强一致性、弱一致性和最终一致性可以通过<a href="https://link.zhihu.com/?target=https%3A//en.wikipedia.org/wiki/Quorum_%28distributed_computing%29" target="_blank" rel="noopener">Quorum NRW算法</a>分析。</p>
 <h2 id="三、分布式事务解决方案"><a href="#三、分布式事务解决方案" class="headerlink" title="三、分布式事务解决方案"></a><strong>三、分布式事务解决方案</strong></h2><p><strong>1、2PC方案——强一致性</strong></p>
 <p>2PC的核心原理是通过提交分阶段和记日志的方式，记录下事务提交所处的阶段状态，在组件宕机重启后，可通过日志恢复事务提交的阶段状态，并在这个状态节点重试，如Coordinator重启后，通过日志可以确定提交处于Prepare还是PrepareAll状态，若是前者，说明有节点可能没有Prepare成功，或所有节点Prepare成功但还没有下发Commit，状态恢复后给所有节点下发RollBack；若是PrepareAll状态，需要给所有节点下发Commit，数据库节点需要保证Commit幂等。</p>
-<p><img src="分布式事务解决方案/v2-21a220437e3d499aeada2d20efc7e083_hd.png" alt=""></p>
+<p><img src="/2018/12/06/杂谈/分布式事务解决方案/v2-21a220437e3d499aeada2d20efc7e083_hd.png" alt=""></p>
 <p>2PC方案的问题：</p>
 <ol>
 <li>同步阻塞。</li>
@@ -391,13 +391,13 @@
 <p><strong>2、eBay 事件队列方案——最终一致性</strong></p>
 <p>eBay 的架构师Dan Pritchett，曾在一篇解释BASE 原理的论文《<a href="https://link.zhihu.com/?target=http%3A//queue.acm.org/detail.cfm%3Fid%3D1394128" target="_blank" rel="noopener">Base：An Acid Alternative</a>》中提到一个eBay 分布式系统一致性问题的解决方案。它的核心思想是将需要分布式处理的任务通过消息或者日志的方式来异步执行，消息或日志可以存到本地文件、数据库或消息队列，再通过业务规则进行失败重试，它要求各服务的接口是幂等的。</p>
 <p>描述的场景为，有用户表user 和交易表transaction，用户表存储用户信息、总销售额和总购买额，交易表存储每一笔交易的流水号、买家信息、卖家信息和交易金额。如果产生了一笔交易，需要在交易表增加记录，同时还要修改用户表的金额。</p>
-<p><img src="分布式事务解决方案/v2-5532dabf9dad7650e892065022de30f8_hd.png" alt=""></p>
+<p><img src="/2018/12/06/杂谈/分布式事务解决方案/v2-5532dabf9dad7650e892065022de30f8_hd.png" alt=""></p>
 <p>论文中提出的解决方法是将更新交易表记录和用户表更新消息放在一个本地事务来完成，为了避免重复消费用户表更新消息带来的问题，增加一个操作记录表updates_applied来记录已经完成的交易相关的信息。</p>
-<p><img src="分布式事务解决方案/v2-65ac9055dd96aee7be2984f6093c0933_hd.png" alt=""></p>
+<p><img src="/2018/12/06/杂谈/分布式事务解决方案/v2-65ac9055dd96aee7be2984f6093c0933_hd.png" alt=""></p>
 <p>这个方案的核心在于第二阶段的重试和幂等执行。失败后重试，这是一种补偿机制，它是能保证系统最终一致的关键流程。</p>
 <p><strong>3、TCC （Try-Confirm-Cancel）补偿模式——最终一致性</strong></p>
 <p>某业务模型如图，由服务 A、服务B、服务C、服务D 共同组成的一个微服务架构系统。服务A 需要依次调用服务B、服务C 和服务D 共同完成一个操作。当服务A 调用服务D 失败时，若要保证整个系统数据的一致性，就要对服务B 和服务C 的invoke 操作进行回滚，执行反向的revert 操作。回滚成功后，整个微服务系统是数据一致的。</p>
-<p><img src="分布式事务解决方案/v2-48e3f206b2b0a8ce1bae05409651ccd8_hd.png" alt=""></p>
+<p><img src="/2018/12/06/杂谈/分布式事务解决方案/v2-48e3f206b2b0a8ce1bae05409651ccd8_hd.png" alt=""></p>
 <p>实现关键要素：</p>
 <ol>
 <li>服务调用链必须被记录下来。</li>

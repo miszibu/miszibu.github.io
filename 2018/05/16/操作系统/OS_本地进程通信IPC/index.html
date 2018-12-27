@@ -346,7 +346,7 @@
 <li>它可以看成是一种<strong>特殊的文件</strong>，对于它的读写也可以使用普通的read、write 等函数。但是它不是普通的文件，并不属于其他任何文件系统，并且<strong>只存在于内存中。</strong></li>
 </ol>
 <p>当一个管道建立时，它会创建两个文件描述符：<code>fd[0]</code>为读而打开，<code>fd[1]</code>为写而打开。如下图：</p>
-<p><img src="../img/pipe.png" alt="管道"></p>
+<p><img src="/2018/05/16/操作系统/OS_本地进程通信IPC/../img/pipe.png" alt="管道"></p>
 <h3 id="二、FIFO（命名管道）"><a href="#二、FIFO（命名管道）" class="headerlink" title="二、FIFO（命名管道）"></a>二、FIFO（命名管道）</h3><p><strong>FIFO</strong>，也称为<strong>命名管道</strong>，它是一种<strong>文件</strong>类型。</p>
 <p><strong>特点</strong></p>
 <ol>

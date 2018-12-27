@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="Goroutine ——协程OS将程序分为了进程和线程来提高程序的CPU利用率，一个进程拥有多个线程，多个线程共享同一份内存空间来实现线程间通信。 协程，可以看做用户级线程（更为轻量级的线程），这个概念是相对于OS 系统级线程所提出的，协程的切换可以由用户控制，而线程只能由操作系统调度。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/06/04/Golang/Go_goroutine/Go_goroutine/go_goroutine.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2018/06/04/Golang/Go_goroutine/go_goroutine.jpg">
 <meta property="og:updated_time" content="2018-12-04T08:18:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go_goroutine">
 <meta name="twitter:description" content="Goroutine ——协程OS将程序分为了进程和线程来提高程序的CPU利用率，一个进程拥有多个线程，多个线程共享同一份内存空间来实现线程间通信。 协程，可以看做用户级线程（更为轻量级的线程），这个概念是相对于OS 系统级线程所提出的，协程的切换可以由用户控制，而线程只能由操作系统调度。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/06/04/Golang/Go_goroutine/Go_goroutine/go_goroutine.jpg">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/06/04/Golang/Go_goroutine/go_goroutine.jpg">
 
 
 
@@ -345,7 +345,7 @@
 <li><strong>P</strong>：Processor，主要用于维护goroutine列表并执行goroutine。存储了所有需要P来执行的gotoutine列表。还有一个<strong>全局列表</strong>。</li>
 <li><strong>G</strong>：Goroutine，G维护了goroutine需要的栈、程序计数器以及它所在的M等信息。 </li>
 </ul>
-<p><img src="Go_goroutine/go_goroutine.jpg" alt="go_goroutine"></p>
+<p><img src="/2018/06/04/Golang/Go_goroutine/go_goroutine.jpg" alt="go_goroutine"></p>
 <p>这张图描绘了三者的关系，一个M（OS系统级线程）对应一个P(Processor协程调度器)，并执行一个G(Goroutine)，P维护了一个G的队列。</p>
 <ul>
 <li><strong>线程阻塞</strong>：当一个线程阻塞时，P会携带G队列转投其他线程来执行。</li>
@@ -393,8 +393,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/03/Golang/Go_chan并发/" rel="next" title="Go-chan并发">
-                <i class="fa fa-chevron-left"></i> Go-chan并发
+              <a href="/2018/06/03/Golang/Go_Bug记录/" rel="next" title="Go-Bug记录">
+                <i class="fa fa-chevron-left"></i> Go-Bug记录
               </a>
             
           </div>

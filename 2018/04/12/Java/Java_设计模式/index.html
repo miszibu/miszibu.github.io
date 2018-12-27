@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="Java设计模式简介本文介绍了常用的工厂模式，抽象工厂模式，单例模式（四种实现），代理模式等常用设计模式， 使用设计模式是为了重用代码、让代码更容易被他人理解、保证代码可靠性。 毫无疑问，设计模式于己于他人于系统都是多赢的，设计模式使代码编制真正工程化，设计模式是软件工程的基石。 总共23种设计模式，这里只介绍了常用的几种，其他的需要时再往文中补充。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/12/Java/Java_设计模式/Java_设计模式/代理模式.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/12/Java/Java_设计模式/代理模式.jpg">
 <meta property="og:updated_time" content="2018-12-04T07:55:45.257Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_设计模式">
 <meta name="twitter:description" content="Java设计模式简介本文介绍了常用的工厂模式，抽象工厂模式，单例模式（四种实现），代理模式等常用设计模式， 使用设计模式是为了重用代码、让代码更容易被他人理解、保证代码可靠性。 毫无疑问，设计模式于己于他人于系统都是多赢的，设计模式使代码编制真正工程化，设计模式是软件工程的基石。 总共23种设计模式，这里只介绍了常用的几种，其他的需要时再往文中补充。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/04/12/Java/Java_设计模式/Java_设计模式/代理模式.jpg">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/04/12/Java/Java_设计模式/代理模式.jpg">
 
 
 
@@ -361,7 +361,7 @@
 <p><strong>代码实例：</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonHolder</span> </span>&#123;  <span class="comment">//设置静态内部类 这样就解决了内存浪费的问题</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> SingletonHolder.INSTANCE;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="代理模式（Proxy-Pattern）"><a href="#代理模式（Proxy-Pattern）" class="headerlink" title="代理模式（Proxy Pattern）"></a>代理模式（Proxy Pattern）</h4><p>所谓代理模式是指客户端并<strong>不直接调用实际的对象</strong>，而是通过调用代理，来<strong>间接的调用</strong>实际的对象。<br>为什么要采用这种间接的形式来调用对象呢？一般是因为客户端不想直接访问实际的对象，或者访问实际的对象存在困难，因此通过一个代理对象来完成间接的访问。<br>在现实生活中，这种情形非常的常见，比如火车票代售点</p>
-<p><img src="Java_设计模式/代理模式.jpg" alt="代理模式"></p>
+<p><img src="/2018/04/12/Java/Java_设计模式/代理模式.jpg" alt="代理模式"></p>
 <p>Subject接口的实现</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Subject</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">visit</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>实现了Subject接口的两个类：</p>

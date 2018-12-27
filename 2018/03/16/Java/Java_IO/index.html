@@ -102,13 +102,13 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="IO综述“对语言设计人员来说，创建好的输入／输出系统是一项特别困难的任务。” ​                                                    ――《Think in Java》 输入覆盖的范围太大了，文件，控制台，网络，内存等等不同的种类，而且还要处理不同的读取方式，如：顺序读取、随机读取，二进制读取、字符读取，按行读取、按字符读取……">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/03/16/Java/Java_IO/Java_IO/JAVAIO1.jpg">
-<meta property="og:image" content="https://miszibu.github.io/2018/03/16/Java/Java_IO/Java_IO/JAVAIO2.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2018/03/16/Java/Java_IO/JAVAIO1.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2018/03/16/Java/Java_IO/JAVAIO2.jpg">
 <meta property="og:updated_time" content="2018-12-04T07:52:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_IO">
 <meta name="twitter:description" content="IO综述“对语言设计人员来说，创建好的输入／输出系统是一项特别困难的任务。” ​                                                    ――《Think in Java》 输入覆盖的范围太大了，文件，控制台，网络，内存等等不同的种类，而且还要处理不同的读取方式，如：顺序读取、随机读取，二进制读取、字符读取，按行读取、按字符读取……">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/03/16/Java/Java_IO/Java_IO/JAVAIO1.jpg">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/03/16/Java/Java_IO/JAVAIO1.jpg">
 
 
 
@@ -345,8 +345,8 @@
 <h4 id="Java流的类型"><a href="#Java流的类型" class="headerlink" title="Java流的类型"></a>Java流的类型</h4><p>流的方向：<strong>输入流</strong>（inputStream）,<strong>输出流</strong>（OutputStream）</p>
 <p>流的功能：<strong>节点流</strong>（可以从或向一个特定的地方读写数据：FileReader）<strong>,处理流</strong>（是对一个已存在的流的连接和封装，通过所封装的流的功能调用实现数据读写。如BufferReader。处理流的构造方法总是要带一个其他的流对象做参数。）</p>
 <p>处理的数据：<strong>字节流和字符流</strong>。字节流继承于InputStream和OutputStream。字符流继承于InputStreamReader和OutputStreamWriter。</p>
-<p><img src="Java_IO/JAVAIO1.jpg" alt=""></p>
-<p><img src="Java_IO/JAVAIO2.jpg" alt=""></p>
+<p><img src="/2018/03/16/Java/Java_IO/JAVAIO1.jpg" alt=""></p>
+<p><img src="/2018/03/16/Java/Java_IO/JAVAIO2.jpg" alt=""></p>
 <h4 id="字节流如何转为字符流"><a href="#字节流如何转为字符流" class="headerlink" title="字节流如何转为字符流"></a>字节流如何转为字符流</h4><p>字节输入流转字符输入流通过<strong>InputStreamReader</strong>实现，该类的构造函数可以传如<strong>InputStream</strong>对象。</p>
 <p>字节输出流转字符输出流通过<strong>OutputStreamWriter</strong>实现，该类的构造函数可以传入<strong>OutputStream</strong>对象</p>
 <h4 id="字节流和字符流的区别"><a href="#字节流和字符流的区别" class="headerlink" title="字节流和字符流的区别"></a>字节流和字符流的区别</h4><p><strong>字节流</strong>读取的时候，读到<strong>一个字节</strong>就返回一个字节；</p>

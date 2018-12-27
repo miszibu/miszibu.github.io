@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="初稿：对最近所学的操作系统进程调度相关内容 做一个总结 2016/11 第一次修改：修改了部分文中理解错误。2018/9">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2016/11/13/操作系统/OS_单核至多核的进程调度/OS_单核至多核的进程调度/cpu运行状态.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2016/11/13/操作系统/OS_单核至多核的进程调度/cpu运行状态.jpg">
 <meta property="og:updated_time" content="2018-09-26T09:14:21.205Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="操作系统_单核至多核的进程调度">
 <meta name="twitter:description" content="初稿：对最近所学的操作系统进程调度相关内容 做一个总结 2016/11 第一次修改：修改了部分文中理解错误。2018/9">
-<meta name="twitter:image" content="https://miszibu.github.io/2016/11/13/操作系统/OS_单核至多核的进程调度/OS_单核至多核的进程调度/cpu运行状态.jpg">
+<meta name="twitter:image" content="https://miszibu.github.io/2016/11/13/操作系统/OS_单核至多核的进程调度/cpu运行状态.jpg">
 
 
 
@@ -363,7 +363,7 @@
 <p>　　CPU 会额外增加5%的晶体管，来模拟一个新的核心来运行。从而获得15%-30%的性能提升。他的cache，流水线等都是原来的，通过对基本寄存器的复制，来实现一个模拟的多核。一个物理核心所模拟的两颗模拟核心，并没有主从之分，他们任意一颗，在一个时间内都完全拥有流水线，和寄存器等部件。而另一个超线程核心只能使用复制的基本寄存器，完成一些非上下文相关的额外操作，进而提升性能。</p>
 <p>​    这里我写了个简单的死循环C程序，运行查看CPU 利用率（四核心八线程）。很明显的能够发现，核心的运行是基本同步的，因为同一时间下一个物理核心只有一个逻辑核心能完全调用核心资源。 </p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdio.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="OS_单核至多核的进程调度/cpu运行状态.jpg" alt="image-20180926160105305"></p>
+<p><img src="/2016/11/13/操作系统/OS_单核至多核的进程调度/cpu运行状态.jpg" alt="image-20180926160105305"></p>
 <p>电脑在设备管理器下看到的核心数量就是CPU的逻辑核心，而非物理核心。</p>
 <p>在牙膏厂的挤牙膏计划中，有这么一个方法，将实际的一核心CPU通过增加寄存器等存储元件的方式，在CPU没有跑满的情况下，就可以跑出接近双核心的效率。但再CPU满载的情况下，实际的核心数量任然为一核心。</p>
 

@@ -102,16 +102,16 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="51%攻击或是双花攻击是指一部分矿工当他们掌握了51%的算力（PoW），通过修改区块链来重构花销，使得已经被确认的交易重新被放弃，从而实现双花甚至多花。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/区块链技术_双花攻击/1_WPK5t9zuCyMob5FgPkoHUw.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/区块链技术_双花攻击/1_VIMfRRhgaSp9yM-GUZUyew.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/区块链技术_双花攻击/1_arn5LoSL2gHyerJo4btuow.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/区块链技术_双花攻击/1_wsfcuDbXnSeVJHCA611oyg.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/区块链技术_双花攻击/1_5abTUgF0OYIi6hqmfWgaLg.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/1_WPK5t9zuCyMob5FgPkoHUw.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/1_VIMfRRhgaSp9yM-GUZUyew.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/1_arn5LoSL2gHyerJo4btuow.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/1_wsfcuDbXnSeVJHCA611oyg.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/1_5abTUgF0OYIi6hqmfWgaLg.png">
 <meta property="og:updated_time" content="2018-12-18T07:14:02.483Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="区块链技术_双花攻击">
 <meta name="twitter:description" content="51%攻击或是双花攻击是指一部分矿工当他们掌握了51%的算力（PoW），通过修改区块链来重构花销，使得已经被确认的交易重新被放弃，从而实现双花甚至多花。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/区块链技术_双花攻击/1_WPK5t9zuCyMob5FgPkoHUw.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_双花攻击/1_WPK5t9zuCyMob5FgPkoHUw.png">
 
 
 
@@ -362,16 +362,16 @@
 <li><strong>正常逻辑</strong>：广播该区块给所有其他矿工，其他矿工验证区块，若成功，则继续挖下一个区块。</li>
 <li><strong>恶意矿工</strong>：挖出区块后，不广播该区块，而是继续挖下一个区块。这样就出现了一条支链。</li>
 </ul>
-<p><img src="区块链技术_双花攻击/1_WPK5t9zuCyMob5FgPkoHUw.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_双花攻击/1_WPK5t9zuCyMob5FgPkoHUw.png" alt=""></p>
 <p>现在，其他的矿工们都工作在主链上，这条支链只有这个恶意矿工在挖矿。</p>
 <p>攻击者现在在主链上花费自己的所有BTC。那么在默认7个区块后，他的交易就被确认可信，完成交易。他不在支链中花费自己的BTC。</p>
-<p><img src="区块链技术_双花攻击/1_VIMfRRhgaSp9yM-GUZUyew.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_双花攻击/1_VIMfRRhgaSp9yM-GUZUyew.png" alt=""></p>
 <p>与此同时，攻击者不断的挖矿，打包交易，出块。支链上的交易都是真实的交易，并没有问题，只是少了它花费BTC的交易。由于区块链遵循<code>最长链共识</code>，这是一场算力竞赛，拥有更大算力的人能够构建更长的区块链。</p>
-<p><img src="区块链技术_双花攻击/1_arn5LoSL2gHyerJo4btuow.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_双花攻击/1_arn5LoSL2gHyerJo4btuow.png" alt=""></p>
 <h2 id="竞赛-通过广播新链来扭转现有交易"><a href="#竞赛-通过广播新链来扭转现有交易" class="headerlink" title="竞赛 - 通过广播新链来扭转现有交易"></a>竞赛 - 通过广播新链来扭转现有交易</h2><p>当这个支链的长度长于主链时，攻击者广播该支链。网络中的其他矿工，收到了这条支链，且发现该链长度更长。根据<code>最长链共识</code>，其余矿工将在长链上进行挖矿，</p>
-<p><img src="区块链技术_双花攻击/1_wsfcuDbXnSeVJHCA611oyg.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_双花攻击/1_wsfcuDbXnSeVJHCA611oyg.png" alt=""></p>
 <p>支链成为了主链，因此此链中未包含的所有交易将立即被撤销。 攻击者重新获取到了本来已经花费的BTC，这时候上次花费的btc对应商品或服务也已获得，一次双花攻击就此实现。</p>
-<p><img src="区块链技术_双花攻击/1_5abTUgF0OYIi6hqmfWgaLg.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_双花攻击/1_5abTUgF0OYIi6hqmfWgaLg.png" alt=""></p>
 <p>双花攻击。 通常被称为51％攻击，因为恶意矿工需要拥有高于网络其他矿工的散列计算能力（51%的全网算力），从而更快的打包出块，最终允许创建一条更长的支链，从而利用<code>最长链共识</code>，强行替换主链。</p>
 <hr>
 <h2 id="比特币如何防范"><a href="#比特币如何防范" class="headerlink" title="比特币如何防范"></a>比特币如何防范</h2><p>实际上，这些攻击非常<strong>难以执行</strong>。</p>

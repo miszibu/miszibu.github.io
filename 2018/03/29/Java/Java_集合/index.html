@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="一.容器与数组数组：可以存放基本数据类型和对象，但是长度需声明，不适合动态场景 容器  : 只能存放对象，也唤作集合，可动态变长，JVM预设一个长度，然后如果容器类大小超额，就将其扩大两倍，内存重新寻址，做个Deep Copy。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/03/29/Java/Java_集合/Java_集合/Java容器类.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/03/29/Java/Java_集合/Java容器类.png">
 <meta property="og:updated_time" content="2018-12-04T08:27:30.823Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_集合">
 <meta name="twitter:description" content="一.容器与数组数组：可以存放基本数据类型和对象，但是长度需声明，不适合动态场景 容器  : 只能存放对象，也唤作集合，可动态变长，JVM预设一个长度，然后如果容器类大小超额，就将其扩大两倍，内存重新寻址，做个Deep Copy。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/03/29/Java/Java_集合/Java_集合/Java容器类.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/03/29/Java/Java_集合/Java容器类.png">
 
 
 
@@ -336,7 +336,7 @@
 <p>容器  : 只能存放<strong>对象</strong>，也唤作集合，可动态变长，JVM预设一个长度，然后如果容器类大小超额，就将其扩大两倍，内存重新寻址，做个Deep Copy。</p>
 <a id="more"></a>
 <h2 id="二-层次关系"><a href="#二-层次关系" class="headerlink" title="二.层次关系"></a>二.层次关系</h2><p>如图所示：实线是实现类，虚线是抽象类或接口</p>
-<p><img src="Java_集合/Java容器类.png" alt=""></p>
+<p><img src="/2018/03/29/Java/Java_集合/Java容器类.png" alt=""></p>
 <p><strong>Collection</strong>接口是集合类的根接口，Java中没有提供这个接口的直接实现类，而是继承该接口实现了，Set和List。<strong>Set</strong>中<strong>不能包含重复</strong>的元素，<strong>List</strong>是一个<strong>有序</strong>的集合。<strong>可以包含重复</strong>的元素，提供了按<strong>索引访问</strong>的方式。</p>
 <p><strong>Map</strong>是Java.util包的另一个接口，与Collection独立但同属于集合类。Map保存<strong>Key-value</strong>对。Map不能包含重复的key，但是可以包含相同的value。</p>
 <p><strong>Iterator</strong>，所有的<strong>集合类，都实现了Iterator接口</strong>，用于在未知容器类型的情况下遍历集合中元素的接口，主要包含以下三种方法：</p>

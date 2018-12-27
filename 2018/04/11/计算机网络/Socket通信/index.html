@@ -102,12 +102,12 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="Socket(套接字)概念本地间进程以PID作为唯一标示，网络间进程则以IP地址+端口号作为唯一标示，而这个功能是由TCP/IP协议提供的，而Socket通信则是TCP/IP协议的API封装。 Socket是应用层与TCP/IP协议族通信的中间软件抽象层，它是一组接口，我们使用Socket来组织数据，以符合指定的协议 Socket起源于Unix，而Unix/Linux的基本哲学之一就是一切皆文件。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/04/11/计算机网络/Socket通信/Socket通信/Socket通信.jpg">
+<meta property="og:image" content="https://miszibu.github.io/2018/04/11/计算机网络/Socket通信/Socket通信.jpg">
 <meta property="og:updated_time" content="2018-12-04T08:09:57.587Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Socket通信入门">
 <meta name="twitter:description" content="Socket(套接字)概念本地间进程以PID作为唯一标示，网络间进程则以IP地址+端口号作为唯一标示，而这个功能是由TCP/IP协议提供的，而Socket通信则是TCP/IP协议的API封装。 Socket是应用层与TCP/IP协议族通信的中间软件抽象层，它是一组接口，我们使用Socket来组织数据，以符合指定的协议 Socket起源于Unix，而Unix/Linux的基本哲学之一就是一切皆文件。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/04/11/计算机网络/Socket通信/Socket通信/Socket通信.jpg">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/04/11/计算机网络/Socket通信/Socket通信.jpg">
 
 
 
@@ -340,7 +340,7 @@
 <p>（1）<strong>服务器监听</strong>：服务器端Socket时刻处于等待连接的状态，实时监控网络状态。</p>
 <p>（2）<strong>客户端请求</strong>：客户端Socket向服务器Socket提出连接请求。客户端Socket以<strong>IP地址+端口号</strong>的形式确认服务器端Socket，然后就向服务器端套接字提出连接请求。</p>
 <p>（3）<strong>连接确认</strong>：服务器端Socket接收到客户端Socket的连接请求，就响应。建立一个新的线程，把服务器端Socket的描述发给客户端，一旦客户端确认了此描述，便建立连接。而服务器端Socket继续处于监听状态，继续接收其他客户端套接字的连接请求。</p>
-<p><img src="Socket通信/Socket通信.jpg" alt=""></p>
+<p><img src="/2018/04/11/计算机网络/Socket通信/Socket通信.jpg" alt=""></p>
 <h2 id="Socket函数"><a href="#Socket函数" class="headerlink" title="Socket函数"></a>Socket函数</h2><h3 id="Socket"><a href="#Socket" class="headerlink" title="Socket()"></a>Socket()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> domain, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>Socket函数对应于普通文件的打开操作。普通文件打开操作返回一个文件描述字，而Socket()函数返回一个<strong>Socket描述符</strong>，唯一标识一个Socket。后续操作则通过描述符来定位Socket。</p>
 <p>参数说明：</p>

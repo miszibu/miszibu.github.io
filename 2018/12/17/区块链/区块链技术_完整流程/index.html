@@ -102,16 +102,16 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="引言： 区块链是如何实现的，从发起一笔交易，计算Hash, 打包交易，广播区块等基础说起，讲述一个区块的生成。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/区块链技术_完整流程/1_pSsgz1p596AIjg4-T6cPqA.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/区块链技术_完整流程/1_oPQWZ02lYP_0Lr8DcB0rEg.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/区块链技术_完整流程/1_q9UITlXmxZbulguIuZDPog.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/区块链技术_完整流程/1_MJMd3OVd89GDUUyjluPmSQ.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/区块链技术_完整流程/1_ROCHY_hAg0KICQD1yWH_dA.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/1_pSsgz1p596AIjg4-T6cPqA.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/1_oPQWZ02lYP_0Lr8DcB0rEg.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/1_q9UITlXmxZbulguIuZDPog.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/1_MJMd3OVd89GDUUyjluPmSQ.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/1_ROCHY_hAg0KICQD1yWH_dA.png">
 <meta property="og:updated_time" content="2018-12-18T07:10:43.199Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="区块链技术_完整流程">
 <meta name="twitter:description" content="引言： 区块链是如何实现的，从发起一笔交易，计算Hash, 打包交易，广播区块等基础说起，讲述一个区块的生成。">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/区块链技术_完整流程/1_pSsgz1p596AIjg4-T6cPqA.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/17/区块链/区块链技术_完整流程/1_pSsgz1p596AIjg4-T6cPqA.png">
 
 
 
@@ -345,13 +345,13 @@
 <hr>
 <h2 id="Step-1—交易数据"><a href="#Step-1—交易数据" class="headerlink" title="Step 1—交易数据"></a>Step 1—交易数据</h2><p>本文以比特币举例，比特币是现存最早的区块链。比特币的区块大小是1MB，迄今为止已经累计了180G的交易数据。</p>
 <hr>
-<h2 id="Step-2—使用Hash连接区块"><a href="#Step-2—使用Hash连接区块" class="headerlink" title="Step 2—使用Hash连接区块"></a>Step 2—使用Hash连接区块</h2><p><img src="区块链技术_完整流程/1_pSsgz1p596AIjg4-T6cPqA.png" alt=""></p>
+<h2 id="Step-2—使用Hash连接区块"><a href="#Step-2—使用Hash连接区块" class="headerlink" title="Step 2—使用Hash连接区块"></a>Step 2—使用Hash连接区块</h2><p><img src="/2018/12/17/区块链/区块链技术_完整流程/1_pSsgz1p596AIjg4-T6cPqA.png" alt=""></p>
 <p>当一笔交易发生时，收到交易的节点会验证交易合法性。是否存在对应UTXO。若验证通过，就将交易放入<code>Unconfirm Transaction Pool</code>，随后广播该交易。</p>
 <p>每个区块限制大小为1MB，当一个区块被挖出时，出块节点打包未确认交易为区块。</p>
 <p>如图纸Block1，若为创世区块，是没有前置区块的。通过<code>Merkle tree</code>的结构，计算出Hash值，就为这个区块的HASH。如果区块中的任意一个交易发生了些许变化，根据Hash算法的规则，最终所生成的Hash值，就会发生极大的变化。</p>
-<p><img src="区块链技术_完整流程/1_oPQWZ02lYP_0Lr8DcB0rEg.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_完整流程/1_oPQWZ02lYP_0Lr8DcB0rEg.png" alt=""></p>
 <p>后续区块创建后，要使用前置区块的Hash值，在计算出最终本区块Hash值。</p>
-<p><img src="区块链技术_完整流程/1_q9UITlXmxZbulguIuZDPog.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_完整流程/1_q9UITlXmxZbulguIuZDPog.png" alt=""></p>
 <p>如果区块1的交易发生改变后，其最终的Hash值也会变化。区块2所记录的前置区块Hash值和新的Hash值不匹配，这样就导致区块1和2断开连接，诚实节点一对比，就知道区块1中的交易被修改了，就会拒绝该区块。由于区块链的链式结构，这就导致改变前置区块数据的难度极大，这就是<strong>不可更改性</strong>的来源。</p>
 <p>每个区块都是可见的，如果修改一个区块中的交易，就会导致Hash值的链式反应。因此这几乎时不可能的，如果想实现，则需要51%的算力来实现<strong>双花攻击</strong>。（详情见双花攻击一文）</p>
 <hr>
@@ -372,9 +372,9 @@
 </ul>
 <p>因为Hash算法的输出是不固定的，在打包一个区块时，想要计算出特定数量前缀的0的Hash值。需要不断的去尝试，由于交易数据，前置区块Hash和其他标记信息（区块序号，时间戳等）是不可变的。这就引入了一个变量，<code>Nonce</code>。Nonce是一个完全随机的字符串，可以由数字，字母，标点等任意字符组成。</p>
 <p>通过不断的修改Nonce来计算区块的hash值，来满足要求。这就是<strong>挖矿</strong>。矿工们使用大量的算力不断来计算Hash值，相对而言，算力越高就能越快挖出区块。这就是一场算力竞赛。</p>
-<p><img src="区块链技术_完整流程/1_MJMd3OVd89GDUUyjluPmSQ.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_完整流程/1_MJMd3OVd89GDUUyjluPmSQ.png" alt=""></p>
 <p>任何人都能参与到这场竞赛中，只需要下载挖矿软件，目前的挖矿竞争已经演变到矿池大战。大量的算力被集中到矿池中，共同参与挖矿的过程。挖出区块则分配区块奖励和交易矿工费用。虽然算力越高，速度越快，但这场游戏也是有运气成分的。只要运气够好，也是能挖到区块的。</p>
-<p><img src="区块链技术_完整流程/1_ROCHY_hAg0KICQD1yWH_dA.png" alt=""></p>
+<p><img src="/2018/12/17/区块链/区块链技术_完整流程/1_ROCHY_hAg0KICQD1yWH_dA.png" alt=""></p>
 <p>如图所示，区块的Hash值是由一系列0的前缀开始的。简而言之，挖出区块是需要大量算力的，不容易。</p>
 <hr>
 <h2 id="Step-5—什么造就了区块链的不可更改性"><a href="#Step-5—什么造就了区块链的不可更改性" class="headerlink" title="Step 5—什么造就了区块链的不可更改性"></a>Step 5—什么造就了区块链的不可更改性</h2><p>如果想要更改一个区块的信息，那么这个区块就会被区块链中剥离，因此需要更改该区块后的所以区块的数据。从新挖出这些区块是需要消耗大量的算力，而主链仍然在不断的延长。只有当个人修改后的区块链长度超过主链长度时，这才会利用<code>最长链共识</code>来更改区块。</p>

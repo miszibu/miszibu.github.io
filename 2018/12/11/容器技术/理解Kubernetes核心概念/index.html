@@ -102,16 +102,16 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="作为一个后端开发，Kubernetes已经是常常被提到的事情，目前还未涉及到这方面的知识，但是我们先来认识和了解下Kubernetes的核心概念。 本文转载自十分钟带你理解Kubernetes核心概念">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/理解Kubernetes核心概念/d56441427680948fb56a00af57bda690.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/理解Kubernetes核心概念/label.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/理解Kubernetes核心概念/service.png">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/理解Kubernetes核心概念/5e2bad1a25e33e2d155da81da1d3a54b.gif">
-<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/理解Kubernetes核心概念/125bbccce0b3bbf42abab0e520d9250b.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/d56441427680948fb56a00af57bda690.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/label.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/service.png">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/5e2bad1a25e33e2d155da81da1d3a54b.gif">
+<meta property="og:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/125bbccce0b3bbf42abab0e520d9250b.gif">
 <meta property="og:updated_time" content="2018-12-11T01:47:37.082Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="理解Kubernetes核心概念">
 <meta name="twitter:description" content="作为一个后端开发，Kubernetes已经是常常被提到的事情，目前还未涉及到这方面的知识，但是我们先来认识和了解下Kubernetes的核心概念。 本文转载自十分钟带你理解Kubernetes核心概念">
-<meta name="twitter:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/理解Kubernetes核心概念/d56441427680948fb56a00af57bda690.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2018/12/11/容器技术/理解Kubernetes核心概念/d56441427680948fb56a00af57bda690.png">
 
 
 
@@ -354,14 +354,14 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f single-config-file.yaml</span><br></pre></td></tr></table></figure>
 <p>kubectl是和Kubernetes API交互的命令行程序。现在介绍一些核心概念。</p>
 <h2 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h2><p>集群是一组节点，这些节点可以是物理服务器或者虚拟机，之上安装了Kubernetes平台。下图展示这样的集群。注意该图为了强调核心概念有所简化。</p>
-<p><img src="理解Kubernetes核心概念/d56441427680948fb56a00af57bda690.png" alt=""></p>
+<p><img src="/2018/12/11/容器技术/理解Kubernetes核心概念/d56441427680948fb56a00af57bda690.png" alt=""></p>
 <p>上图可以看到如下组件，使用特别的图标表示Service和Label：</p>
 <ul>
 <li>Pod</li>
 <li>Container（容器）</li>
-<li>Label(<img src="理解Kubernetes核心概念/label.png" alt="label">)（标签）</li>
+<li>Label(<img src="/2018/12/11/容器技术/理解Kubernetes核心概念/label.png" alt="label">)（标签）</li>
 <li>Replication Controller（复制控制器）</li>
-<li>Service（<img src="理解Kubernetes核心概念/service.png" alt="enter image description here">）（服务）</li>
+<li>Service（<img src="/2018/12/11/容器技术/理解Kubernetes核心概念/service.png" alt="enter image description here">）（服务）</li>
 <li>Node（节点）</li>
 <li>Kubernetes Master（Kubernetes主节点）</li>
 </ul>
@@ -374,7 +374,7 @@
 <h3 id="Lable"><a href="#Lable" class="headerlink" title="Lable"></a>Lable</h3><p>正如图所示，一些Pod有Label。一个Label是attach到Pod的一对键/值对，用来传递用户定义的属性。比如，你可能创建了一个”tier”和“app”标签，通过Label（tier=frontend, app=myapp）来标记前端Pod容器，使用Label（tier=backend, app=myapp）标记后台Pod。然后可以使用Selectors选择带有特定Label的Pod，并且将Service或者Replication Controller应用到上面。</p>
 <h3 id="Replication-Controller"><a href="#Replication-Controller" class="headerlink" title="Replication Controller"></a>Replication Controller</h3><p><em>是否手动创建Pod，如果想要创建同一个容器的多份拷贝，需要一个个分别创建出来么，能否将Pods划到逻辑组里？</em></p>
 <p>Replication Controller确保任意时间都有指定数量的Pod“副本”在运行。如果为某个Pod创建了Replication Controller并且指定3个副本，它会创建3个Pod，并且持续监控它们。如果某个Pod不响应，那么Replication Controller会替换它，保持总数为3.如下面的动画所示：</p>
-<p><img src="理解Kubernetes核心概念/5e2bad1a25e33e2d155da81da1d3a54b.gif" alt=""></p>
+<p><img src="/2018/12/11/容器技术/理解Kubernetes核心概念/5e2bad1a25e33e2d155da81da1d3a54b.gif" alt=""></p>
 <p>如果之前不响应的Pod恢复了，现在就有4个Pod了，那么Replication Controller会将其中一个终止保持总数为3。如果在运行中将副本总数改为5，Replication Controller会立刻启动2个新Pod，保证总数为5。还可以按照这样的方式缩小Pod，这个特性在执行滚动升级时很有用。</p>
 <p>当创建Replication Controller时，需要指定两个东西：</p>
 <ol>
@@ -390,7 +390,7 @@
 <li>现在前端已经得到了后台服务的IP地址，但是它应该访问2个后台Pod的哪一个呢？Service在这2个后台Pod之间提供透明的负载均衡，会将请求分发给其中的任意一个（如下面的动画所示）。通过每个Node上运行的代理（kube-proxy）完成。</li>
 </ul>
 <p>下述动画展示了Service的功能。注意该图作了很多简化。如果不进入网络配置，那么达到透明的负载均衡目标所涉及的底层网络和路由相对先进。</p>
-<p><img src="理解Kubernetes核心概念/125bbccce0b3bbf42abab0e520d9250b.gif" alt=""></p>
+<p><img src="/2018/12/11/容器技术/理解Kubernetes核心概念/125bbccce0b3bbf42abab0e520d9250b.gif" alt=""></p>
 <p>有一个特别类型的Kubernetes Service，称为<code>LoadBalancer</code>，作为外部负载均衡器使用，在一定数量的Pod之间均衡流量。比如，对于负载均衡Web流量很有用。</p>
 <h3 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h3><p>节点（上图橘色方框）是物理或者虚拟机器，作为Kubernetes worker，通常称为Minion。每个节点都运行如下Kubernetes关键组件：</p>
 <ul>
