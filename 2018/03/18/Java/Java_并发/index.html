@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Java,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="1.Java并发综述​    并发通常是提高在单处理器上的程序的性能。 　　这听起来有些违背直觉。如果仔细思考后发现，在单处理器上运行的并发程序开销确实比该程序的所有部分按顺序执行的开销大，因为其中增加了切换上下文的代价。表面上看，将程序的所有部分当作单个任务运行看上去好像是开销小点，并且可以节省切换上下文的代价。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java_并发">
+<meta property="og:url" content="https://miszibu.github.io/2018/03/18/Java/Java_并发/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="1.Java并发综述​    并发通常是提高在单处理器上的程序的性能。 　　这听起来有些违背直觉。如果仔细思考后发现，在单处理器上运行的并发程序开销确实比该程序的所有部分按顺序执行的开销大，因为其中增加了切换上下文的代价。表面上看，将程序的所有部分当作单个任务运行看上去好像是开销小点，并且可以节省切换上下文的代价。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-10T01:44:28.867Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java_并发">
+<meta name="twitter:description" content="1.Java并发综述​    并发通常是提高在单处理器上的程序的性能。 　　这听起来有些违背直觉。如果仔细思考后发现，在单处理器上运行的并发程序开销确实比该程序的所有部分按顺序执行的开销大，因为其中增加了切换上下文的代价。表面上看，将程序的所有部分当作单个任务运行看上去好像是开销小点，并且可以节省切换上下文的代价。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2018/03/18/Java/Java_并发/">
+
+
+
+
+
+  <title>Java_并发 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/18/Java/Java_并发/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java_并发</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-18T23:06:51+08:00">
+                2018-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="1-Java并发综述"><a href="#1-Java并发综述" class="headerlink" title="1.Java并发综述"></a>1.Java并发综述</h3><p>​    并发通常是提高在单处理器上的程序的性能。</p>
+<p>　　这听起来有些违背直觉。如果仔细思考后发现，在单处理器上运行的并发程序开销确实比该程序的所有部分按顺序执行的开销大，因为其中增加了切换上下文的代价。表面上看，将程序的所有部分当作单个任务运行看上去好像是开销小点，并且可以节省切换上下文的代价。</p>
+<a id="more"></a>
+<p>　　但在代码实际运行中可能会出现<strong>阻塞</strong>。如果程序中的某个任务因为该程序控制范围之外的某些条件（通常I/O）而导致不能继续执行，那么我们就会说这个任务或线程阻塞了。如果没有并发，则整个程序都将停止下来，直至外部条件发生变化。但是，如果使用并发来编写程序，那么当一个任务阻塞时，程序中其他任务还可以继续执行，因为这个程序可以保持继续向前执行。事实上，从性能角度看，如果没有任务阻塞，那么在单处理器机器上使用并发就没有任何意义。</p>
+<p>　    Java的线程机制是<strong>抢占式</strong>的，这表示调度机制会周期性地中断线程，将上下文切换到另一个线程。从而为每个线程都提供时间片，使得每个线程都会分配合理数量的时间去驱动它们的任务。</p>
+<hr>
+<h3 id="2-基本线程实现"><a href="#2-基本线程实现" class="headerlink" title="2.基本线程实现"></a>2.基本线程实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span></span>&#123;<span class="comment">//线程驱动任务，用Runnable接口描述任务</span></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    实现一个<strong>Runnable</strong>实例,Runnable接口的实际意义只是Task,进程不与任务绑定，从而增加了代码的可重用性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">runnableDemo</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">  	 System.out.println();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">Thread t = <span class="keyword">new</span> Thread(<span class="keyword">new</span> runnable());<span class="comment">//实际上此时有一个Main进程跟实例化的新进程</span></span><br><span class="line">t.start();<span class="comment">//实例化一个线程，并通过线程start方法调用</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="3-线程池-ThreadPool"><a href="#3-线程池-ThreadPool" class="headerlink" title="3.线程池(ThreadPool)"></a>3.线程池<strong>(ThreadPool)</strong></h3><p><strong>1.综述</strong></p>
+<p>（1） 使用线程池的好处</p>
+<ul>
+<li>降低资源消耗。通过重复利用已创的线程降低线程创建和销毁在成的消耗</li>
+<li>提高响应速度。当任务到达的时候，不需要再去创建线程就能立即执行</li>
+<li>提高线程的可管理性。线程是稀缺资源，如果无限制的创建不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配、调优和监控。</li>
+</ul>
+<p>（2） 线程池的创建:</p>
+<ul>
+<li>ExecutorService是具有生命周期的Executor，知道如何构建恰当的上下文来执行Runnable。</li>
+<li>CachedThreadPool：可缓存线程池，将为每个任务都创建一个线程，并且当线程池大小超过了处理任务所需的线程，那么就会回收空闲线程（60S无执行）</li>
+<li>FixedThreadPool:使用有限的线程集来执行所提交的任务，一次性预先执行代价高昂的线程分配，可以限制线程的数量，可以节省时间因为不用为每一个任务都固定的付出创建线程的开销。</li>
+<li>SingleThreadExecutor：就像是线程数量为1的FixedThreadPool，如果向该线程池提交了多个任务，这些任务将排队，每个任务都会在下一个任务开始之前运行结束（因为采用的是同步队列，一个任务进入线程，就需要一个任务退出线程）所有的任务使用的是同一个线程。会序列化所有的任务，并会维护它自己的悬挂任务队列。</li>
+</ul>
+<p><strong>2.线程核心数量</strong></p>
+<ul>
+<li>任务的性质：CPU密集型任务，IO密集型任务和混合型任务。</li>
+<li>任务的优先级：高，中和低。</li>
+<li>任务的执行时间：长，中和短。</li>
+<li>任务的依赖性：是否依赖其他系统资源，如数据库连接。</li>
+</ul>
+<p>任务性质不同的任务可以用不同规模的线程池分开处理。</p>
+<p><strong>CPU密集型</strong>任务配置尽可能少的线程数量，如配置<strong>Ncpu+1</strong>个线程的线程池。</p>
+<p><strong>IO密集型</strong>任务则由于需要等待IO操作，线程并不是一直在执行任务，则配置尽可能多的线程，如<strong>2*Ncpu</strong>。</p>
+<p>混合型的任务，如果可以拆分，则将其<strong>拆分</strong>成一个CPU密集型任务和一个IO密集型任务，只要这两个任务执行的时间相差不是太大，那么分解后执行的吞吐率要高于串行执行的吞吐率，如果这两个任务执行时间相差太大，则没必要进行分解。我们可以通过Runtime.getRuntime().availableProcessors()方法获得当前设备的CPU个数。</p>
+<p><strong>优先级</strong>不同的任务可以使用<strong>优先级队列PriorityBlockingQueue</strong>来处理。它可以让优先级高的任务先得到执行，需要注意的是如果一直有优先级高的任务提交到队列里，那么优先级低的任务可能永远不能执行。</p>
+<p>执行时间不同的任务可以交给不同规模的线程池来处理，或者也可以使用优先级队列，让执行时间短的任务先执行。</p>
+<p><strong>依赖数据库连接池</strong>的任务，因为线程提交SQL后需要等待数据库返回结果，如果等待的时间越长CPU空闲时间就越长，那么<strong>线程数应该设置越大</strong>，这样才能更好的利用CPU。</p>
+<p><strong>建议使用有界队列</strong>，有界队列能<strong>增加系统的稳定性和预警能力</strong>，可以根据需要设大一点，比如几千。例如:后台任务线程池的队列和线程池全满了，不断的抛出抛弃任务的异常，通过排查发现是数据库出现了问题，导致执行SQL变得非常缓慢，因为后台任务线程池里的任务全是需要向数据库查询和插入数据的，所以导致线程池里的工作线程全部阻塞住，任务积压在线程池里。如果当时我们设置成无界队列，线程池的队列就会越来越多，有可能会撑满内存，导致整个系统不可用，而不只是后台任务出现问题。当然我们的系统所有的任务是用的单独的服务器部署的，而我们使用不同规模的线程池跑不同类型的任务，但是出现这样问题时也会影响到其他任务。</p>
+<p><strong>3.实现</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService exec = Executors.newCachedThreadPool();</span><br><span class="line"><span class="comment">//ExecutorService exec = Executors.newFixedThreadPool();</span></span><br><span class="line"><span class="comment">//ExecutorService exec = Executors.newSingleThreadPool();</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">5</span>;i++)&#123;</span><br><span class="line">     exec.execute(<span class="keyword">new</span> runnableDemo());</span><br><span class="line">&#125;</span><br><span class="line">exec.shutdown();<span class="comment">//在所有进程执行完毕后退出</span></span><br></pre></td></tr></table></figure>
+<p><strong>4.关闭线程池</strong></p>
+<ol>
+<li>我们可以通过调用线程池的shutdown或shutdownNow方法来关闭线程池，它们的原理是遍历线程池中的工作线程，然后逐个调用线程的interrupt方法来中断线程，所以<strong>无法响应中断的任务可能永远无法终止。</strong></li>
+<li>shutdownNow首先将线程池的状态设置成STOP，然后尝试停止所有的正在执行或暂停任务的线程，并返回等待执行任务的列表。</li>
+<li>而shutdown只是将线程池的状态设置成SHUTDOWN状态，然后中断所有没有正在执行任务的线程。调用该方法，当前线程将继续运行在shutdown()被调用之前所提交的所有任务，再退出。</li>
+<li>只要调用了这两个关闭方法的其中一个，isShutdown方法就会返回true。当所有的任务都已关闭后,才表示线程池关闭成功，这时调用isTerminaed方法会返回true。至于我们应该调用哪一种方法来关闭线程池，应该由提交到线程池的任务特性决定，通常调用shutdown来关闭线程池，如果任务不一定要执行完，则可以调用shutdownNow。</li>
+</ol>
+<p><strong>5.线程池分析</strong></p>
+<p>当提交一个新任务到线程池时，线程池的处理流程如下：</p>
+<ul>
+<li>首先线程池判断基本线程池是否已满？没满，创建一个工作线程来执行任务。满了，则进入下个流程。 </li>
+<li>其次线程池判断工作队列是否已满？没满，则将新提交的任务存储在工作队列里。满了，则进入下个流程。 </li>
+<li>最后线程池判断整个线程池是否已满？没满，则创建一个新的工作线程来执行任务，满了，则交给饱和策略来处理这个任务。</li>
+</ul>
+<hr>
+<h3 id="4-ThreadPoolExecutor详解"><a href="#4-ThreadPoolExecutor详解" class="headerlink" title="4.ThreadPoolExecutor详解"></a>4.ThreadPoolExecutor详解</h3><p><strong>1.ThreadPoolExecutor的完整构造方法的签名是：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ThreadPoolExecutor(<span class="keyword">int</span> corePoolSize, <span class="keyword">int</span> maximumPoolSize, <span class="keyword">long</span> keepAliveTime, TimeUnit unit, BlockingQueue&lt;Runnable&gt; workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler)</span><br></pre></td></tr></table></figure>
+<p><strong>corePoolSize</strong> - 池中所保存的线程数，包括空闲线程。</p>
+<p><strong>maximumPoolSize</strong>-池中允许的最大线程数。</p>
+<p><strong>keepAliveTime</strong> - 当线程数大于核心时，此为终止前多余的空闲线程等待新任务的最长时间。</p>
+<p><strong>unit</strong> - keepAliveTime 参数的时间单位。</p>
+<p><strong>workQueue</strong> - 执行前用于保持任务的队列。此队列仅保持由 execute方法提交的 Runnable任务。</p>
+<p><strong>threadFactory</strong> - 执行程序创建新线程时使用的工厂。</p>
+<p><strong>handler</strong> - 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序。</p>
+<p><strong>2.ThreadPoolExecutor是Executors类的底层实现。</strong></p>
+<p>在JDK帮助文档中，有如此一段话：</p>
+<p>“强烈建议程序员使用较为方便的Executors工厂方法Executors.newCachedThreadPool()（无界线程池，可以进行自动线程回收）、Executors.newFixedThreadPool(int),Executors.newSingleThreadExecutor()</p>
+<p>它们均为大多数使用场景预定义了设置。”</p>
+<p><strong>源码分析</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newFixedThreadPool</span><span class="params">(<span class="keyword">int</span> nThreads)</span> </span>&#123;   </span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(nThreads, nThreads,   </span><br><span class="line">                                        <span class="number">0L</span>, TimeUnit.MILLISECONDS,   </span><br><span class="line">                                        <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;());   </span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+<p>corePoolSize和maximumPoolSize的大小是一样的（实际上，后面会介绍，如果使用无界queue的话maximumPoolSize参数是没有意义的）</p>
+<p>keepAliveTime和unit的设置标志不想keep alive！</p>
+<p>最后的BlockingQueue选择了LinkedBlockingQueue，该queue有一个特点，他是无界的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newSingleThreadExecutor</span><span class="params">()</span> </span>&#123;   </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> FinalizableDelegatedExecutorService(<span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">1</span>,   </span><br><span class="line">                                       <span class="number">0L</span>, TimeUnit.MILLISECONDS,   </span><br><span class="line">                                      <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;()));   </span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<p>同FixedThreadPool,只是将corePoolSize和maximumPoolSize的大小设置为1 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newCachedThreadPool</span><span class="params">()</span> </span>&#123;   </span><br><span class="line">             <span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">0</span>, Integer.MAX_VALUE,   </span><br><span class="line">                                         <span class="number">60L</span>, TimeUnit.SECONDS,   </span><br><span class="line">                                        <span class="keyword">new</span> SynchronousQueue&lt;Runnable&gt;());   </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>无界的线程池，maximumPoolSize为极大值。</p>
+<p>其次BlockingQueue的选择上使用SynchronousQueue。可能对于该BlockingQueue有些陌生，简单说：该QUEUE中，每个插入操作必须等待另一个线程的对应移除操作。</p>
+<p><strong>3.queue上的三种类型。</strong></p>
+<p>排队有三种通用策略：</p>
+<p><strong>直接提交。</strong>工作队列的默认选项是 SynchronousQueue，它将任务直接提交给线程而不保持它们。在此，如果不存在可用于立即运行任务的线程，则试图把任务加入队列将失败，因此会构造一个新的线程。</p>
+<p><strong>无界队列。</strong>使用无界队列（例如，不具有预定义容量的 LinkedBlockingQueue）将导致在所有corePoolSize 线程都忙时新任务在队列中等待。这样，创建的线程就不会超过 corePoolSize。（因此，maximumPoolSize的值也就无效了。）当每个任务完全独立于其他任务，即任务执行互不影响时，适合于使用无界队列；例如，在 Web页服务器中。这种排队可用于处理瞬态突发请求，当命令以超过队列所能处理的平均数连续到达时，此策略允许无界线程具有增长的可能性。</p>
+<p><strong>有界队列。</strong>当使用有限的 maximumPoolSizes时，有界队列（如 ArrayBlockingQueue）有助于防止资源耗尽，但是可能较难调整和控制。队列大小和最大池大小可能需要相互折衷：使用大型队列和小型池可以最大限度地降低 CPU 使用率、操作系统资源和上下文切换开销，但是可能导致人工降低吞吐量。如果任务频繁阻塞（例如，如果它们是 I/O边界），则系统可能为超过您许可的更多线程安排时间。使用小型队列通常要求较大的池大小，CPU使用率较高，但是可能遇到不可接受的调度开销，这样也会降低吞吐量。 </p>
+<p><strong>4.三种队列的实际应用</strong></p>
+<p><strong>基本原则</strong>：如果无法将请求加入队列，则创建新的线程，除非创建此线程超出maximumPoolSize，在这种情况下，任务将被拒绝，并返回异常。</p>
+<p><strong>例一：使用直接提交策略，也即SynchronousQueue</strong>：任务进入队列，判断是否有空余进程，若有则运行。若无空闲进程，则将请求加入队列SynchronousQueue，队列大小只有一，若加入队列失败，则判断基本原则。</p>
+<p><strong>例二：使用无界队列策略，即LinkedBlockingQueue</strong>：同例一，然而最大的区别就是，若使用链表来实现，则队列长度为无穷（除非线程开销耗尽资源）。所以几乎不会触发产生新的线程，就需要设置一个良好CorePoolSize。</p>
+<p><strong>例三：有界队列，使用ArrayBlockingQueue</strong>：最为复杂，看完前面两个，原则相同，自行理解即可。</p>
+<hr>
+<h3 id="5-从任务中产生返回值"><a href="#5-从任务中产生返回值" class="headerlink" title="5.从任务中产生返回值"></a>5.从任务中产生返回值</h3><p><strong>5.1Callable具体实现</strong></p>
+<p>Runnable接口作为执行工作的独立任务，不产生返回值。为了任务完成返回时，实现Callable接口。Callable是一种具有类型参数的泛型。类型参数表示的是方法call()中返回的值，并且使用submit方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskWithResult</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">String</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> count=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        id = count++;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"TaskWithResult"</span>+id;<span class="comment">//call接口返回一个值</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ExecutorService exec = Executors.newCachedThreadPool();</span><br><span class="line">        ArrayList&lt;Future&lt;String&gt;&gt; results = <span class="keyword">new</span> ArrayList&lt;Future&lt;String&gt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">5</span>;i++)&#123;</span><br><span class="line">            results.add(exec.submit(<span class="keyword">new</span> TaskWithResult()));<span class="comment">//submit对象会返回Future对象</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Future&lt;String&gt; fs:results)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                System.out.println(fs.get());<span class="comment">//调用get来获取结果，若不使用isDone()来检查，get()将阻塞，直到结果准备就绪。</span></span><br><span class="line">            &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">                System.err.println(e);</span><br><span class="line">            &#125;<span class="keyword">catch</span> (ExecutionException e)&#123;</span><br><span class="line">                System.err.println(e);</span><br><span class="line">            &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">                exec.shutdown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>5.2Future对象</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">cancel</span><span class="params">(<span class="keyword">boolean</span> mayInterruptIfRunning)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isCancelled</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isDone</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">V <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException, ExecutionException</span>;</span><br><span class="line">    <span class="function">V <span class="title">get</span><span class="params">(<span class="keyword">long</span> timeout, TimeUnit unit)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>cancel</strong>:用于取消任务，参数mayInterruptIfRunning,true则可以取消正在执行的任务</p>
+</li>
+<li><p><strong>isCancelled</strong>:用于判定任务是否取消成功</p>
+</li>
+<li><p><strong>isDone</strong>:用于表示任务是否完成</p>
+</li>
+<li><p><strong>get()</strong>：用来获取执行结果，这个方法会产生阻塞，会一直等到任务执行完毕才返回</p>
+</li>
+<li><p><strong>get(long timeout, TimeUnit unit)</strong>用来获取执行结果，如果在指定时间内，还没获取到结果，就直接返回null</p>
+<p>然而Future只是一个接口，不能直接用来创建对象使用。</p>
+</li>
+</ul>
+<p><strong>5.3FutureTask</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RunnableFuture</span>&lt;<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Runnable</span>, <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;<span class="comment">//RunnableFuture接口继承了Runnable,Future接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureTask</span>&lt;<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">RunnableFuture</span>&lt;<span class="title">V</span>&gt;</span></span><br><span class="line"><span class="class">//既可以作为<span class="title">Runnable</span>被线程执行，又可以作为<span class="title">Future</span>得到<span class="title">Callable</span>的返回值</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="6-休眠"><a href="#6-休眠" class="headerlink" title="6.休眠"></a>6.休眠</h3><p>TimeUnit下的方法进行休眠，语义化更强。而实际上TimeUnit包调用的也是Thread.sleep</p>
+<p>调用Sleep方法会抛出InterruptedException，因为<strong>异常不能跨线程传播会Main方法</strong>，因此必须在本地处理内部所产生的异常。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line"> 	<span class="comment">// Old-style:</span></span><br><span class="line">    <span class="comment">// Thread.sleep(100)</span></span><br><span class="line">    <span class="comment">// Java SE5/6-style:</span></span><br><span class="line">       TimeUnit.MILLISECONDS.sleep(<span class="number">100</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span>(InterruptedException e) &#123;</span><br><span class="line">      System.err.println(<span class="string">"Interrupted"</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="7-优先级-amp-amp-让步"><a href="#7-优先级-amp-amp-让步" class="headerlink" title="7.优先级 &amp;&amp; 让步"></a>7.优先级 &amp;&amp; 让步</h3><p>线程的优先级将该线程的重要性传递给调度器。尽管CPU处理现有线程集的顺序是不确定的，但是调度器将倾向于让优先级最高的线程来执行。然而，这并不意味着线程优先级低的线程将得不到执行。优先级较低的线程仅仅只是线程执行的没那么频繁。<strong>因此不会造成线程阻塞</strong></p>
+<p>在绝大多数时间里，所有线程都应该按照默认优先级执行，试图操作线程优先级通常是一种错误。</p>
+<p>可以用getPriority()来读取现有线程的优先级，并且在任意时刻都可以通过setPriority()来修改它。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimplePriorities</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> countDown = <span class="number">5</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">double</span> d; <span class="comment">// No optimization</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> priority;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">SimplePriorities</span><span class="params">(<span class="keyword">int</span> priority)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.priority = priority;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;<span class="comment">//重写toString方法</span></span><br><span class="line">    <span class="keyword">return</span> Thread.currentThread() + <span class="string">": "</span> + countDown;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Thread.currentThread().setPriority(priority);<span class="comment">//设置当前进程优先级</span></span><br><span class="line">    <span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">      <span class="comment">// An expensive, interruptable operation:</span></span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; <span class="number">100000</span>; i++) &#123;</span><br><span class="line">        d += (Math.PI + Math.E) / (<span class="keyword">double</span>)i;</span><br><span class="line">        <span class="keyword">if</span>(i % <span class="number">1000</span> == <span class="number">0</span>)</span><br><span class="line">          Thread.yield();	<span class="comment">//让步 实际上只是一个建议，任何有实际确定功能的进程切换都不能依赖于让步</span></span><br><span class="line">      &#125;</span><br><span class="line">      System.out.println(<span class="keyword">this</span>);</span><br><span class="line">      <span class="keyword">if</span>(--countDown == <span class="number">0</span>) </span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    ExecutorService exec = Executors.newCachedThreadPool();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">      exec.execute(<span class="keyword">new</span> SimplePriorities(Thread.MIN_PRIORITY));</span><br><span class="line">   	  <span class="comment">//exec.execute(new SimplePriorities(Thread.MAX_PRIORITY));</span></span><br><span class="line">      <span class="comment">//exec.execute(new SimplePriorities(Thread.NORM_PRIORITY));</span></span><br><span class="line">      exec.shutdown();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>jdk与OP的进程优先级映射有问题。因此建议使用三种优先级即可</p>
+<hr>
+<h3 id="8-后台进程"><a href="#8-后台进程" class="headerlink" title="8.后台进程"></a>8.后台进程</h3><ol>
+<li>所谓后台线程是指在程序运行的时候在后台提供一种通用服务的线程，并且这种线程并不属于程序中不可或缺的部分。<strong>当所有的非后台线程结束时，程序也就终止，同时会杀死进程中所有的后台进程。</strong></li>
+<li>线程必须在启动之前调用setDaemon()方法，才能把它设置为后台线程。</li>
+<li>后台进程在<strong>不执行finally子句的情况下就会终止其run()方法</strong></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Thread thread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> SimpleDaemons());</span><br><span class="line">thread.setDaemon(<span class="keyword">true</span>);<span class="comment">//后台进程设置需要在进程启动前调用</span></span><br><span class="line">thread.start();</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="9-Join"><a href="#9-Join" class="headerlink" title="9.Join"></a>9.Join</h3><p>一个线程可以调用其他线程的join()方法，其效果是等待其他线程结束才继续执行。如果某个线程调用t.join()，此线程将被挂起，直到目标线程t结束才恢复（即t.isAlive()为假）。</p>
+<p>对join()方法的调用可以被中断，做法就是在调用线程上调用interrupt()方法，即t.interrupt()。例子如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Joiner</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Sleeper sleeper;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Joiner</span><span class="params">(String name, Sleeper sleeper)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">        <span class="keyword">this</span>.sleeper = sleeper;</span><br><span class="line">        start();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            sleeper.join();<span class="comment">//将自身进程挂起,知道Sleeper执行完</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Interupted"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(getName() + <span class="string">" join completed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.xqq.join;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Sleeper</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> duration;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Sleeper</span><span class="params">(String name, <span class="keyword">int</span> sleeperTime)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">        duration = sleeperTime;</span><br><span class="line">        start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            sleep(duration);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(getName() + <span class="string">" was interrupted. "</span> + <span class="string">"isInterupted:"</span>+isInterrupted());</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(getName() + <span class="string">" has awakened"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 如果某一个线程在另一个线程t上调用t.join()，此线程将被挂起，直到线程t运行结束</span></span><br><span class="line"><span class="comment"> * 对join方法的调用可以被中断，在调用线程上调用interrupt()方法。</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> zibu</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Joining</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Sleeper sleepy = <span class="keyword">new</span> Sleeper(<span class="string">"Sleepy"</span>, <span class="number">1500</span>);</span><br><span class="line">        Sleeper grumpy = <span class="keyword">new</span> Sleeper(<span class="string">"Grumpy"</span>, <span class="number">1500</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Joiner(<span class="string">"Dopey"</span>, sleepy);</span><br><span class="line">        <span class="keyword">new</span> Joiner(<span class="string">"Doc"</span>, grumpy);</span><br><span class="line">        grumpy.interrupt();<span class="comment">//grumpy被终止，随后Doc开始执行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">运行结果：</span><br><span class="line">Grumpy was interrupted. isInterupted: <span class="keyword">false</span></span><br><span class="line">Doc join completed</span><br><span class="line">Sleepy has awakened</span><br><span class="line">Dopey join completed</span><br></pre></td></tr></table></figure>
+<h3 id="10-捕获异常"><a href="#10-捕获异常" class="headerlink" title="10.捕获异常"></a>10.捕获异常</h3><p><a href="http://blog.csdn.net/chun0801/article/details/51835719" target="_blank" rel="noopener">http://blog.csdn.net/chun0801/article/details/51835719</a></p>
+<p><a href="https://www.cnblogs.com/tomcatx/p/5094574.html" target="_blank" rel="noopener">https://www.cnblogs.com/tomcatx/p/5094574.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/Java/Java_IO/" rel="next" title="Java_IO">
+                <i class="fa fa-chevron-left"></i> Java_IO
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/19/服务器/Nginx/" rel="prev" title="Nginx使用">
+                Nginx使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">99</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Java并发综述"><span class="nav-number">1.</span> <span class="nav-text">1.Java并发综述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-基本线程实现"><span class="nav-number">2.</span> <span class="nav-text">2.基本线程实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-线程池-ThreadPool"><span class="nav-number">3.</span> <span class="nav-text">3.线程池(ThreadPool)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-ThreadPoolExecutor详解"><span class="nav-number">4.</span> <span class="nav-text">4.ThreadPoolExecutor详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-从任务中产生返回值"><span class="nav-number">5.</span> <span class="nav-text">5.从任务中产生返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-休眠"><span class="nav-number">6.</span> <span class="nav-text">6.休眠</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-优先级-amp-amp-让步"><span class="nav-number">7.</span> <span class="nav-text">7.优先级 &amp;&amp; 让步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-后台进程"><span class="nav-number">8.</span> <span class="nav-text">8.后台进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-Join"><span class="nav-number">9.</span> <span class="nav-text">9.Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-捕获异常"><span class="nav-number">10.</span> <span class="nav-text">10.捕获异常</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
