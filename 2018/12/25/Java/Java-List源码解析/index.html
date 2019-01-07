@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="容器类中List是使用最为广泛的，主要有ArrayList，LinkedList两个实现类。本文将从源码入手，直接分析ArrayList，LinkedList的实现，扩容机制等。 了解所使用的类库，才能更好的使用它。——《Effective Java》第47条。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-25T15:19:24.751Z">
+<meta property="og:updated_time" content="2018-12-28T05:38:32.850Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_List源码解析">
 <meta name="twitter:description" content="容器类中List是使用最为广泛的，主要有ArrayList，LinkedList两个实现类。本文将从源码入手，直接分析ArrayList，LinkedList的实现，扩容机制等。 了解所使用的类库，才能更好的使用它。——《Effective Java》第47条。">
@@ -341,7 +341,7 @@
 <p>它继承于AbstarctList，实现了List，RandomAccess，Cloneable，Serializable四个接口。</p>
 <p>由于数组的实现，ArrayList的增加元素和查询第n个元素都是O(1)，然而删除和新增都是O(N)</p>
 <ul>
-<li><strong>RandomAccess</strong>，一个空的接口（标记型接口），用于标注一个类是否可以实现随机访问。</li>
+<li><strong>RandomAccess</strong>，一个空的接口（标记型接口），用于标注一个类是否可以实现随机访问。实现该接口的类。</li>
 <li><strong>Cloneable</strong>，标记型接口，用于声明接口覆盖了clone()方法，能被克隆。</li>
 <li><strong>java.io.Serializable</strong>，ArrayList支持序列化，能通过序列化进行传输。</li>
 </ul>
