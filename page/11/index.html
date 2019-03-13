@@ -260,6 +260,132 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/23/Framework/Spring/Spring_IOC/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/23/Framework/Spring/Spring_IOC/" itemprop="url">SpringIoc</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T17:20:34+08:00">
+                2018-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="Ioc"><a href="#Ioc" class="headerlink" title="Ioc"></a>Ioc</h2><h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>Inverse of Control ，控制反转。是Spring容器的内核，AOP,声明式事务等功能的基础。涉及代码解耦，设计模式，代码优化等问题</p>
+<p>有关于IOC的理解，这个回答下的第一篇文章非常清楚，示例代码配上解答令人很快理解。故不再赘述，</p>
+<p>来源：<a href="https://www.zhihu.com/question/23277575" target="_blank" rel="noopener">https://www.zhihu.com/question/23277575</a></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/23/Framework/Spring/Spring_IOC/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/21/OS/BaseKnowledge/OS_Linux内核/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1276,134 +1402,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2016/10/23/杂谈/杂谈_探访随机数/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/10/23/杂谈/杂谈_探访随机数/" itemprop="url">关于js && java 的随机数问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-23T20:58:47+08:00">
-                2016-10-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>最近在JAVA课上提到了个随机数的问题，用的是Random对象的nextInt()  方法。然后就对随机数这个概念产生了兴趣，就对此查询了些资料文档，写了点自己的理解。</p>
-<p><strong>随机数是由算法生成的，然而算法的五大特性中的确定性又决定，固定的输入只能有固定的输出，那么问题来了。所谓的随机数都非是真正的随机，只是在一定输入下的固定输出而已，因此为了实现随机，就只能在算法的输入上想方法，一般来说是获取系统时间作为种子值，准确值在ms。</strong></p>
-<p><strong>亦或是在元器件上的随机做文章，比如实时的电压，电流等。</strong></p>
-<p><strong>那自然界有没有真正的随机呢，在自然宏观上似乎也没有真正的随机，在人类可知的情况比如抛硬币，丢骰子，天气等。在可知的各种情况下，这些结果都是可以确定的。</strong></p>
-<p><strong>这个时候，我想到了薛定谔的猫。我便对量子力学的随机进行了一番查询，贝尔提出了一个实验可观测的效应来区分真随机还是伪随机，也就是贝尔不等式。证明了量子力学下存在真随机，但是有一种观点认为，我们当前维度观察到的随机是真随机，在更高维度下还是这样吗？ 从科学的曲折前进来看，我赞同后一种。假设成立的话，那！往下走的话，问题又来了，真正的的随机存在吗？这里只是做一个门外汉的围观而已。</strong></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/10/23/杂谈/杂谈_探访随机数/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2016/10/23/杂谈/blog_hexo搭建/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1526,7 +1524,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span>
+    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1570,7 +1568,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">110</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
