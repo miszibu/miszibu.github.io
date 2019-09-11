@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="docker,">
+  <meta name="keywords" content="Docker,">
 
 
 
@@ -95,14 +95,14 @@
 
 
 <meta name="description" content="Build , Ship and Run Any App , Anywhere 容器的发展历史，从VM的hypervisor模拟硬件 到 Linux上cgroup, namespace等概念的出现。最终发展到现在容器，而最有名的就是Docker了。 本文主要讲解docker的特点和安装使用，并介绍镜像，容器，仓库，端口容器互联等功能。 文章内容会同步更新在docker脑图中 zibuのDocke">
-<meta name="keywords" content="docker">
+<meta name="keywords" content="Docker">
 <meta property="og:type" content="article">
 <meta property="og:title" content="docker-基本概念">
 <meta property="og:url" content="https://miszibu.github.io/2018/07/05/Container/Docker_基础概念/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="Build , Ship and Run Any App , Anywhere 容器的发展历史，从VM的hypervisor模拟硬件 到 Linux上cgroup, namespace等概念的出现。最终发展到现在容器，而最有名的就是Docker了。 本文主要讲解docker的特点和安装使用，并介绍镜像，容器，仓库，端口容器互联等功能。 文章内容会同步更新在docker脑图中 zibuのDocke">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-28T08:51:46.287Z">
+<meta property="og:updated_time" content="2019-03-17T14:50:51.940Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="docker-基本概念">
 <meta name="twitter:description" content="Build , Ship and Run Any App , Anywhere 容器的发展历史，从VM的hypervisor模拟硬件 到 Linux上cgroup, namespace等概念的出现。最终发展到现在容器，而最有名的就是Docker了。 本文主要讲解docker的特点和安装使用，并介绍镜像，容器，仓库，端口容器互联等功能。 文章内容会同步更新在docker脑图中 zibuのDocke">
@@ -413,14 +413,14 @@
 <li>数据卷迁移 Data Volume Containers：使用特定容器维护数据卷</li>
 </ul>
 <hr>
-<h2 id="端口映射与容器互联"><a href="#端口映射与容器互联" class="headerlink" title="端口映射与容器互联"></a>端口映射与容器互联</h2><h5 id="1-映射容器内应用的服务端口到本地宿主主机"><a href="#1-映射容器内应用的服务端口到本地宿主主机" class="headerlink" title="1.映射容器内应用的服务端口到本地宿主主机"></a>1.映射容器内应用的服务端口到本地宿主主机</h5><p>​    在启动容器时，如果不指定对应的参数，在容器外部是无法通过网络来访问容器内的网络应用和服务。    </p>
+<h2 id="端口映射与容器互联"><a href="#端口映射与容器互联" class="headerlink" title="端口映射与容器互联"></a>端口映射与容器互联</h2><h3 id="1-映射容器内应用的服务端口到本地宿主主机"><a href="#1-映射容器内应用的服务端口到本地宿主主机" class="headerlink" title="1.映射容器内应用的服务端口到本地宿主主机"></a>1.映射容器内应用的服务端口到本地宿主主机</h3><p>​    在启动容器时，如果不指定对应的参数，在容器外部是无法通过网络来访问容器内的网络应用和服务。    </p>
 <p>​    <strong>-P</strong> : Docker会随机映射一个49000~49900的端口到内部容器开放的网络端口</p>
 <p>​    <strong>-p</strong> : -p 5000:5000 将本地的5000端口映射到虚拟机的5000端口上</p>
 <p>​        多次使用可以映射多个端口 如：-p 5000:5000 -p 80：80</p>
 <p>​        -p 127.0.0.1:5000:5000/udp 映射端口到指定地址 并指定UDP端口</p>
 <p>​        -p 127.0.0.1::5000 映射到指定地址的任意端口</p>
 <p>​        docker port containerName 5000： 查看某个容器 某个端口的映射</p>
-<h5 id="2-互联机制实现多个容器间通过容器名快速访问"><a href="#2-互联机制实现多个容器间通过容器名快速访问" class="headerlink" title="2.互联机制实现多个容器间通过容器名快速访问"></a>2.互联机制实现多个容器间通过容器名快速访问</h5><p>​    使用<strong>–name</strong>自定义容器命名:docker run -d -P <strong>–name</strong> newName imageName</p>
+<h3 id="2-互联机制实现多个容器间通过容器名快速访问"><a href="#2-互联机制实现多个容器间通过容器名快速访问" class="headerlink" title="2.互联机制实现多个容器间通过容器名快速访问"></a>2.互联机制实现多个容器间通过容器名快速访问</h3><p>​    使用<strong>–name</strong>自定义容器命名:docker run -d -P <strong>–name</strong> newName imageName</p>
 <p>​    docker run -d -P –link db:db newName imageName </p>
 <p>​    <strong>–link name:alias</strong>  : name 要连接的容器名称 db 连接的名称</p>
 <p>​    </p>
@@ -448,7 +448,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/docker/" rel="tag"># docker</a>
+            <a href="/tags/Docker/" rel="tag"># Docker</a>
           
         </div>
       
@@ -461,8 +461,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/28/OS/BaseKnowledge/OS_CentOS问题汇总/" rel="next" title="CentOS7问题汇总">
-                <i class="fa fa-chevron-left"></i> CentOS7问题汇总
+              <a href="/2018/07/05/Container/Docker_dockerfile创建镜像实践/" rel="next" title="docker-基础入门">
+                <i class="fa fa-chevron-left"></i> docker-基础入门
               </a>
             
           </div>
@@ -471,8 +471,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/07/05/Container/Docker_dockerfile创建镜像实践/" rel="prev" title="docker-基础入门">
-                docker-基础入门 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/07/23/BlockChain/区块链技术_加密货币三角定律/" rel="prev" title="区块链技术-加密货币三角定律">
+                区块链技术-加密货币三角定律 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -548,7 +548,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">111</span>
+                <span class="site-state-item-count">115</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -561,7 +561,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">45</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -631,7 +631,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#初识容器和Docker"><span class="nav-number">1.</span> <span class="nav-text">初识容器和Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心概念"><span class="nav-number">2.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像Imgae"><span class="nav-number">3.</span> <span class="nav-text">镜像Imgae:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分层存储"><span class="nav-number">3.1.</span> <span class="nav-text">分层存储</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器Container"><span class="nav-number">4.</span> <span class="nav-text">容器Container</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker镜像使用-Docker-容器管理"><span class="nav-number">5.</span> <span class="nav-text">Docker镜像使用 || Docker 容器管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker数据管理"><span class="nav-number">6.</span> <span class="nav-text">Docker数据管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口映射与容器互联"><span class="nav-number">7.</span> <span class="nav-text">端口映射与容器互联</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-映射容器内应用的服务端口到本地宿主主机"><span class="nav-number">7.0.0.1.</span> <span class="nav-text">1.映射容器内应用的服务端口到本地宿主主机</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-互联机制实现多个容器间通过容器名快速访问"><span class="nav-number">7.0.0.2.</span> <span class="nav-text">2.互联机制实现多个容器间通过容器名快速访问</span></a></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Dockerfile创建镜像"><span class="nav-number">8.</span> <span class="nav-text">使用Dockerfile创建镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关资料"><span class="nav-number">9.</span> <span class="nav-text">相关资料</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#初识容器和Docker"><span class="nav-number">1.</span> <span class="nav-text">初识容器和Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心概念"><span class="nav-number">2.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像Imgae"><span class="nav-number">3.</span> <span class="nav-text">镜像Imgae:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分层存储"><span class="nav-number">3.1.</span> <span class="nav-text">分层存储</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器Container"><span class="nav-number">4.</span> <span class="nav-text">容器Container</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker镜像使用-Docker-容器管理"><span class="nav-number">5.</span> <span class="nav-text">Docker镜像使用 || Docker 容器管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker数据管理"><span class="nav-number">6.</span> <span class="nav-text">Docker数据管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口映射与容器互联"><span class="nav-number">7.</span> <span class="nav-text">端口映射与容器互联</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-映射容器内应用的服务端口到本地宿主主机"><span class="nav-number">7.1.</span> <span class="nav-text">1.映射容器内应用的服务端口到本地宿主主机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-互联机制实现多个容器间通过容器名快速访问"><span class="nav-number">7.2.</span> <span class="nav-text">2.互联机制实现多个容器间通过容器名快速访问</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Dockerfile创建镜像"><span class="nav-number">8.</span> <span class="nav-text">使用Dockerfile创建镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关资料"><span class="nav-number">9.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
             
 
           </div>
