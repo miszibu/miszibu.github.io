@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Spring,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Ioc综述Inverse of Control ，控制反转。是Spring容器的内核，AOP,声明式事务等功能的基础。涉及代码解耦，设计模式，代码优化等问题 有关于IOC的理解，这个回答下的第一篇文章非常清楚，示例代码配上解答令人很快理解。故不再赘述， 来源：https://www.zhihu.com/question/23277575">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringIoc">
+<meta property="og:url" content="https://miszibu.github.io/2018/03/23/框架/Spring/Spring_IOC/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Ioc综述Inverse of Control ，控制反转。是Spring容器的内核，AOP,声明式事务等功能的基础。涉及代码解耦，设计模式，代码优化等问题 有关于IOC的理解，这个回答下的第一篇文章非常清楚，示例代码配上解答令人很快理解。故不再赘述， 来源：https://www.zhihu.com/question/23277575">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-29T01:59:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringIoc">
+<meta name="twitter:description" content="Ioc综述Inverse of Control ，控制反转。是Spring容器的内核，AOP,声明式事务等功能的基础。涉及代码解耦，设计模式，代码优化等问题 有关于IOC的理解，这个回答下的第一篇文章非常清楚，示例代码配上解答令人很快理解。故不再赘述， 来源：https://www.zhihu.com/question/23277575">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2018/03/23/框架/Spring/Spring_IOC/">
+
+
+
+
+
+  <title>SpringIoc | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/23/框架/Spring/Spring_IOC/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SpringIoc</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T17:20:34+08:00">
+                2018-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Ioc"><a href="#Ioc" class="headerlink" title="Ioc"></a>Ioc</h2><h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>Inverse of Control ，控制反转。是Spring容器的内核，AOP,声明式事务等功能的基础。涉及代码解耦，设计模式，代码优化等问题</p>
+<p>有关于IOC的理解，这个回答下的第一篇文章非常清楚，示例代码配上解答令人很快理解。故不再赘述，</p>
+<p>来源：<a href="https://www.zhihu.com/question/23277575" target="_blank" rel="noopener">https://www.zhihu.com/question/23277575</a></p>
+<a id="more"></a>
+<h3 id="Ioc的类"><a href="#Ioc的类" class="headerlink" title="Ioc的类"></a>Ioc的类</h3><ul>
+<li>1.<strong>构造函数注入</strong>，将接口实现类通过构造函数变量传入。</li>
+<li>2.<strong>属性注入</strong>，set方法注入，部分时候不需要构造函数注入时，选择set方法注入。</li>
+<li>3.<strong>接口注入</strong>，将调用类所有依赖注入方法抽取到接口中，通过类实现接口来提供注入。(需要额外声明接口，且实际作用与属性注入无本质区别，<strong>不建议</strong>)</li>
+</ul>
+<h2 id="Java反射机制相关基础知识"><a href="#Java反射机制相关基础知识" class="headerlink" title="Java反射机制相关基础知识"></a>Java反射机制相关基础知识</h2><p>Java允许通过程序化的方法间接对Class进行操作。Class文件由类装载器装载后，在JVM中形成一份描述Class结构的元信息对象。通过该对象可以获知Class的结构信息，即构造函数，属性，方法等。Java允许使用该元信息对象来间接调用Class对象的功能。</p>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Car</span> </span>&#123;<span class="comment">//这是普通的一个car的方法</span></span><br><span class="line">	<span class="keyword">private</span> String brand;</span><br><span class="line">	<span class="keyword">private</span> String color;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> maxSpeed;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Car</span><span class="params">()</span></span>&#123;System.out.println(<span class="string">"init car!!"</span>);&#125;<span class="comment">//一个无参构造</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Car</span><span class="params">(String brand,String color,<span class="keyword">int</span> maxSpeed)</span></span>&#123;<span class="comment">//一个有参构造</span></span><br><span class="line">		<span class="keyword">this</span>.brand = brand;</span><br><span class="line">		<span class="keyword">this</span>.color = color;</span><br><span class="line">		<span class="keyword">this</span>.maxSpeed = maxSpeed;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">introduce</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       System.out.println(<span class="string">"brand:"</span>+brand+<span class="string">";color:"</span>+color+<span class="string">";maxSpeed:"</span>+maxSpeed);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getBrand</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> brand;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBrand</span><span class="params">(String brand)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.brand = brand;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getColor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> color;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setColor</span><span class="params">(String color)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.color = color;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getMaxSpeed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> maxSpeed;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMaxSpeed</span><span class="params">(<span class="keyword">int</span> maxSpeed)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.maxSpeed = maxSpeed;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Car <span class="title">initByDefaultConst</span><span class="params">()</span> <span class="keyword">throws</span> Throwable</span>&#123;<span class="comment">//execption的父类</span></span><br><span class="line">		ClassLoader loader = Thread.currentThread().getContextClassLoader();<span class="comment">//获取根类加载器</span></span><br><span class="line">		Class clazz = loader.loadClass(<span class="string">"com.smart.reflect.Car"</span>);<span class="comment">//类加载器 加载 Car类</span></span><br><span class="line">		Constructor cons = clazz.getDeclaredConstructor((Class[])<span class="keyword">null</span>);<span class="comment">//获取类的默认构造器对象</span></span><br><span class="line">		Car car = (Car)cons.newInstance();<span class="comment">//并通过它实例化Car</span></span><br><span class="line">		Method setBrand = clazz.getMethod(<span class="string">"setBrand"</span>,String.class);<span class="comment">//通过反射方法设置属性</span></span><br><span class="line">		setBrand.invoke(car,<span class="string">"宝马"</span>);</span><br><span class="line">		Method setColor = clazz.getMethod(<span class="string">"setColor"</span>,String.class);</span><br><span class="line">		setBrand.invoke(car,<span class="string">"黑色"</span>);</span><br><span class="line">		<span class="keyword">return</span> car;		</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span>  Throwable</span>&#123;</span><br><span class="line">		Car car = initByDefaultConst();</span><br><span class="line">		car.introduce();</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>可以通过编程方式调用Class的各项功能，相比于构造函数的间接调用，方法直接调用更为直接。具体查看上述注释。</p>
+<h3 id="类装载器"><a href="#类装载器" class="headerlink" title="类装载器"></a>类装载器</h3><p>类装载器：就是寻找类的字节码文件并构造出类在JVM内部表示对象的组件。在Java中，类装载器通过以下步骤载入JVM。</p>
+<p><strong>工作机制</strong>:</p>
+<ul>
+<li><ol>
+<li>装载：查找和导入class文件 </li>
+</ol>
+</li>
+<li><ol>
+<li>连接：执行校验，准备和解析步骤</li>
+</ol>
+</li>
+<li>校验：检查文件正确性。 准备：为类的静态变量分配存储空间  解析：将符号引用转为直接引用</li>
+<li>3.初始化：对类的静态变量，静态代码块执行初始化工作。 </li>
+</ul>
+<p>类装载工作有ClassLoader及其子类负责。JVM运行时产生三个ClassLoader，ClassLoader(根装载器)，ExtClassLoader(扩展类装载器)，AppClassLoader(应用类装载器)。</p>
+<p>ClassLoader-&gt;ExtClassLoader-&gt;AppClassLoader(三者的继承关系)</p>
+<p><strong>全盘负责委托机制</strong>：除非显示调用一个ClassLoader，否则所有JVM类都由一个ClassLoader载入。而且只有当父类装载器无法找到目标类时，才会调用子类装载器从自身类路径下寻找装载目标类。</p>
+<p>每个类在JVM中都拥有一个对应的java.lang.Class对象，提供了类结构信息的描述。所有java类包括void都有对应的Class对象。Class没有public的构造方法。Class对象实在装载类时由JVM通过调用类装载器中的defineClass()方法自动构造。</p>
+<h2 id="Java反射机制"><a href="#Java反射机制" class="headerlink" title="Java反射机制"></a>Java反射机制</h2><p>所谓的反射机制就是java语言在运行时拥有一项自观的能力。通过这种能力可以彻底的了解自身的情况为下一步的动作做准备。</p>
+<p>下面具体介绍一下java的反射机制。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Java的反射机制的实现要借助于4个类：class，Constructor，Field，Method;</span><br></pre></td></tr></table></figure>
+<p>其中class代表的类对象，Constructor－类的构造器对象，Field－类的属性对象，Method－类的方法对象。通过这四个对象我们可以粗略的看到一个类的各个组 成部分。</p>
+<p>Java反射的作用：</p>
+<p>在Java运行时环境中，对于任意一个类，可以知道这个类有哪些属性和方法。对于任意一个对象，可以调用它的任意一个方法。这种动态获取类的信息以及动态调用对象的方法的功能来自于Java 语言的反射（Reflection）机制。</p>
+<p>Java 反射机制主要提供了以下功能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在运行时判断任意一个对象所属的类。</span><br><span class="line">在运行时构造任意一个类的对象。</span><br><span class="line">在运行时判断任意一个类所具有的成员变量和方法。</span><br><span class="line">在运行时调用任意一个对象的方法</span><br></pre></td></tr></table></figure>
+<p>Class类</p>
+<p>1、得到构造器的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Constructor getConstructor(Class[] params) -- 获得使用特殊的参数类型的公共构造函数， </span><br><span class="line"> </span><br><span class="line">Constructor[] getConstructors() -- 获得类的所有公共构造函数 </span><br><span class="line"> </span><br><span class="line">Constructor getDeclaredConstructor(Class[] params) -- 获得使用特定参数类型的构造函数(与接入级别无关) </span><br><span class="line"> </span><br><span class="line">Constructor[] getDeclaredConstructors() -- 获得类的所有构造函数(与接入级别无关)</span><br></pre></td></tr></table></figure>
+<p>2、获得字段信息的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Field getField(String name) -- 获得命名的公共字段 </span><br><span class="line"> </span><br><span class="line">Field[] getFields() -- 获得类的所有公共字段 </span><br><span class="line"> </span><br><span class="line">Field getDeclaredField(String name) -- 获得类声明的命名的字段 </span><br><span class="line"> </span><br><span class="line">Field[] getDeclaredFields() -- 获得类声明的所有字段</span><br></pre></td></tr></table></figure>
+<p>3、获得方法信息的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Method getMethod(String name, Class[] params) -- 使用特定的参数类型，获得命名的公共方法 </span><br><span class="line"> </span><br><span class="line">Method[] getMethods() -- 获得类的所有公共方法 </span><br><span class="line"> </span><br><span class="line">Method getDeclaredMethod(String name, Class[] params) -- 使用特写的参数类型，获得类声明的命名的方法 </span><br><span class="line"> </span><br><span class="line">Method[] getDeclaredMethods() -- 获得类声明的所有方法</span><br></pre></td></tr></table></figure>
+<p>在程序开发中使用反射并结合属性文件，可以达到程序代码与配置文件相分离的目的</p>
+<p>如果我们想要得到对象的信息，一般需要“引入需要的‘包.类’的名称——通过new实例化——取得实例化对象”这样的过程。使用反射就可以变成“实例化对象——getClass()方法——得到完整的‘包.类’名称”这样的过程。</p>
+<p>正常方法是通过一个类创建对象，反射方法就是通过一个对象找到一个类的信息。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/21/计算机通用知识/OS/BaseKnowledge/OS_Linux内核/" rel="next" title="Linux-内核">
+                <i class="fa fa-chevron-left"></i> Linux-内核
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/23/杂谈/人工智能和深度学习概念入门/" rel="prev" title="人工智能和深度学习概念入门">
+                人工智能和深度学习概念入门 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">110</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ioc"><span class="nav-number">1.</span> <span class="nav-text">Ioc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#综述"><span class="nav-number">1.1.</span> <span class="nav-text">综述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ioc的类"><span class="nav-number">1.2.</span> <span class="nav-text">Ioc的类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java反射机制相关基础知识"><span class="nav-number">2.</span> <span class="nav-text">Java反射机制相关基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">2.1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类装载器"><span class="nav-number">2.2.</span> <span class="nav-text">类装载器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java反射机制"><span class="nav-number">3.</span> <span class="nav-text">Java反射机制</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

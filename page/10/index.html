@@ -260,7 +260,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/04/Golang/Go_struct和方法/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/04/06/杂谈/微服务架构/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -279,7 +279,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/04/Golang/Go_struct和方法/" itemprop="url">Go-struct</a></h1>
+                <a class="post-title-link" href="/2018/04/06/杂谈/微服务架构/" itemprop="url">微服务架构</a></h1>
         
 
         <div class="post-meta">
@@ -291,8 +291,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-04T14:27:55+08:00">
-                2018-06-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-06T15:06:45+08:00">
+                2018-04-06
               </time>
             
 
@@ -330,18 +330,11 @@
 
       
         
-          <ul>
-<li>结构体的三种声明方式，直接声明，new（Struct）,混合字面量</li>
-<li>结构体的内存布局——Go的结构体数据以连续块的形式存放在内存中</li>
-<li>递归结构体——可以引用自身来定义，方便树和链表的建立</li>
-<li>结构体工厂</li>
-<li>带标签的结构体</li>
-<li>匿名字段</li>
-<li>结构方法</li>
-</ul>
+          <h2 id="SOA综述"><a href="#SOA综述" class="headerlink" title="SOA综述"></a>SOA综述</h2><p>提到微服务架构就不得不提SOA(Service Oriented Architecture):面向服务架构</p>
+<p>SOA是一种<strong>粗粒度</strong>、<strong>松耦合</strong>服务架构，服务之间通过简单、精确定义<strong>接口进行通讯</strong>，不涉及底层编程接口和通讯模型。SOA可以看作是B/S模型(浏览器，服务器)、XML（Extensible Markup Language）/Web Service技术之后的自然延伸。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/04/Golang/Go_struct和方法/#more" rel="contents">
+            <a class="btn" href="/2018/04/06/杂谈/微服务架构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -392,7 +385,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/04/Golang/Go_defer和追踪/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/04/01/杂谈/Restful API/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -411,7 +404,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/04/Golang/Go_defer和追踪/" itemprop="url">Go-defer和追踪</a></h1>
+                <a class="post-title-link" href="/2018/04/01/杂谈/Restful API/" itemprop="url">Restful API</a></h1>
         
 
         <div class="post-meta">
@@ -423,8 +416,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-04T14:04:55+08:00">
-                2018-06-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T16:23:45+08:00">
+                2018-04-01
               </time>
             
 
@@ -462,16 +455,143 @@
 
       
         
-          <p>关键词defer允许我们推迟到函数返回之前（既<strong>函数return语句之后</strong>）一刻才执行某个语句或函数。类似于JAVA中的finally语句块，它一般用于<strong>释放某些资源</strong>。</p>
-<p>之所以有defer的语法是为了代码更加的简洁，易读。相当于一个<strong>语法糖</strong>（在创建资源后，就写好释放资源的代码）</p>
-<p>defer的特点如下：</p>
+          
+            <h2 id="理解Restful架构"><a href="#理解Restful架构" class="headerlink" title="理解Restful架构"></a>理解Restful架构</h2><h2 id="Restful-综述"><a href="#Restful-综述" class="headerlink" title="Restful 综述"></a>Restful 综述</h2><p>Representational State Transfer：表现层状态转化</p>
+<p>符合REST原则的架构，被称作RESTful架构</p>
+<p>通过具体的URI定位符，找到对应的资源，然后以固定的格式返回数据，这样的就是Restful API。</p>
+<h2 id="相关引用"><a href="#相关引用" class="headerlink" title="相关引用"></a>相关引用</h2><p><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">理解RESTful架构</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/04/01/编程语言/Java/Java_Java8/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/编程语言/Java/Java_Java8/" itemprop="url">Java8 新特性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T16:23:45+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>​    Java8由Oracle公司于2014年3月18号正式推出，JDK1.8中新增了许多全新的特性，支持函数式编程。</p>
 <ul>
-<li>在函数return之后才会执行</li>
-<li>当有多个defer执行时，以逆序执行（类似栈，即后进先出）</li>
+<li><strong>Lambda表达式</strong>：Lambda允许把<strong>函数作为</strong>一个方法的<strong>参数</strong></li>
+<li><strong>方法引用</strong>：可以直接引用已有Java类或对象（实例）的方法或构造器。与lambda联合使用，方法引用可以使语言的构造更紧凑简洁，减少冗余代码</li>
+<li><strong>默认方法</strong>：一个在接口里面有了一个实现的方法</li>
+<li><strong>新的编译工具</strong>：如：Nashorn引擎 jjs、 类依赖分析器jdeps</li>
+<li><strong>Stream API</strong>：新添加的Stream API（java.util.stream） 把真正的函数式编程风格引入到Java中。</li>
+<li><strong>Date Time API</strong> − 加强对日期与时间的处理。</li>
+<li><strong>Optional 类</strong> − Optional 类已经成为 Java 8 类库的一部分，用来解决空指针异常。</li>
+<li><strong>Nashorn, JavaScript 引擎</strong> − Java 8提供了一个新的Nashorn javascript引擎，它允许我们在JVM上运行特定的javascript应用。</li>
 </ul>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/04/Golang/Go_defer和追踪/#more" rel="contents">
+            <a class="btn" href="/2018/04/01/编程语言/Java/Java_Java8/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -522,7 +642,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/04/Golang/Go_goroutine/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/04/01/编程语言/Java/JVM/Java_内存空间/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -541,7 +661,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/04/Golang/Go_goroutine/" itemprop="url">Go_goroutine</a></h1>
+                <a class="post-title-link" href="/2018/04/01/编程语言/Java/JVM/Java_内存空间/" itemprop="url">Java内存空间</a></h1>
         
 
         <div class="post-meta">
@@ -553,8 +673,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-04T10:42:55+08:00">
-                2018-06-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T16:23:37+08:00">
+                2018-04-01
               </time>
             
 
@@ -592,11 +712,10 @@
 
       
         
-          <h3 id="Goroutine-——协程"><a href="#Goroutine-——协程" class="headerlink" title="Goroutine ——协程"></a>Goroutine ——协程</h3><p>OS将程序分为了进程和线程来提高程序的CPU利用率，一个进程拥有多个线程，多个线程共享同一份内存空间来实现线程间通信。</p>
-<p><strong>协程</strong>，可以看做<strong>用户级线程</strong>（更为轻量级的线程），这个概念是相对于OS <strong>系统级线程</strong>所提出的，协程的切换可以由用户控制，而线程只能由操作系统调度。</p>
+          <h2 id="Java内存分配方式"><a href="#Java内存分配方式" class="headerlink" title="Java内存分配方式"></a>Java内存分配方式</h2><p><img src="/2018/04/01/编程语言/Java/JVM/Java_内存空间/Java内存区域分配.jpg" alt="Java内存区域分配"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/04/Golang/Go_goroutine/#more" rel="contents">
+            <a class="btn" href="/2018/04/01/编程语言/Java/JVM/Java_内存空间/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -647,7 +766,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/03/Golang/Go_数组和切片/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/29/框架/Spring/Spring_AOP/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -666,7 +785,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/03/Golang/Go_数组和切片/" itemprop="url">Go-Bug记录</a></h1>
+                <a class="post-title-link" href="/2018/03/29/框架/Spring/Spring_AOP/" itemprop="url">Spring_AOP</a></h1>
         
 
         <div class="post-meta">
@@ -678,8 +797,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T14:04:55+08:00">
-                2018-06-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T23:59:58+08:00">
+                2018-03-29
               </time>
             
 
@@ -717,10 +836,11 @@
 
       
         
-          <p>此处记录日常业务编写中所出现的Bug并加以记录，以作为以后快速解决Bug的查询数据库</p>
+          <h3 id="AOP"><a href="#AOP" class="headerlink" title="AOP"></a>AOP</h3><p>AOP(Aspect Oriented Programming) : 面向切面编程。是OOP（Object Oriented Programming，面向对象编程）的补充和完善。<strong>这种在运行时，动态地将代码切入到类的指定方法、指定位置上的编程思想就是面向切面的编程。</strong></p>
+<p>OOP通过封装，继承，多态等概念建立对象层次结构，从而实现对现实世界的一个模拟。OOP允许开发者定义一个总想的关系，但并不适合定义横向的关系。因此这会引起一个问题，比如<strong>日志</strong>功能，日志相关代码会横向散布在所有对象层次中，如<strong>安全性，异常处理</strong>等等功能也是如此，这种散布在各处的无关的代码被称为<strong>横切（cross cutting）</strong>，在OOP设计中，导致了大量代码的重复，而不利于各个模块的重用。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/03/Golang/Go_数组和切片/#more" rel="contents">
+            <a class="btn" href="/2018/03/29/框架/Spring/Spring_AOP/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -771,7 +891,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/03/Golang/Go_Bug记录/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/29/编程语言/Java/Java集合类/Java_集合/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -790,7 +910,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/03/Golang/Go_Bug记录/" itemprop="url">Go-Bug记录</a></h1>
+                <a class="post-title-link" href="/2018/03/29/编程语言/Java/Java集合类/Java_集合/" itemprop="url">Java_集合</a></h1>
         
 
         <div class="post-meta">
@@ -802,8 +922,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T14:04:55+08:00">
-                2018-06-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T15:03:04+08:00">
+                2018-03-29
               </time>
             
 
@@ -841,10 +961,11 @@
 
       
         
-          <p>此处记录日常业务编写中所出现的Bug并加以记录，以作为以后快速解决Bug的查询数据库</p>
+          <p>数组：可以存放<strong>基本数据类型和对象</strong>，但是在使用上需要动态扩容。</p>
+<p>容器  : 只能存放<strong>对象</strong>，也唤作集合，容器类是个大家族，常用的有ArrayList，LinkedList，HashMap等等，理解熟悉容器类才能更好的使用他们。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/03/Golang/Go_Bug记录/#more" rel="contents">
+            <a class="btn" href="/2018/03/29/编程语言/Java/Java集合类/Java_集合/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -895,7 +1016,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/03/Golang/Go_chan并发/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/29/编程语言/Java/JVM/Java_GC/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -914,7 +1035,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/03/Golang/Go_chan并发/" itemprop="url">Go-chan并发</a></h1>
+                <a class="post-title-link" href="/2018/03/29/编程语言/Java/JVM/Java_GC/" itemprop="url">Java_GC</a></h1>
         
 
         <div class="post-meta">
@@ -926,8 +1047,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T14:04:55+08:00">
-                2018-06-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T14:44:32+08:00">
+                2018-03-29
               </time>
             
 
@@ -965,10 +1086,10 @@
 
       
         
-          <p>Channel是Go中的一个核心类型，可以把它看作一个<strong>管道</strong>，通过它可以完成goroutine之间的通信。Channel是<strong>FIFO的队列</strong>，而且当多个goroutine可以同时读写channel而<strong>不用考虑同步</strong>。</p>
+          <p>相比较C++需要在程序中自行处理内存的回收释放。Java在JVM虚拟机上增加了GC机制，用以在合适的时间通过垃圾回收，回收不需要的数据，从而减少内存占用，避免OOM(Out Of Memory)。掌握GC知识一方面可以帮助我们快速排查因JVM导致的线上问题，另一方面也可以帮助我们在Java应用发布之前合理地对JVM进行调优，提高应用的执行效率、可靠性和健壮性。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/03/Golang/Go_chan并发/#more" rel="contents">
+            <a class="btn" href="/2018/03/29/编程语言/Java/JVM/Java_GC/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1019,7 +1140,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/01/Golang/Go_常用命令/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/23/编程语言/Java/Java应用基础/Java_多态/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -1038,7 +1159,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/01/Golang/Go_常用命令/" itemprop="url">Go_常用命令</a></h1>
+                <a class="post-title-link" href="/2018/03/23/编程语言/Java/Java应用基础/Java_多态/" itemprop="url">Java_多态</a></h1>
         
 
         <div class="post-meta">
@@ -1050,8 +1171,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-01T14:04:55+08:00">
-                2018-06-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T20:50:33+08:00">
+                2018-03-23
               </time>
             
 
@@ -1089,11 +1210,10 @@
 
       
         
-          <p><strong>Go build / install /clean /fmt /doc /get /test</strong></p>
-<p>本文主要介绍了以上几种GO常用命令 </p>
+          <p>对Thinking in java 多态一章的总结</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/06/01/Golang/Go_常用命令/#more" rel="contents">
+            <a class="btn" href="/2018/03/23/编程语言/Java/Java应用基础/Java_多态/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1144,7 +1264,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/05/29/Golang/Go_语言基础/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/23/杂谈/人工智能和深度学习概念入门/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -1163,7 +1283,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/29/Golang/Go_语言基础/" itemprop="url">Go-语言基础</a></h1>
+                <a class="post-title-link" href="/2018/03/23/杂谈/人工智能和深度学习概念入门/" itemprop="url">人工智能和深度学习概念入门</a></h1>
         
 
         <div class="post-meta">
@@ -1175,8 +1295,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-29T14:38:15+08:00">
-                2018-05-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T20:50:33+08:00">
+                2018-03-23
               </time>
             
 
@@ -1214,10 +1334,13 @@
 
       
         
-          <h3 id="linux安装Go环境"><a href="#linux安装Go环境" class="headerlink" title="linux安装Go环境"></a>linux安装Go环境</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">yum install mercurial</span><br><span class="line">yum install git</span><br><span class="line">yum install gcc</span><br><span class="line">wget https://golang.google.cn/dlc/具体包名</span><br><span class="line">tar -zxvf go1.2.linux-amd64.tar.gz </span><br><span class="line">vim /etc/profile</span><br><span class="line">//配置GO 全局变量 </span><br><span class="line">//Gopath是个人Go目录地址</span><br><span class="line">//Goroot是Go安装地址</span><br><span class="line"><span class="built_in">export</span> GOROOT=/usr/<span class="built_in">local</span>/go</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$GOROOT</span>/bin:<span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">export</span> GOPATH=/usr/zibu/go</span><br></pre></td></tr></table></figure>
+          <h2 id="AI-DL-ML三者的概念"><a href="#AI-DL-ML三者的概念" class="headerlink" title="AI/DL/ML三者的概念"></a>AI/DL/ML三者的概念</h2><p>人工智能是一个宽泛的概念，目的是让计算机能够像人一样思考。</p>
+<p>人工智能现阶段分为弱人工智能和强人工智能。当下的AI本质上都是弱人工智能。而DL是实现AI的一种方法,而在深度学习出现之前，一般是以机器学习的神经网络学习算法存在的，随着计算机资源和大数据的兴起，神经网络变成了如今的DL。</p>
+<p>三者的关系，是互相包含。AI概念最广，DL和ML之间关系，不确定，根据划分方法的不同而不同。</p>
+<p><img src="/2018/03/23/杂谈/人工智能和深度学习概念入门/AIDIML关系.jpg" alt="AI/DI/ML关系"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/05/29/Golang/Go_语言基础/#more" rel="contents">
+            <a class="btn" href="/2018/03/23/杂谈/人工智能和深度学习概念入门/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1268,7 +1391,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/05/28/BlockChain/区块链技术_以太坊概述/">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/23/框架/Spring/Spring_IOC/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zibu">
@@ -1287,7 +1410,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/28/BlockChain/区块链技术_以太坊概述/" itemprop="url">区块链技术-以太坊概述</a></h1>
+                <a class="post-title-link" href="/2018/03/23/框架/Spring/Spring_IOC/" itemprop="url">SpringIoc</a></h1>
         
 
         <div class="post-meta">
@@ -1299,8 +1422,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-28T16:59:25+08:00">
-                2018-05-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T17:20:34+08:00">
+                2018-03-23
               </time>
             
 
@@ -1338,139 +1461,12 @@
 
       
         
-          <h2 id="以太坊是什么"><a href="#以太坊是什么" class="headerlink" title="以太坊是什么"></a>以太坊是什么</h2><p>以太坊（Ethereum）是一个建立在区块链技术之上， 去中心化应用平台。它允许任何人在平台中建立和使用通过区块链技术运行的去中心化应用。</p>
+          <h2 id="Ioc"><a href="#Ioc" class="headerlink" title="Ioc"></a>Ioc</h2><h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>Inverse of Control ，控制反转。是Spring容器的内核，AOP,声明式事务等功能的基础。涉及代码解耦，设计模式，代码优化等问题</p>
+<p>有关于IOC的理解，这个回答下的第一篇文章非常清楚，示例代码配上解答令人很快理解。故不再赘述，</p>
+<p>来源：<a href="https://www.zhihu.com/question/23277575" target="_blank" rel="noopener">https://www.zhihu.com/question/23277575</a></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/05/28/BlockChain/区块链技术_以太坊概述/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/05/19/Java/Java应用基础/Java_异常/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/19/Java/Java应用基础/Java_异常/" itemprop="url">Java_异常</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-19T14:40:02+08:00">
-                2018-05-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h3 id="异常分类"><a href="#异常分类" class="headerlink" title="异常分类"></a>异常分类</h3><p>按照异常需要处理的时机分为<strong>编译时异常（强制性异常）</strong>也叫<strong>CheckedException</strong>和<strong>运行时异常（非强制性异常）</strong>也叫<strong>RuntimeException</strong>。只有Java语言提供了Checked异常，Java认为Checked异常都是可以被处理的异常，所以Java程序必须显式处理异常，否则就会编译报错。这就是Java设计哲学之一，没有妥善处理异常的代码根本没有机会被执行。方法有两种</p>
-<ol>
-<li>当前方法知道如何处理异常，则用<strong>try…catch</strong>语句处理异常。</li>
-<li>当前方法不知道如何处理异常，则<strong>向上抛出</strong>该异常。</li>
-</ol>
-<p>运行时异常，只有在当代码运行时才会发现，如除数是0，数组下标越界等，根据具体情况选择是否处理。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/05/19/Java/Java应用基础/Java_异常/#more" rel="contents">
+            <a class="btn" href="/2018/03/23/框架/Spring/Spring_IOC/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1512,7 +1508,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1556,7 +1552,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">134</span>
+                <span class="site-state-item-count">110</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1569,7 +1565,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
