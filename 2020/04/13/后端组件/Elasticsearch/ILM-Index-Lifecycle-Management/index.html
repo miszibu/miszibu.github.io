@@ -103,7 +103,7 @@
 <meta property="og:description" content="IntroductionILM(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。 在时序型数据的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/ILM-Index-Lifecycle-Management/index-life-cycle.png">
-<meta property="og:updated_time" content="2020-04-14T15:53:57.564Z">
+<meta property="og:updated_time" content="2020-04-14T15:58:09.457Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ILM_Index_Lifecycle_Management">
 <meta name="twitter:description" content="IntroductionILM(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。 在时序型数据的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要">
@@ -334,7 +334,7 @@
       
         <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a><strong>Introduction</strong></h2><p><strong>ILM</strong>(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。</p>
 <p>在<strong>时序型数据</strong>的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要指定一个规则删除无效 Index。这就是 ILM 可以帮助我们做到的。</p>
-<p>在这篇 Blog 中，我们会TODO</p>
+<p>在这篇 Blog 中，我们会介绍 ILM 所涉及的相关概念，并通过 ILM 来实现时序型日志的定时删除功能，这在之前的版本中往往是需要 由 Crontab 定期触发 curator 来实现的，相对复杂。</p>
 <a id="more"></a>
 <h2 id="Index-Life-Cycle-Introduction"><a href="#Index-Life-Cycle-Introduction" class="headerlink" title="Index Life Cycle Introduction"></a>Index Life Cycle Introduction</h2><p><img src="/2020/04/13/后端组件/Elasticsearch/ILM-Index-Lifecycle-Management/index-life-cycle.png" alt="index-life-cycle"></p>
 <p>这 ILM 中，Index的生命周期被划分为了4个阶段，<strong>Hot  Warm Cold &amp; Delete</strong>。</p>
