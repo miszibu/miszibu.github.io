@@ -103,7 +103,7 @@
 <meta property="og:description" content="IntroductionILM(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。 在时序型数据的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/ILM-Index-Lifecycle-Management/index-life-cycle.png">
-<meta property="og:updated_time" content="2020-04-14T15:58:09.457Z">
+<meta property="og:updated_time" content="2020-04-14T15:59:06.114Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ILM_Index_Lifecycle_Management">
 <meta name="twitter:description" content="IntroductionILM(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。 在时序型数据的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要">
@@ -380,7 +380,7 @@
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://www.elastic.co/blog/implementing-hot-warm-cold-in-elasticsearch-with-index-lifecycle-management" target="_blank" rel="noopener">Implementing a Hot-Warm-Cold Architecture with Index Lifecycle Management</a></p>
 <p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.7/getting-started-index-lifecycle-management.html" target="_blank" rel="noopener">ES6.7 getting-started-index-lifecycle-management.html</a></p>
 <p><a href="https://elasticsearch.cn/article/6358" target="_blank" rel="noopener">Elasticsearch 6.6 Index Lifecycle Management 尝鲜</a></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.</span></span><br><span class="line"><span class="attr">  index:</span> <span class="string">"metricbeat-<span class="template-variable">%&#123;[agent.version]&#125;</span>-<span class="template-variable">%&#123;+yyyy.MM.dd.HH.mm&#125;</span>"</span></span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="string">setup.template.name:</span> <span class="string">"metricbeat-<span class="template-variable">%&#123;[agent.version]&#125;</span>"</span></span><br><span class="line"><span class="string">setup.template.pattern:</span> <span class="string">"metricbeat-<span class="template-variable">%&#123;[agent.version]&#125;</span>-*"</span></span><br></pre></td></tr></table></figure>
+
       
     </div>
     
