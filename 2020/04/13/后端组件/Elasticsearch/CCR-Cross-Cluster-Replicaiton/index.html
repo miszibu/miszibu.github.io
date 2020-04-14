@@ -107,7 +107,7 @@
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-read-alias-blog-read-aliases.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-write-alias-blog-write-aliases.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-overview-blog-test.png">
-<meta property="og:updated_time" content="2020-04-13T07:52:48.747Z">
+<meta property="og:updated_time" content="2020-04-14T13:42:43.690Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CCR-Cross_Cluster_Replicaiton">
 <meta name="twitter:description" content="IntroductionElasticsearch cross-cluster replication (CCR) 在 ES6.7版本正式发布，ccr允许 index 跨集群复制，复制Index 数据到其他 ES Cluster，有助于实现例如high availability (HA) across datacenters, disaster recovery (DR)和 CDN-like ar">
@@ -341,6 +341,7 @@
 <p><strong>Leader Index</strong>用于接收操作，并复制数据到N 个 Follower Index 中。</p>
 <p><strong>Follower Index</strong>则无法接收写请求（除了来自于 Leader Index 的数据）。</p>
 <p>CCR无法处理Conflict Resolutin（我理解为数据同时写入多个 Index 中），这意味着数据只会被写入到 Leader Index, 并被复制到 Follower Index 上。<em>我们可以将一个 Follower Index 升级为 Regular Index（Leader Index 其实就是一个 Regualr Index），但我们无法将一个存在数据的 Leader Index 转为 Follower Index。</em></p>
+<a id="more"></a>
 <h2 id="CCR-Bi-directional（双向）-Replication"><a href="#CCR-Bi-directional（双向）-Replication" class="headerlink" title="CCR Bi-directional（双向） Replication"></a>CCR Bi-directional（双向） Replication</h2><h2 id="Tutorial-Optimizing-CCR-for-index"><a href="#Tutorial-Optimizing-CCR-for-index" class="headerlink" title="Tutorial: Optimizing CCR for index"></a>Tutorial: Optimizing CCR for index</h2><h3 id="1-Setup"><a href="#1-Setup" class="headerlink" title="1. Setup"></a>1. Setup</h3><p>在本教程中，我们将会使用两个集群来模拟 CCR 的场景。</p>
 <p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-replicated-blog.png" alt="bidirectional-ccr-replicated-blog"></p>
 <center>Replicated (read-only) indices are in gray</center>
@@ -382,6 +383,13 @@
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /logs/_doc  &#123;   "test" : "log message in DC1"  &#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /logs/_search</span><br></pre></td></tr></table></figure>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://www.elastic.co/blog/bi-directional-replication-with-elasticsearch-cross-cluster-replication-ccr" target="_blank" rel="noopener">Bi-directional replication with Elasticsearch cross-cluster replication (CCR)</a></p>
+<p><a href="https://www.elastic.co/blog/follow-the-leader-an-introduction-to-cross-cluster-replication-in-elasticsearch" target="_blank" rel="noopener">Follow the Leader: An Introduction to Cross-Cluster Replication in Elasticsearch</a></p>
+<ol>
+<li>版本升级 如何切换</li>
+<li>别名自动化</li>
+<li>DR切换的条件，http code?</li>
+<li>重要的 Index 才需要做 CCR</li>
+</ol>
 
       
     </div>

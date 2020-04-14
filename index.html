@@ -330,55 +330,18 @@
 
       
         
-          
-            <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Elasticsearch cross-cluster replication (CCR) 在 ES6.7版本正式发布，ccr允许 <strong>index 跨集群复制</strong>，复制Index 数据到其他 ES Cluster，有助于实现例如high availability (HA) across datacenters, disaster recovery (DR)和 CDN-like architectures等用户场景。</p>
+          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Elasticsearch cross-cluster replication (CCR) 在 ES6.7版本正式发布，ccr允许 <strong>index 跨集群复制</strong>，复制Index 数据到其他 ES Cluster，有助于实现例如high availability (HA) across datacenters, disaster recovery (DR)和 CDN-like architectures等用户场景。</p>
 <p>CCR是基于 Leader/Follower  架构。</p>
 <p><strong>Leader Index</strong>用于接收操作，并复制数据到N 个 Follower Index 中。</p>
 <p><strong>Follower Index</strong>则无法接收写请求（除了来自于 Leader Index 的数据）。</p>
 <p>CCR无法处理Conflict Resolutin（我理解为数据同时写入多个 Index 中），这意味着数据只会被写入到 Leader Index, 并被复制到 Follower Index 上。<em>我们可以将一个 Follower Index 升级为 Regular Index（Leader Index 其实就是一个 Regualr Index），但我们无法将一个存在数据的 Leader Index 转为 Follower Index。</em></p>
-<h2 id="CCR-Bi-directional（双向）-Replication"><a href="#CCR-Bi-directional（双向）-Replication" class="headerlink" title="CCR Bi-directional（双向） Replication"></a>CCR Bi-directional（双向） Replication</h2><h2 id="Tutorial-Optimizing-CCR-for-index"><a href="#Tutorial-Optimizing-CCR-for-index" class="headerlink" title="Tutorial: Optimizing CCR for index"></a>Tutorial: Optimizing CCR for index</h2><h3 id="1-Setup"><a href="#1-Setup" class="headerlink" title="1. Setup"></a>1. Setup</h3><p>在本教程中，我们将会使用两个集群来模拟 CCR 的场景。</p>
-<p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-replicated-blog.png" alt="bidirectional-ccr-replicated-blog"></p>
-<center>Replicated (read-only) indices are in gray</center>
-
-<h3 id="2-License"><a href="#2-License" class="headerlink" title="2. License"></a>2. License</h3><p>CCR 是一个 Platinum License Featuer, 请自行购买 License。在测试环境直接激活Trial License 即可。可以通过 Kibana或者 API 激活。</p>
-<h3 id="3-Define-Remote-Cluster"><a href="#3-Define-Remote-Cluster" class="headerlink" title="3. Define Remote Cluster"></a>3. Define Remote Cluster</h3><p>两个 ES Clusters 都需要设置对方 集群的TCP链接地址，使集群可互相感知，访问。</p>
-<p>请自行选择Kibana dev tools console( Kibana&gt; Dev tools &gt; Console) 或者 API 来激活配置。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">// 在DC1-cluster 集群中，配置 DC2-cluster 的连接信息</span><br><span class="line">PUT /_cluster/settings </span><br><span class="line">&#123; </span><br><span class="line">  <span class="attr">"persistent"</span> : &#123; </span><br><span class="line">    <span class="attr">"cluster"</span> : &#123; </span><br><span class="line">      <span class="attr">"remote"</span> : &#123; </span><br><span class="line">        <span class="attr">"DC2-cluster"</span> : &#123; </span><br><span class="line">          <span class="attr">"seeds"</span> : [ </span><br><span class="line">            <span class="string">"127.0.0.1:9301"</span> </span><br><span class="line">          ] </span><br><span class="line">        &#125; </span><br><span class="line">      &#125; </span><br><span class="line">    &#125; </span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br><span class="line">// 同理，在 DC2-cluster 中，配置 DC1-cluster 的连接信息</span><br><span class="line">PUT /_cluster/settings </span><br><span class="line">&#123; </span><br><span class="line">  <span class="attr">"persistent"</span> : &#123; </span><br><span class="line">    <span class="attr">"cluster"</span> : &#123; </span><br><span class="line">      <span class="attr">"remote"</span> : &#123; </span><br><span class="line">        <span class="attr">"DC1-cluster"</span> : &#123; </span><br><span class="line">          <span class="attr">"seeds"</span> : [ </span><br><span class="line">            <span class="string">"127.0.0.1:9300"</span> </span><br><span class="line">          ] </span><br><span class="line">        &#125; </span><br><span class="line">      &#125; </span><br><span class="line">    &#125; </span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在设置完成后，可以通过以下 API 来获取当前 Cluster 所配置的 Remote Cluster 信息。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_remote/info?pretty</span><br></pre></td></tr></table></figure>
-<h3 id="4-Create-Indices-for-bi-directional-replication"><a href="#4-Create-Indices-for-bi-directional-replication" class="headerlink" title="4. Create Indices for bi-directional replication"></a>4. Create Indices for bi-directional replication</h3><p>在 DC1-cluster 上创建 logs-dc1 index</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// Create a logs index in DC1 </span><br><span class="line">PUT /logs-dc1</span><br></pre></td></tr></table></figure>
-<p>在 DC2-cluster 上创建 logs-dc2 index</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// Create a logs index in DC2 </span><br><span class="line">PUT /logs-dc2</span><br></pre></td></tr></table></figure>
-<p>Note: 在这一步我们只创建了 Leader Index，现在它还是个Regular index。Follower Index 则是通过设置 CCR，来自动生成的。</p>
-<p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-replicated-blog.png" alt="bidirectional-ccr-replicated-blog"></p>
-<h3 id="5-Initiate-replication"><a href="#5-Initiate-replication" class="headerlink" title="5. Initiate replication"></a>5. Initiate replication</h3><p>在 DC2-cluster 中我们通过以下方式，来在当前集群中创建，DC1-cluster 的 logs-dc1 index 的 follower index.</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PUT /logs-dc1/_ccr/follow </span><br><span class="line">&#123; </span><br><span class="line">  <span class="attr">"remote_cluster"</span> : <span class="string">"DC1-cluster"</span>, </span><br><span class="line">  <span class="attr">"leader_index"</span> : <span class="string">"logs-dc1"</span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>同理，在 DC1-cluster 中，创建 DC2-cluster 的 logs-dc2 index 的 follower index.</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PUT /logs-dc2/_ccr/follow </span><br><span class="line">&#123; </span><br><span class="line">  <span class="attr">"remote_cluster"</span> : <span class="string">"DC2-cluster"</span>, </span><br><span class="line">  <span class="attr">"leader_index"</span> : <span class="string">"logs-dc2"</span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>Note</strong>: 在上述案例中我们使用的是单个index 的设置，在日志分析的场景中，我们则可以通过 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.5/ccr-put-auto-follow-pattern.html" target="_blank" rel="noopener">auto-follow patterns</a> ，来批量匹配时序型index. 集群将在 Remote cluster 中自动检测符合 Pattern 的索引，然后在当前集群中创建对应的 Follower Index.</p>
-<p><strong>Note：</strong>再次提示 Follower Index 是只读的，不接受写请求。</p>
-<h3 id="6-Define-read-aliases"><a href="#6-Define-read-aliases" class="headerlink" title="6. Define read aliases"></a>6. Define read aliases</h3><p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-read-alias-blog-read-aliases.png" alt="bidirectional-ccr-read-alias-blog-read-aliases"></p>
-<p>现在，每个集群都有了两个 index,一个是自己的 Leader Index，另外一个则是另外集群的 Follower index.</p>
-<p>为了在多个 indices 上同时查询，且简化查询语句。我们可以通过设置别名的方式，既查询”logs”别名时，同时查询 logs-dc1 和 logs-dc2。</p>
-<p><strong>Note:</strong> <strong>别名是设置在 Index 上的，可以被follower index复制</strong>，也就是说当我们为 logs-dc1设置别名为 logs 时，那么在 DC2-cluster 上对应的 follower index也可以由该别名访问到。</p>
-<p>DC1-cluster</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases </span><br><span class="line">&#123; </span><br><span class="line">    <span class="attr">"actions"</span> : [ </span><br><span class="line">        &#123; <span class="attr">"add"</span> : &#123; <span class="attr">"index"</span> : <span class="string">"logs-dc1"</span>, <span class="attr">"alias"</span> : <span class="string">"logs"</span> &#125; &#125; </span><br><span class="line">    ] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>DC2-cluster</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases </span><br><span class="line">&#123; </span><br><span class="line">    <span class="attr">"actions"</span> : [ </span><br><span class="line">        &#123; <span class="attr">"add"</span> : &#123; <span class="attr">"index"</span> : <span class="string">"logs-dc2"</span>, <span class="attr">"alias"</span> : <span class="string">"logs"</span> &#125; &#125; </span><br><span class="line">    ] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="7-Define-write-aliases"><a href="#7-Define-write-aliases" class="headerlink" title="7. Define write aliases"></a>7. Define write aliases</h3><p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-write-alias-blog-write-aliases.png" alt=""></p>
-<p>同第6步，为了简化Application setup，我们可以通过创建 write alias，通过指定 logs alias 到指定的 index 中，比如 logs-dc1 index on DC1-cluster, logs-dc2 index on DC2-clutser.</p>
-<p>那么对应 Application 而言，只需要简单的将数据发送到当前 data center 的 logs index即可。</p>
-<p>DC1-clusetr</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases </span><br><span class="line">&#123; </span><br><span class="line">    <span class="attr">"actions"</span> : [ </span><br><span class="line">        &#123; </span><br><span class="line">            <span class="attr">"add"</span> : &#123; </span><br><span class="line">                 <span class="attr">"index"</span> : <span class="string">"logs-dc1"</span>, </span><br><span class="line">                 <span class="attr">"alias"</span> : <span class="string">"logs"</span>, </span><br><span class="line">                 <span class="attr">"is_write_index"</span> : <span class="literal">true</span> </span><br><span class="line">            &#125; </span><br><span class="line">        &#125; </span><br><span class="line">    ] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>DC2-clusetr</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases </span><br><span class="line">&#123; </span><br><span class="line">    <span class="attr">"actions"</span> : [ </span><br><span class="line">        &#123; </span><br><span class="line">            <span class="attr">"add"</span> : &#123; </span><br><span class="line">                 <span class="attr">"index"</span> : <span class="string">"logs-dc2"</span>, </span><br><span class="line">                 <span class="attr">"alias"</span> : <span class="string">"logs"</span>, </span><br><span class="line">                 <span class="attr">"is_write_index"</span> : <span class="literal">true</span> </span><br><span class="line">            &#125; </span><br><span class="line">        &#125; </span><br><span class="line">    ] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="8-Test-replication-setup"><a href="#8-Test-replication-setup" class="headerlink" title="8. Test replication setup"></a>8. Test replication setup</h3><p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-overview-blog-test.png" alt="bidirectional-ccr-overview-blog-test"></p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /logs/_doc  &#123;   "test" : "log message in DC1"  &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /logs/_search</span><br></pre></td></tr></table></figure>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://www.elastic.co/blog/bi-directional-replication-with-elasticsearch-cross-cluster-replication-ccr" target="_blank" rel="noopener">Bi-directional replication with Elasticsearch cross-cluster replication (CCR)</a></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -495,10 +458,16 @@
 
       
         
-          
-            <p>ILM, Index Lifecycle Managment 是 ES6.6.版本发布的新的特性。</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2>
-          
+          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a><strong>Introduction</strong></h2><p><strong>ILM</strong>(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。</p>
+<p>在<strong>时序型数据</strong>的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要指定一个规则删除无效 Index。这就是 ILM 可以帮助我们做到的。</p>
+<p>在这篇 Blog 中，我们会TODO</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/04/13/后端组件/Elasticsearch/ILM-Index-Lifecycle-Management/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
