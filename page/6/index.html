@@ -260,6 +260,383 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/07/23/后端组件/DB/Mysql/DB_Raft分布式一致性/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/23/后端组件/DB/Mysql/DB_Raft分布式一致性/" itemprop="url">DB_Raft分布式一致性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-23T17:47:01+08:00">
+                2018-07-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>Raft是一种便于理解和实现的一致性算法，它在容错方面的表现与Paxos相当，不同之处在于它被分解为相对独立的子问题，并且它干净的解决了实际系统中所需的主要部分。</p>
+</blockquote>
+<p>与Paxos相比，Raft更为简洁易懂，只需要读懂几篇论文，就可以相对的实现一个分布式一致性的系统，这也是Raft在工程中被广泛应用的原因。本文就将介绍Raft是如何实现分布式一致性的。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/23/后端组件/DB/Mysql/DB_Raft分布式一致性/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/07/23/杂谈/Better Coder/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/23/杂谈/Better Coder/" itemprop="url">Better Coder</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-23T15:26:55+08:00">
+                2018-07-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>什么是优质的代码，如何编写出优质的代码，在Coding的时候要做什么才能让自己的代码更为优雅简洁，本文<strong>落足实际</strong>，为编写出优秀的业务的代码而服务。</p>
+<h3 id="表格驱动法"><a href="#表格驱动法" class="headerlink" title="表格驱动法"></a>表格驱动法</h3><p>核心：<strong>拆分业务逻辑和具体数据</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同样一段业务代码 如果在需要增加数据的时候，代码就会特别冗杂</span></span><br><span class="line"><span class="function">function <span class="title">contry_initial</span><span class="params">($country)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ($country===<span class="string">"China"</span> )&#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="string">"CHN"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>($country===<span class="string">"America"</span>)&#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="string">"USA"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>($country===<span class="string">"Japan"</span>)&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"JPN"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="string">"OTHER"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 然而将数据和逻辑分离之后，数据可以单独增加，不影响业务逻辑，代码的可重用性更高。</span></span><br><span class="line"><span class="function">function <span class="title">contry_initial</span><span class="params">($country)</span></span>&#123;</span><br><span class="line">  $countryList=[</span><br><span class="line">      <span class="string">"China"</span>=&gt; <span class="string">"CHN"</span>,</span><br><span class="line">      <span class="string">"America"</span>=&gt; <span class="string">"USA"</span>,</span><br><span class="line">      <span class="string">"Japan"</span>=&gt; <span class="string">"JPN"</span>,</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(in_array($country, array_keys($countryList))) &#123;</span><br><span class="line">        <span class="keyword">return</span> $countryList[$country];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Other"</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在实际的多人开发的项目中，表格驱动法可以使得在添加相对应功能的时候，只需要修改数据而非变动逻辑，使得代码的维护性大大增强，风格统一。数据易于变动，逻辑相对而言更为稳定。</p>
+<hr>
+<h3 id="相关引用"><a href="#相关引用" class="headerlink" title="相关引用"></a>相关引用</h3><p><a href="https://www.zhihu.com/question/37943171/answer/119525120" target="_blank" rel="noopener">表格驱动法</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/07/23/计算机通用知识/Network/计算机网络_TCP/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/23/计算机通用知识/Network/计算机网络_TCP/" itemprop="url">计算机网络-TCP协议</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-23T15:06:08+08:00">
+                2018-07-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在项目中从零构建P2P网络时，遇到了许多问题，如TCP长连接为何断开，Client访问Server 6420端口，为什么实际上建立的端口连接是其他端口，等等问题。</p>
+<p>这才发现个人的计网能力非常表面，在应对面试时尚可，一旦到了生产环境中就远远不足了，因此以TCP协议为主，将仔细研读《计算机网络—自顶向下方法》 一书，扩充个人Blog的计网相关知识文章。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/23/计算机通用知识/Network/计算机网络_TCP/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/07/23/编程语言/Golang/Go_pprof使用/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1139,377 +1516,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/14/计算机通用知识/Algorithm/数据结构-红黑树/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/14/计算机通用知识/Algorithm/数据结构-红黑树/" itemprop="url">数据结构-红黑树</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-14T11:18:55+08:00">
-                2018-06-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><strong>二叉查找树，二叉平衡树（AVL），红黑树</strong>是二叉树中三个重要的分支。</p>
-<p>二叉查找树在极端情况下会形成一个单链表，那么时间复杂度就回退到了O(n);</p>
-<p>而AVL树，任一节点左右子树高度相差不超过1的特性，使其性能完美的接近O(logn),然而AVL树的每一次插入删除都极大可能的要进行节点旋转，<strong>删除插入的效率不高</strong>。</p>
-<p>RB-tree:红黑树利用非严格的平衡，牺牲了一定的查找效率，但更大程度上增加了插入删除的效率。从功能，性能，空间开销等方面来综合考量，红黑树的<strong>综合表现</strong>来讲胜于AVL树。</p>
-<p><strong>应用</strong>：在JDK集合类TreeMap和TreeSet底层就是红黑树实现的，在JAVA8中，连HashMap也用到了红黑树。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/06/14/计算机通用知识/Algorithm/数据结构-红黑树/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/14/计算机通用知识/Algorithm/数据结构_B+树/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/14/计算机通用知识/Algorithm/数据结构_B+树/" itemprop="url">数据结构-B+树</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-14T11:18:55+08:00">
-                2018-06-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/14/计算机通用知识/Algorithm/算法_动态规划DP/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/14/计算机通用知识/Algorithm/算法_动态规划DP/" itemprop="url">算法_动态规划DP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-14T11:18:55+08:00">
-                2018-06-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Dynamic programming : <strong>分阶段求解决策问题</strong>的的数学思想。也就是说将复杂的问题简化为简单的问题来处理。动态规划有三个重要的概念，<strong>最优子结构，边界，状态转移公式</strong>。每个情况必须符合这三个条件方能求解。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/06/14/计算机通用知识/Algorithm/算法_动态规划DP/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1558,7 +1564,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">112</span>
+                <span class="site-state-item-count">115</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1571,7 +1577,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-count">45</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
