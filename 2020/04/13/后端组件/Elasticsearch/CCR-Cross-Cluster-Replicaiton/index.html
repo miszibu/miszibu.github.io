@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="ELK,Elasticsearch,">
+  <meta name="keywords" content="Elasticsearch,ELK,">
 
 
 
@@ -95,7 +95,7 @@
 
 
 <meta name="description" content="IntroductionElasticsearch cross-cluster replication (CCR) 在 ES6.7版本正式发布，ccr允许 index 跨集群复制，复制Index 数据到其他 ES Cluster，有助于实现例如high availability (HA) across datacenters, disaster recovery (DR)和 CDN-like ar">
-<meta name="keywords" content="ELK,Elasticsearch">
+<meta name="keywords" content="Elasticsearch,ELK">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CCR-Cross_Cluster_Replicaiton">
 <meta property="og:url" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/index.html">
@@ -107,7 +107,7 @@
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-read-alias-blog-read-aliases.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-write-alias-blog-write-aliases.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-overview-blog-test.png">
-<meta property="og:updated_time" content="2020-04-14T13:42:43.690Z">
+<meta property="og:updated_time" content="2020-04-20T14:59:18.114Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CCR-Cross_Cluster_Replicaiton">
 <meta name="twitter:description" content="IntroductionElasticsearch cross-cluster replication (CCR) 在 ES6.7版本正式发布，ccr允许 index 跨集群复制，复制Index 数据到其他 ES Cluster，有助于实现例如high availability (HA) across datacenters, disaster recovery (DR)和 CDN-like ar">
@@ -342,7 +342,7 @@
 <p><strong>Follower Index</strong>则无法接收写请求（除了来自于 Leader Index 的数据）。</p>
 <p>CCR无法处理Conflict Resolutin（我理解为数据同时写入多个 Index 中），这意味着数据只会被写入到 Leader Index, 并被复制到 Follower Index 上。<em>我们可以将一个 Follower Index 升级为 Regular Index（Leader Index 其实就是一个 Regualr Index），但我们无法将一个存在数据的 Leader Index 转为 Follower Index。</em></p>
 <a id="more"></a>
-<h2 id="CCR-Bi-directional（双向）-Replication"><a href="#CCR-Bi-directional（双向）-Replication" class="headerlink" title="CCR Bi-directional（双向） Replication"></a>CCR Bi-directional（双向） Replication</h2><h2 id="Tutorial-Optimizing-CCR-for-index"><a href="#Tutorial-Optimizing-CCR-for-index" class="headerlink" title="Tutorial: Optimizing CCR for index"></a>Tutorial: Optimizing CCR for index</h2><h3 id="1-Setup"><a href="#1-Setup" class="headerlink" title="1. Setup"></a>1. Setup</h3><p>在本教程中，我们将会使用两个集群来模拟 CCR 的场景。</p>
+<h2 id="Tutorial-Optimizing-CCR-for-index"><a href="#Tutorial-Optimizing-CCR-for-index" class="headerlink" title="Tutorial: Optimizing CCR for index"></a>Tutorial: Optimizing CCR for index</h2><h3 id="1-Setup"><a href="#1-Setup" class="headerlink" title="1. Setup"></a>1. Setup</h3><p>在本教程中，我们将会使用两个集群来模拟 CCR 的场景。</p>
 <p><img src="/2020/04/13/后端组件/Elasticsearch/CCR-Cross-Cluster-Replicaiton/bidirectional-ccr-replicated-blog.png" alt="bidirectional-ccr-replicated-blog"></p>
 <center>Replicated (read-only) indices are in gray</center>
 
@@ -407,9 +407,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/ELK/" rel="tag"># ELK</a>
-          
             <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+            <a href="/tags/ELK/" rel="tag"># ELK</a>
           
         </div>
       
@@ -509,7 +509,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">115</span>
+                <span class="site-state-item-count">117</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -592,7 +592,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CCR-Bi-directional（双向）-Replication"><span class="nav-number">2.</span> <span class="nav-text">CCR Bi-directional（双向） Replication</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tutorial-Optimizing-CCR-for-index"><span class="nav-number">3.</span> <span class="nav-text">Tutorial: Optimizing CCR for index</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Setup"><span class="nav-number">3.1.</span> <span class="nav-text">1. Setup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-License"><span class="nav-number">3.2.</span> <span class="nav-text">2. License</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Define-Remote-Cluster"><span class="nav-number">3.3.</span> <span class="nav-text">3. Define Remote Cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Create-Indices-for-bi-directional-replication"><span class="nav-number">3.4.</span> <span class="nav-text">4. Create Indices for bi-directional replication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Initiate-replication"><span class="nav-number">3.5.</span> <span class="nav-text">5. Initiate replication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Define-read-aliases"><span class="nav-number">3.6.</span> <span class="nav-text">6. Define read aliases</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Define-write-aliases"><span class="nav-number">3.7.</span> <span class="nav-text">7. Define write aliases</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-Test-replication-setup"><span class="nav-number">3.8.</span> <span class="nav-text">8. Test replication setup</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tutorial-Optimizing-CCR-for-index"><span class="nav-number">2.</span> <span class="nav-text">Tutorial: Optimizing CCR for index</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Setup"><span class="nav-number">2.1.</span> <span class="nav-text">1. Setup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-License"><span class="nav-number">2.2.</span> <span class="nav-text">2. License</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Define-Remote-Cluster"><span class="nav-number">2.3.</span> <span class="nav-text">3. Define Remote Cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Create-Indices-for-bi-directional-replication"><span class="nav-number">2.4.</span> <span class="nav-text">4. Create Indices for bi-directional replication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Initiate-replication"><span class="nav-number">2.5.</span> <span class="nav-text">5. Initiate replication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Define-read-aliases"><span class="nav-number">2.6.</span> <span class="nav-text">6. Define read aliases</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Define-write-aliases"><span class="nav-number">2.7.</span> <span class="nav-text">7. Define write aliases</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-Test-replication-setup"><span class="nav-number">2.8.</span> <span class="nav-text">8. Test replication setup</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">3.</span> <span class="nav-text">Reference</span></a></li></ol></div>
             
 
           </div>

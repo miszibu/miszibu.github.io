@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="本文将介绍 ES 的线程池和请求等待队列等知识。 施工中">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-19T16:02:50.698Z">
+<meta property="og:updated_time" content="2020-04-19T16:27:15.130Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES_线程池_分析">
 <meta name="twitter:description" content="本文将介绍 ES 的线程池和请求等待队列等知识。 施工中">
@@ -483,6 +483,8 @@
 <p>直接增加等待队列的大小是相对可取的方案。</p>
 <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">thread_pool.search.queue_size:</span> <span class="number">500</span></span><br><span class="line"><span class="comment">#queue_size允许控制没有线程执行它们的挂起请求队列的初始大小。</span></span><br><span class="line"></span><br><span class="line"><span class="string">thread_pool.search.size:</span> <span class="number">200</span></span><br><span class="line"><span class="comment">#size参数控制线程数，默认为核心数乘以5。</span></span><br><span class="line"></span><br><span class="line"><span class="string">thread_pool.search.min_queue_size:10</span></span><br><span class="line"><span class="comment">#min_queue_size设置控制queue_size可以调整到的最小量。</span></span><br><span class="line"></span><br><span class="line"><span class="string">thread_pool.search.max_queue_size:</span> <span class="number">1000</span></span><br><span class="line"><span class="comment">#max_queue_size设置控制queue_size可以调整到的最大量。</span></span><br><span class="line"></span><br><span class="line"><span class="string">thread_pool.search.auto_queue_frame_size:</span> <span class="number">2000</span></span><br><span class="line"><span class="comment">#auto_queue_frame_size设置控制在调整队列之前进行测量的操作数。它应该足够大，以便单个操作不会过度偏向计算。</span></span><br><span class="line"></span><br><span class="line"><span class="string">thread_pool.search.target_response_time:</span> <span class="number">6</span><span class="string">s</span></span><br><span class="line"><span class="comment">#target_response_time是时间值设置，指示线程池队列中任务的目标平均响应时间。如果任务通常超过此时间，则将调低线程池队列以拒绝任务。</span></span><br></pre></td></tr></table></figure>
 <h3 id="示例场景"><a href="#示例场景" class="headerlink" title="示例场景"></a>示例场景</h3><p>通过代码生成大量写请求，来测试请求过载的场景。</p>
+<p>目前设置 write 线程数量为1，发送1W 个请求，还是没有监测到 queue队列的拥堵现象。</p>
+<p>考虑多线程发送请求，提高压力。</p>
 <p>//todo</p>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/cat-thread-pool.html" target="_blank" rel="noopener">ESV6.7 _cat/therad_pool api introductin</a></p>
 <p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/dont-touch-these-settings.html" target="_blank" rel="noopener">ES Don’t touch these setting</a></p>
@@ -604,7 +606,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">115</span>
+                <span class="site-state-item-count">117</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
