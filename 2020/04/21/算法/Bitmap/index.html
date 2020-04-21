@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="算法,">
 
 
 
@@ -94,14 +94,20 @@
 
 
 
+<meta name="description" content="Bitmap 位图算法，通常使用于大数据量数字需要统计查重等场景。">
+<meta name="keywords" content="算法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Bitmap">
 <meta property="og:url" content="https://miszibu.github.io/2020/04/21/算法/Bitmap/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Bitmap 位图算法，通常使用于大数据量数字需要统计查重等场景。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-20T16:30:44.517Z">
+<meta property="og:image" content="https://miszibu.github.io/2020/04/21/算法/Bitmap/bitmap.png">
+<meta property="og:updated_time" content="2020-04-21T15:38:50.010Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bitmap">
+<meta name="twitter:description" content="Bitmap 位图算法，通常使用于大数据量数字需要统计查重等场景。">
+<meta name="twitter:image" content="https://miszibu.github.io/2020/04/21/算法/Bitmap/bitmap.png">
 
 
 
@@ -326,7 +332,23 @@
       
 
       
-        
+        <blockquote>
+<p>Bitmap 位图算法，通常使用于大数据量数字需要<strong>统计查重</strong>等场景。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在一个大数据量的场景中，单单存储数据本身就会消耗非常大的内存资源。</p>
+<p><strong>举例</strong>说给定20亿个数字，需要统计哪些数字未出现，怎么做？</p>
+<p><strong>解决方法1：</strong>我们新建一个int数组arr，每次通过 arr[i]=1来标记是否出现。一个 Int 需要32bit，4B，会需要消耗约8GB 内存。</p>
+<p><strong>解决方法2：</strong>替换 int 数组为 boolean 数组，一个 boolean 占用8bit，总共约占用2GB</p>
+<p>使用Bitmap来实现可以最小化空间占用：</p>
+<p><strong>当数字的值对应位置的 bit为1时，我们就标志它存在，这就是 bitmap</strong></p>
+<p><img src="/2020/04/21/算法/Bitmap/bitmap.png" alt=""></p>
+<p>使用 bitmap 来表示数字还能方便的求交集和异或运算，在 <a href="https://miszibu.github.io/2020/04/20/后端组件/Elasticsearch/ElasticSearch-倒排索引/#more">Lucene 的倒排索引</a>中就有应用。</p>
+<h2 id="解题实践"><a href="#解题实践" class="headerlink" title="解题实践"></a>解题实践</h2><p><a href="https://leetcode-cn.com/problems/set-mismatch/" target="_blank" rel="noopener">LeetCode 645 错误的合集</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] findErrorNums(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        BitSet bitMap = <span class="keyword">new</span> BitSet(nums.length);</span><br><span class="line">        <span class="keyword">int</span> repeatNum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(bitMap.get(nums[i]-<span class="number">1</span>))&#123;</span><br><span class="line">                repeatNum = nums[i];</span><br><span class="line">            &#125;</span><br><span class="line">            bitMap.set(nums[i]-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; bitMap.size(); i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!bitMap.get(i))&#123;</span><br><span class="line">                <span class="keyword">int</span>[] output = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</span><br><span class="line">                output[<span class="number">0</span>]=repeatNum;</span><br><span class="line">                output[<span class="number">1</span>]=i+<span class="number">1</span>;</span><br><span class="line">                <span class="keyword">return</span> output;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://juejin.im/post/5c4fd2af51882525da267385" target="_blank" rel="noopener">漫画：什么是Bitmap算法？ </a></p>
+<p><a href="https://www.jianshu.com/p/6082a2f7df8e" target="_blank" rel="noopener">经典算法系列之(一) - BitMap</a></p>
+
       
     </div>
     
@@ -340,6 +362,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
       
 
       
@@ -410,8 +438,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
           <p class="site-author-name" itemprop="name">Zibu</p>
@@ -497,6 +534,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题实践"><span class="nav-number">2.</span> <span class="nav-text">解题实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">3.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
