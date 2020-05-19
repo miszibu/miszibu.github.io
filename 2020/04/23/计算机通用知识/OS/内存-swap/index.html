@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。">
+<meta name="description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。 Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。">
 <meta name="keywords" content="OS,Memory">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存-swap">
 <meta property="og:url" content="https://miszibu.github.io/2020/04/23/计算机通用知识/OS/内存-swap/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
-<meta property="og:description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。">
+<meta property="og:description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。 Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-26T08:52:02.217Z">
+<meta property="og:updated_time" content="2020-04-27T15:46:53.004Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内存-swap">
-<meta name="twitter:description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。">
+<meta name="twitter:description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。 Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。">
 
 
 
@@ -331,6 +331,7 @@
 
       
         <p>内存 <strong>Swap</strong>是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。</p>
+<p>Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。</p>
 <a id="more"></a>
 <h2 id="Swapping-定义"><a href="#Swapping-定义" class="headerlink" title="Swapping 定义"></a>Swapping 定义</h2><p>Linux 将物理内存 <strong>RAM</strong>（Random Access Memory）划分为称之为内存页（<strong>Page</strong>）的小块。Swapping 指的就是将一部分内存页从内存拷贝到我们称之为 Swap 空间的磁盘区域，从而释放内存页。这部分物理内存和 Swap 空间我们称之为<strong>虚拟内存</strong>。</p>
 <blockquote>
@@ -351,12 +352,12 @@
 <p>当 Swapping 频繁发生的时候，系统的performance 会明显下降。</p>
 <p>有时候，内存页被频繁换入换出，系统在艰难的从内存中寻找空闲空间来保持应用的正常运行。在这个情况下，最好的方式就是增大 RAM。</p>
 <p>为什么呢，因为系统会优先选择低使用率的内存页来进行 Swap，然而频繁的 Swap 表示，内存资源紧俏，不存在低使用率的内存页了。</p>
-<h2 id="Swapping-空间的类型"><a href="#Swapping-空间的类型" class="headerlink" title="Swapping 空间的类型"></a>Swapping 空间的类型</h2><p>Linux存在两种不同类型的 Swap 空间，</p>
+<h2 id="Swapping-空间类型"><a href="#Swapping-空间类型" class="headerlink" title="Swapping 空间类型"></a>Swapping 空间类型</h2><p>Linux存在两种不同类型的 Swap 空间，</p>
 <ul>
 <li>Swap Partition: Swap分区是磁盘中一块只用于swapping 使用的单独分区。</li>
 <li>Swap File: 一个特殊的文件，介于系统文件和数据文件之间</li>
 </ul>
-<h2 id="Swapping-空间类型"><a href="#Swapping-空间类型" class="headerlink" title="Swapping 空间类型"></a>Swapping 空间类型</h2><p>使用 <code>swapon -s</code> 命令来查看系统使用的 swap 空间类型，输出如下</p>
+<h2 id="查看Swap-空间类型"><a href="#查看Swap-空间类型" class="headerlink" title="查看Swap 空间类型"></a>查看Swap 空间类型</h2><p>使用 <code>swapon -s</code> 命令来查看系统使用的 swap 空间类型，输出如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Filename  Type       Size       Used Priority</span><br><span class="line">/dev/sda5 partition  859436  0       -1</span><br></pre></td></tr></table></figure>
 <p>每一行代表着一个单独的 Swap 空间。</p>
 <ul>
@@ -418,7 +419,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/04/22/后端组件/Elasticsearch/ES-索引别名alias/" rel="next" title="ES-索引别名alias">
+              <a href="/2020/04/22/Components/Elasticsearch/ES-索引别名alias/" rel="next" title="ES-索引别名alias">
                 <i class="fa fa-chevron-left"></i> ES-索引别名alias
               </a>
             
@@ -427,6 +428,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/26/Components/Container/Docker搭建ES集群/" rel="prev" title="Docker搭建ES集群">
+                Docker搭建ES集群 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -501,7 +506,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">119</span>
+                <span class="site-state-item-count">121</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -514,7 +519,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-count">45</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -584,7 +589,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-定义"><span class="nav-number">1.</span> <span class="nav-text">Swapping 定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-作用"><span class="nav-number">2.</span> <span class="nav-text">Swapping 作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-的不足"><span class="nav-number">3.</span> <span class="nav-text">Swapping 的不足</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-空间的类型"><span class="nav-number">4.</span> <span class="nav-text">Swapping 空间的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-空间类型"><span class="nav-number">5.</span> <span class="nav-text">Swapping 空间类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何添加-SwappIng-Space"><span class="nav-number">6.</span> <span class="nav-text">如何添加 SwappIng Space</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swap-Space-的大小多少为宜"><span class="nav-number">7.</span> <span class="nav-text">Swap Space 的大小多少为宜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-Kernal-2-6-—swappiness"><span class="nav-number">8.</span> <span class="nav-text">Linux Kernal 2.6 —swappiness</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-定义"><span class="nav-number">1.</span> <span class="nav-text">Swapping 定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-作用"><span class="nav-number">2.</span> <span class="nav-text">Swapping 作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-的不足"><span class="nav-number">3.</span> <span class="nav-text">Swapping 的不足</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-空间类型"><span class="nav-number">4.</span> <span class="nav-text">Swapping 空间类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看Swap-空间类型"><span class="nav-number">5.</span> <span class="nav-text">查看Swap 空间类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何添加-SwappIng-Space"><span class="nav-number">6.</span> <span class="nav-text">如何添加 SwappIng Space</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swap-Space-的大小多少为宜"><span class="nav-number">7.</span> <span class="nav-text">Swap Space 的大小多少为宜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-Kernal-2-6-—swappiness"><span class="nav-number">8.</span> <span class="nav-text">Linux Kernal 2.6 —swappiness</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
             
 
           </div>
