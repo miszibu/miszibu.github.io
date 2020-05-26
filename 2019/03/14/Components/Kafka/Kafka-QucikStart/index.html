@@ -334,11 +334,11 @@
 <p>Kafka 常用命令记录贴</p>
 </blockquote>
 <a id="more"></a>
-<h2 id="Start-Server"><a href="#Start-Server" class="headerlink" title="Start Server"></a>Start Server</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 开启系统集成的Zookeeper</span><br><span class="line"><span class="meta">#</span> 简便做法，不推荐</span><br><span class="line">bin/zookeeper-server-start.sh config/zookeeper.properties</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 开启Kafka Broker，使用指定properties</span><br><span class="line">bin/kafka-server-start.sh config/server.properties</span><br></pre></td></tr></table></figure>
+<h2 id="Start-Server"><a href="#Start-Server" class="headerlink" title="Start Server"></a>Start Server</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 开启系统集成的Zookeeper</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 简便做法，不推荐</span></span><br><span class="line">bin/zookeeper-server-start.sh config/zookeeper.properties</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启Kafka Broker，使用指定properties</span></span><br><span class="line">bin/kafka-server-start.sh config/server.properties</span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Topic"><a href="#Topic" class="headerlink" title="Topic"></a>Topic</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 创建Topic 并设置命令行设置相关参数</span><br><span class="line">bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic $&#123;topicName&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> List Topics</span><br><span class="line">bin/kafka-topics.sh --list --zookeeper localhost:2181</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Get Topic Detail</span><br><span class="line">bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic $&#123;TopicName&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Topic"><a href="#Topic" class="headerlink" title="Topic"></a>Topic</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建Topic 并设置命令行设置相关参数</span></span><br><span class="line">bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic $&#123;topicName&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> List Topics</span></span><br><span class="line">bin/kafka-topics.sh --list --zookeeper localhost:2181</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Get Topic Detail</span></span><br><span class="line">bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic $&#123;TopicName&#125;</span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Producer-Consumer-Command"><a href="#Producer-Consumer-Command" class="headerlink" title="Producer||Consumer Command"></a>Producer||Consumer Command</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 命令行建立一个Producer</span><br><span class="line">bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</span><br><span class="line"><span class="meta">#</span> 命令行建立一个Consumer</span><br><span class="line">bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic $&#123;topicName&#125; --from-beginning</span><br></pre></td></tr></table></figure>
+<h2 id="Producer-Consumer-Command"><a href="#Producer-Consumer-Command" class="headerlink" title="Producer||Consumer Command"></a>Producer||Consumer Command</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 命令行建立一个Producer</span></span><br><span class="line">bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令行建立一个Consumer</span></span><br><span class="line">bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic $&#123;topicName&#125; --from-beginning</span><br></pre></td></tr></table></figure>
 <hr>
 
       
@@ -370,8 +370,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/03/10/Components/Storm/Storm简介/" rel="next" title="Storm简介">
-                <i class="fa fa-chevron-left"></i> Storm简介
+              <a href="/2019/03/10/Components/Kafka/Kafka简介/" rel="next" title="Kafka简介">
+                <i class="fa fa-chevron-left"></i> Kafka简介
               </a>
             
           </div>
@@ -457,7 +457,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">121</span>
+                <span class="site-state-item-count">125</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -470,7 +470,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">45</span>
+                <span class="site-state-item-count">46</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
