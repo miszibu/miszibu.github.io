@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Elasticsearch,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="CCR (Cross Cluster Replication),  本文会介绍如何在ES6.7环境下搭建CCR 双向复制模型， 并测试HTTP和TCP Client(ES7.0版本为Deprecated, 8.0正式移除)两种模式是否能够实现数据跨集群备份。">
+<meta name="keywords" content="Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-CCR">
+<meta property="og:url" content="https://miszibu.github.io/2020/07/29/Components/Elasticsearch/ES-CCR/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="CCR (Cross Cluster Replication),  本文会介绍如何在ES6.7环境下搭建CCR 双向复制模型， 并测试HTTP和TCP Client(ES7.0版本为Deprecated, 8.0正式移除)两种模式是否能够实现数据跨集群备份。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-07-29T15:59:01.978Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ES-CCR">
+<meta name="twitter:description" content="CCR (Cross Cluster Replication),  本文会介绍如何在ES6.7环境下搭建CCR 双向复制模型， 并测试HTTP和TCP Client(ES7.0版本为Deprecated, 8.0正式移除)两种模式是否能够实现数据跨集群备份。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2020/07/29/Components/Elasticsearch/ES-CCR/">
+
+
+
+
+
+  <title>ES-CCR | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/29/Components/Elasticsearch/ES-CCR/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES-CCR</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-29T23:33:11+08:00">
+                2020-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>CCR (Cross Cluster Replication), </p>
+<p>本文会介绍如何在<strong>ES6.7</strong>环境下搭建CCR 双向复制模型， 并测试<strong>HTTP</strong>和<strong>TCP Client</strong>(ES7.0版本为Deprecated, 8.0正式移除)两种模式是否能够实现数据跨集群备份。</p>
+<a id="more"></a>
+<h1 id="集群搭建及参数设置"><a href="#集群搭建及参数设置" class="headerlink" title="集群搭建及参数设置"></a>集群搭建及参数设置</h1><h2 id="集群搭建："><a href="#集群搭建：" class="headerlink" title="集群搭建："></a>集群搭建：</h2><p>我们需要搭建两个ES集群，一个为主集群，一个为备份集群。但是他们需要使用<strong>相同的集群名称</strong></p>
+<blockquote>
+<p>为什么需要相同的集群名称？</p>
+<p>正常情况下，如果与ES的连接都是走HTTP协议的，那肯定使用不同的集群名称来区分集群。<br>在本文中，为了同时支持TCP Client，TCP Client需要配置集群名称，如果主副集群名称不一致，当主集群下线时，请求会forward到备用集群，因此我们需要确保相同的配置也能连接到备用集群，其中就包括证书，集群名称，账户密码等。</p>
+</blockquote>
+<h2 id="环境设置"><a href="#环境设置" class="headerlink" title="环境设置"></a>环境设置</h2><h3 id="Define-Remote-Cluster"><a href="#Define-Remote-Cluster" class="headerlink" title="Define Remote Cluster"></a>Define Remote Cluster</h3><p>我们需要为主副集群都配置另外一个集群的连接信息.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">curl -XPUT -u elastic:xxxxxxxxxxx "http://&#123;&#123;primary_cluster&#125;&#125;:&#123;&#123;http_port&#125;&#125;/_cluster/settings?pretty" -H 'Content-Type: application/json' -d'</span><br><span class="line">&#123;</span><br><span class="line">  "persistent" : &#123;</span><br><span class="line">    "cluster" : &#123;</span><br><span class="line">      "remote" : &#123;</span><br><span class="line">        "&#123;&#123;cluster-name&#125;&#125;" : &#123;</span><br><span class="line">          "seeds" : [</span><br><span class="line">            "&#123;&#123;node-0&#125;&#125;:&#123;&#123;tcp-port&#125;&#125;",</span><br><span class="line">            "&#123;&#123;node-1&#125;&#125;:&#123;&#123;tcp-port&#125;&#125;",</span><br><span class="line">            "&#123;&#123;node-2&#125;&#125;:&#123;&#123;tcp-port&#125;&#125;"</span><br><span class="line">          ]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">'</span><br></pre></td></tr></table></figure>
+<p>查看Remote Cluster定义是否正确</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>Get _cluster/settings</span><br><span class="line"></span><br><span class="line">curl -XGET -u elastic:xxxxxxxxxxx "http://&#123;&#123;server&#125;&#125;:&#123;&#123;http_port&#125;&#125;/_cluster/settings?pretty"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>Get remote information</span><br><span class="line"></span><br><span class="line">curl -XGET -u elastic:xxxxxxxxxxx "http://&#123;&#123;server&#125;&#125;:&#123;&#123;http_port&#125;&#125;/_remote/info?pretty"</span><br></pre></td></tr></table></figure>
+<h3 id="Template-设置修改"><a href="#Template-设置修改" class="headerlink" title="Template 设置修改"></a>Template 设置修改</h3><p>CCR需要Primary Indices的 <code>soft_deletes</code> 设置是激活的，而这个参数在7.0以后的版本是默认激活的，因此在6.7中我们需要手动激活。</p>
+<p>我们也需要添加 aliases  ，因为对follower index我们会给到一个follower的前缀(见Auto-follower pattern)，因为集群Kibana中配置了很多默认的Index-Pattern, 它们是匹配不到有follower 前缀的索引的，在这里添加一个别名指向自己就可以解决这个问题。</p>
+<p>当然修改index-pattern也是一个方案，index-pattern 的修改会影响到dashboard和visualization的数据展示，为了避免导致的问题，添加别名可能是更好的方案，考虑到对集群的影响下。</p>
+<h4 id="Beat-Template-Change"><a href="#Beat-Template-Change" class="headerlink" title="Beat Template Change"></a>Beat Template Change</h4><p>如果使用Beats来发送数据，我们可以预先在es上创建tempaltes.</p>
+<p>在两个集群上同时上传template, 注意beats的yml文件中需要预先设置es连接</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./metricbeat setup --template -c metricbeat_es_cl1.yml</span><br><span class="line"></span><br><span class="line">./metricbeat setup --template -c metricbeat_es_cl1.yml</span><br></pre></td></tr></table></figure>
+<p>修改Template</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>获取template内容</span><br><span class="line">GET  _template/&#123;&#123;template_name&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>更新template</span><br><span class="line">PUT _template/&#123;&#123;template_name&#125;&#125;</span><br><span class="line">&#123;</span><br><span class="line">    &#123;Other-Setting&#125;</span><br><span class="line">    "settings": &#123;</span><br><span class="line">        "index": &#123;</span><br><span class="line">             "soft_deletes": &#123;</span><br><span class="line">                  "enabled": "true"</span><br><span class="line">              &#125;,</span><br><span class="line">          &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    "aliases": &#123;"&#123;&#123;alias-name&#125;&#125;":&#123;&#125;&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+<h4 id="Self-generated-Template"><a href="#Self-generated-Template" class="headerlink" title="Self-generated Template"></a>Self-generated Template</h4><p>对于我们自己创建的索引而言，我们也同时需要做这样的操作，和上面基本一样。</p>
+<h3 id="创建Auto-Follower-Pattern"><a href="#创建Auto-Follower-Pattern" class="headerlink" title="创建Auto-Follower Pattern"></a>创建Auto-Follower Pattern</h3><p>我们需要在两个集群上都创建<code>auto-follower pattern</code>. </p>
+<ul>
+<li>需要声明remote_cluster name， 因为我们可能会有很多remote-cluster connection.</li>
+<li>还需要声明leader index pattern，既怎么样的Primary Index需要被选中，这里只支持* 通配符。</li>
+</ul>
+<p>follower-index-pattern中，我们使用了leader_index 这个字符串，这是一个内嵌的变量，会被映射为primary index的名字，而其他的花括号都是需要填入真实的数据</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">GET /_ccr/auto_follow/</span><br><span class="line">PUT /_ccr/auto_follow/&#123;&#123;auto-follower-pattrn-name&#125;&#125;</span><br><span class="line">&#123;</span><br><span class="line">    "remote_cluster" : "&#123;&#123;remote-cluster-name&#125;&#125;",</span><br><span class="line">    "leader_index_patterns" : [</span><br><span class="line">        "metricbeat-6.7.0-*"</span><br><span class="line">    ],</span><br><span class="line">    "follow_index_pattern" : "follower-&#123;&#123;leader_index&#125;&#125;"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Loadbalance"><a href="#Loadbalance" class="headerlink" title="Loadbalance"></a>Loadbalance</h2><p>所有的数据都不直接连接到ES集群，而是连接到LoadBalance,  当集群下线，由LB自动来切换集群。</p>
+<p>一开始想选用Haproxy，然后他forward tcp请求遇到点问题，懒得解决了，就直接用nginx了。</p>
+<h3 id="Nginx-Preparation"><a href="#Nginx-Preparation" class="headerlink" title="Nginx Preparation"></a>Nginx Preparation</h3><p>这里为了方便和尽量不影响测试机器上的环境，我们使用docker 来装nginx.</p>
+<h3 id="Nginx-Configuartion"><a href="#Nginx-Configuartion" class="headerlink" title="Nginx Configuartion"></a>Nginx Configuartion</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">user</span>  nginx;</span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="attribute">error_log</span>  /var/log/nginx/error.log <span class="literal">warn</span>;</span><br><span class="line"><span class="attribute">pid</span>        /var/run/nginx.pid;</span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       /etc/nginx/mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line">    <span class="attribute">log_format</span>  main  <span class="string">'<span class="variable">$remote_addr</span> - <span class="variable">$remote_user</span> [<span class="variable">$time_local</span>] "<span class="variable">$request</span>" '</span></span><br><span class="line">                      <span class="string">'<span class="variable">$status</span> <span class="variable">$body_bytes_sent</span> "<span class="variable">$http_referer</span>" '</span></span><br><span class="line">                      <span class="string">'"<span class="variable">$http_user_agent</span>" "<span class="variable">$http_x_forwarded_for</span>"'</span>;</span><br><span class="line">    <span class="attribute">access_log</span>  /var/log/nginx/access.log  main;</span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line">    <span class="attribute">include</span> /etc/nginx/conf.d/<span class="regexp">*.conf</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span> <span class="number">9001</span>;</span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://http_backend;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">upstream</span> http_backend &#123;</span><br><span class="line">       <span class="attribute">server</span> gdcdc80490:<span class="number">9204</span>;</span><br><span class="line">       <span class="attribute">server</span> dc3dc80189:<span class="number">9204</span> backup;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">stream</span> &#123;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>     <span class="number">9002</span>;</span><br><span class="line">        <span class="comment">#TCP traffic will be forwarded to the "stream_backend" upstream group</span></span><br><span class="line">        <span class="attribute">proxy_pass</span> stream_backend;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">upstream</span> stream_backend &#123;   </span><br><span class="line">        <span class="attribute">server</span> gdcdc80490:<span class="number">9303</span>;</span><br><span class="line">        <span class="attribute">server</span> dc3dc80189:<span class="number">9303</span> backup;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Start-Nginx-Container"><a href="#Start-Nginx-Container" class="headerlink" title="Start Nginx Container"></a>Start Nginx Container</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull nginx:stable</span><br><span class="line">docker run --name &#123;&#123;container_name&#125;&#125; -v &#123;&#123;your_nginx_cfg_path&#125;&#125;:/etc/nginx/nginx.conf:ro -p 9002:9001 -p 9001:9001 -d &#123;&#123;image_id&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="HTTP-Test"><a href="#HTTP-Test" class="headerlink" title="HTTP Test"></a>HTTP Test</h2><p>这里我们使用Metricbeat来发送数据测试HTTP请求的Automatic Failover</p>
+<p>Metricbeat Config</p>
+<p>Metricbeat connect to loadbalance</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">output.elasticsearch:</span></span><br><span class="line"><span class="attr">  hosts:</span> <span class="string">["&#123;&#123;nginx_server&#125;&#125;:9001"]</span> </span><br><span class="line"><span class="attr">  protocol:</span> <span class="string">"http"</span></span><br><span class="line"><span class="attr">  username:</span> <span class="string">"elastic"</span></span><br><span class="line"><span class="attr">  password:</span> <span class="string">"<span class="template-variable">&#123;&#123;pwd&#125;&#125;</span>"</span></span><br></pre></td></tr></table></figure>
+<p>Startup metricbeat</p>
+<blockquote>
+<p>./metricbeat  -c </p>
+</blockquote>
+<h2 id="TCP-Test"><a href="#TCP-Test" class="headerlink" title="TCP Test"></a>TCP Test</h2><p>这里我们使用ES 的Transport Client去作为TCP一端的测试，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    String truststorePath = <span class="string">"C:\\Users\\xxxx\\xxxx\\Elasticsearch\\Certification\\xxxx-xxx.p12"</span>;</span><br><span class="line">    String clusterName = <span class="string">"ES_CL1"</span>;</span><br><span class="line"></span><br><span class="line">    Settings settings = Settings.builder()</span><br><span class="line">            .put(<span class="string">"cluster.name"</span>, clusterName)</span><br><span class="line">            .put(<span class="string">"client.transport.sniff"</span>, <span class="keyword">true</span>)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.enabled"</span>, <span class="keyword">true</span>)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.keystore.path"</span>, truststorePath)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.truststore.path"</span>, truststorePath)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.keystore.password"</span>, <span class="string">"logaggcert"</span>)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.truststore.password"</span>, <span class="string">"logaggcert"</span>)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.enabled"</span>, <span class="string">"true"</span>)</span><br><span class="line">            .put(<span class="string">"xpack.security.transport.ssl.verification_mode"</span>, <span class="string">"certificate"</span>)</span><br><span class="line">            .put(<span class="string">"xpack.security.user"</span>, <span class="string">"elastic:dopdevPassword"</span>)</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    TransportClient transportClient = <span class="keyword">new</span> PreBuiltXPackTransportClient(settings);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        transportClient.addTransportAddress(<span class="keyword">new</span> TransportAddress(InetAddress.getByName(<span class="string">"itsrhv17064"</span>), <span class="number">9002</span>));</span><br><span class="line">    &#125; <span class="keyword">catch</span> (UnknownHostException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Map&lt;String, Object&gt; json = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">    json.put(<span class="string">"user"</span>, <span class="string">"kimchy_java_api"</span>);</span><br><span class="line">    json.put(<span class="string">"postDate"</span>, <span class="keyword">new</span> Date());</span><br><span class="line">    json.put(<span class="string">"message"</span>, <span class="string">"trying out Elasticsearch"</span>);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        IndexResponse response = transportClient.prepareIndex(<span class="string">"zibu"</span>, <span class="string">"_doc"</span>)</span><br><span class="line">                .setSource(json, XContentType.JSON)</span><br><span class="line">                .get();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// on shutdown</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//client.close();</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Error preparing ESBolt: "</span> + e.getMessage(), e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="如何测试"><a href="#如何测试" class="headerlink" title="如何测试"></a>如何测试</h2><p>整个测试流程可以分为一下几个步骤</p>
+<ol>
+<li>启动MetricBeat 和 ES TCP Client，测试整个DataFlow是否正常。备用集群能否创建follower-index.</li>
+<li>关掉主集群，测试备用集群能否正常工作。</li>
+<li>重启主集群，测试主集群能否为备用集群上的primary-index来创建follower-index</li>
+</ol>
+<h3 id="Ansible-To-Manage-ES-Cluster"><a href="#Ansible-To-Manage-ES-Cluster" class="headerlink" title="Ansible To Manage ES Cluster"></a>Ansible To Manage ES Cluster</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">es_cl1</span></span><br><span class="line"><span class="attr">  gather_facts:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    ece_storage_path:</span> <span class="string">/data/ecedata</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">Start</span> <span class="string">ES</span> <span class="string">Nodes</span></span><br><span class="line"><span class="attr">     shell:</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">     register:</span> <span class="string">result</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - debug:</span></span><br><span class="line"><span class="attr">      var:</span> <span class="string">result</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">Stop</span> <span class="string">ES</span> <span class="string">Nodes</span></span><br><span class="line"><span class="attr">     shell:</span> <span class="string">ps</span> <span class="bullet">-fe|grep</span> <span class="string">ela</span> <span class="string">|grep</span> <span class="bullet">-v</span> <span class="string">grep</span> <span class="string">| awk '&#123;print $2&#125;'| xargs kill -9</span></span><br><span class="line"><span class="string"></span><span class="attr">     ignore_errors:</span> <span class="literal">yes</span></span><br><span class="line">   <span class="comment"># 注意设置Java-Home</span></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">Start</span> <span class="string">ES</span> <span class="string">Nodes</span></span><br><span class="line"><span class="attr">     shell:</span> <span class="string">nohup</span> <span class="string">/usr/local/clo/ven/ESCluster671/tools/esnode/bin/elasticsearch</span> <span class="bullet">-d</span> <span class="string">&amp;</span></span><br><span class="line"><span class="attr">     environment:</span></span><br><span class="line"><span class="attr">        JAVA_HOME:</span> <span class="string">/opt/jdk</span></span><br><span class="line"><span class="attr">     register:</span> <span class="string">eslog</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - debug:</span></span><br><span class="line"><span class="attr">      var:</span> <span class="string">eslog</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/29/General/SSH/RSA免密登录远程机器/" rel="next" title="RSA免密登录远程机器">
+                <i class="fa fa-chevron-left"></i> RSA免密登录远程机器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/29/Components/Zookeeper/ZK-Introduction/" rel="prev" title="ZK-Introduction">
+                ZK-Introduction <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">142</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#集群搭建及参数设置"><span class="nav-number">1.</span> <span class="nav-text">集群搭建及参数设置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#集群搭建："><span class="nav-number">1.1.</span> <span class="nav-text">集群搭建：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境设置"><span class="nav-number">1.2.</span> <span class="nav-text">环境设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Define-Remote-Cluster"><span class="nav-number">1.2.1.</span> <span class="nav-text">Define Remote Cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Template-设置修改"><span class="nav-number">1.2.2.</span> <span class="nav-text">Template 设置修改</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Beat-Template-Change"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">Beat Template Change</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Self-generated-Template"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">Self-generated Template</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Auto-Follower-Pattern"><span class="nav-number">1.2.3.</span> <span class="nav-text">创建Auto-Follower Pattern</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Loadbalance"><span class="nav-number">1.3.</span> <span class="nav-text">Loadbalance</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-Preparation"><span class="nav-number">1.3.1.</span> <span class="nav-text">Nginx Preparation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-Configuartion"><span class="nav-number">1.3.2.</span> <span class="nav-text">Nginx Configuartion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Start-Nginx-Container"><span class="nav-number">1.3.3.</span> <span class="nav-text">Start Nginx Container</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Test"><span class="nav-number">1.4.</span> <span class="nav-text">HTTP Test</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-Test"><span class="nav-number">1.5.</span> <span class="nav-text">TCP Test</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何测试"><span class="nav-number">1.6.</span> <span class="nav-text">如何测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ansible-To-Manage-ES-Cluster"><span class="nav-number">1.6.1.</span> <span class="nav-text">Ansible To Manage ES Cluster</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

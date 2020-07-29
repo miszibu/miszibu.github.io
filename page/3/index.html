@@ -260,6 +260,130 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/05/24/Code_Language/Java/Java多线程/Java-AQS/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/24/Code_Language/Java/Java多线程/Java-AQS/" itemprop="url">Java_AQS</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-24T20:10:24+08:00">
+                2020-05-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>AQS (Abstract Queued Synchronizer)抽象队列同步器</p>
+<p><strong>AQS就是一个并发包的基础组件，用来实现各种锁，各种同步组件的。</strong></p>
+<p><strong>它包含了state变量、加锁线程、等待队列等并发中的核心组件。</strong></p>
+<p>AQS 是 JDK 并发包下的并发同步工具类（框架），提供同步队列维护、线程阻塞、线程唤醒等功能，可以为同步锁的实现提供很多支持。</p>
+<p>其次，如何定义锁的轻量级和重量级？直观理解是从获取锁的成本而言。那又如何评估成本？在 JDK 早期版本中 synchronized 是要调用内核态的monitorenter 和 monitorexit 指令 ，进而引发内核态与用户态的上下文切换；这是之前主要的成本开销。所以后来才有了对 synchronized 进行的偏向锁和轻量级锁的优化，核心都是通过 CAS 实现、避免线程上下文切换；这点其实和AQS 类似，区别之处是 synchronized 在之前策略失效后，还是会通过 monitor 指令实现加锁（锁膨胀）。为什么这样选择？考虑一直自旋和 CAS 的效果，CPU 的消耗会大大增加，这样还是轻量级锁吗？所以在多线程竞争激烈的情况下，synchronized 的效果会比 Lock（基于 AQS） 更好。再次，<strong>锁</strong> 要实现的目的是什么？获取则独占临界区执行代码；<strong>否则等待直到重新竞争获取</strong>（不考虑tryLock 的情况）。所以无论锁是重量级、轻量级、还是可编程，在未获取的情况下阻塞都是自然的需求；只是 Lock（AQS） 的阻塞方式 park（对应 condition_wait 指令）同样工作在用户态下。更大的区别是Lock提供了丰富的语义支持并发编程，包括 等待可中断、公平非公平多种方式、多种条件变量（Condition）等，极大方便并发编程。最后总结下，锁的轻量级和重量级是相对概念，一定场景下成本（特别是 CPU）完全可能反转；而是否阻塞也不是区分它们的标志。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/05/23/General/Others/一致性Hash算法/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -894,131 +1018,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/05/17/Components/Redis/Redis-发布与订阅/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/05/17/Components/Redis/Redis-发布与订阅/" itemprop="url">Redis-发布与订阅</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-17T19:09:25+08:00">
-                2020-05-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>SUBSCRIBE、UNSUBSCRIBE、PUBLISH 三个命令实现了Redis 的发布与订阅信息泛型，在这个实现中，发送者将信息发送给频道，频道将信息转发给所有该频道的订阅者。</p>
-<p>发送者和接受者之间没有主动的交流，该模型通过对发布者和订阅者进行解构，极大地提高系统的扩展性。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/05/17/Components/Redis/Redis-发布与订阅/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/05/17/Components/Redis/Redis-数据持久化/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1099,6 +1098,131 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2020/05/17/Components/Redis/Redis-数据持久化/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/05/17/Components/Redis/Redis-发布与订阅/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/17/Components/Redis/Redis-发布与订阅/" itemprop="url">Redis-发布与订阅</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-17T19:09:25+08:00">
+                2020-05-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>SUBSCRIBE、UNSUBSCRIBE、PUBLISH 三个命令实现了Redis 的发布与订阅信息泛型，在这个实现中，发送者将信息发送给频道，频道将信息转发给所有该频道的订阅者。</p>
+<p>发送者和接受者之间没有主动的交流，该模型通过对发布者和订阅者进行解构，极大地提高系统的扩展性。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/05/17/Components/Redis/Redis-发布与订阅/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1385,125 +1509,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/04/22/Components/Elasticsearch/ES-索引别名alias/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/04/22/Components/Elasticsearch/ES-索引别名alias/" itemprop="url">ES-索引别名alias</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-22T01:03:39+08:00">
-                2020-04-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1552,7 +1557,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">141</span>
+                <span class="site-state-item-count">142</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
