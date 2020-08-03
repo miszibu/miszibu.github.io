@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Zookeeper,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。 我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。  数据发布与订阅(配置中心)：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。 负载均衡: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户端使用W">
+<meta name="keywords" content="Zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zk-应用场景">
+<meta property="og:url" content="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-应用场景/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。 我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。  数据发布与订阅(配置中心)：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。 负载均衡: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户端使用W">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-07-30T16:01:15.100Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zk-应用场景">
+<meta name="twitter:description" content="本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。 我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。  数据发布与订阅(配置中心)：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。 负载均衡: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户端使用W">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-应用场景/">
+
+
+
+
+
+  <title>Zk-应用场景 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-应用场景/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Zk-应用场景</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-30T21:39:07+08:00">
+                2020-07-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。</p>
+<p>我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。</p>
+<ul>
+<li><strong>数据发布与订阅(配置中心)</strong>：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。</li>
+<li><strong>负载均衡</strong>: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户端使用Watcher监控子节点变化，获取可用服务列表。</li>
+<li><strong>命名服务</strong>：实现方式同负载均衡</li>
+<li><strong>分布式协调/通知</strong>: 注册ZNode，通过监控ZNode数量和节点数据来协调通知节点，</li>
+<li><strong>分布式UUID:</strong>：基于ZNode的顺序ID功能，注册一个ZNode, 获取其序号。</li>
+<li><strong>Master 选举：</strong> 有两种实现方式</li>
+<li><strong>分布式锁：</strong> 可以实现共享锁和互斥锁</li>
+<li><strong>分布式队列</strong>：可以实现 FIFO Queue 和 Barrier </li>
+</ul>
+<a id="more"></a>
+<h2 id="数据发布与订阅-配置中心"><a href="#数据发布与订阅-配置中心" class="headerlink" title="数据发布与订阅(配置中心)"></a>数据发布与订阅(配置中心)</h2><p>将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更，从而实现<strong>配置信息的集中式管理和动态更新。</strong></p>
+<blockquote>
+<p>ZNode 存在数据大小的限制，最好不要超过1MB， 请酌情设置。</p>
+</blockquote>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>这里的负载均衡是客户端的负载均衡，客户端获取所有可用服务列表，自身选择合适的负载均衡算法。</p>
+<p><strong>实现思路：</strong></p>
+<ol>
+<li>建立一个服务的ZNode, 如/server</li>
+<li>服务端启动时，在/server 目录下建立<strong>临时ZNode</strong>, 并设置服务器IP:Port 等连接信息</li>
+<li>客户端启动时获取/Server下的所有子节点，即所有可用服务端，并设置<strong>Watcher</strong>监控子节点数量的变动。</li>
+<li>当服务端新增或减少节点时，引起子节点数量变动。客户端获得<strong>Watcher</strong>提醒获取最新服务端列表。</li>
+</ol>
+<h2 id="命名服务"><a href="#命名服务" class="headerlink" title="命名服务"></a>命名服务</h2><p>实现方式同负载均衡。</p>
+<p> 在Dubbo实现中：</p>
+<p> 服务提供者在启动的时候，向ZK上的指定节点<strong>/dubbo/${serviceName}/providers</strong>目录下写入自己的URL地址，这个操作就完成了服务的发布。</p>
+<p> 服务消费者启动的时候，订阅/dubbo/${serviceName}/providers目录下的提供者URL地址， 并向<strong>/dubbo/${serviceName} /consumers目录下写入自己的URL地址。</strong></p>
+<p> 注意，所有向ZK上注册的地址都是<strong>临时节点</strong>，这样就能够保证服务提供者和消费者能够自动感应资源的变化。</p>
+<p>另外，Dubbo还有针对服务粒度的监控，方法是订阅/dubbo/${serviceName}目录下所有提供者和消费者的信息。</p>
+<h2 id="分布式协调-通知"><a href="#分布式协调-通知" class="headerlink" title="分布式协调/通知"></a>分布式协调/通知</h2><h3 id="节点心跳"><a href="#节点心跳" class="headerlink" title="节点心跳:"></a><strong>节点心跳:</strong></h3><p><strong>实现思路：</strong> 注册一个临时ZNode, 节点之间通过Watcher监控ZNode数量，当ZNode不存在时，则表示服务不可用。一般而言，分布式环境通过心跳来判断节点是否存活。</p>
+<p><strong>优点:</strong> 通过ZK来关联节点，减少了系统之间的耦合。</p>
+<h3 id="节点协调："><a href="#节点协调：" class="headerlink" title="节点协调："></a>节点协调：</h3><p><strong>实现思路：</strong> 注册一个ZNode, 通过Watcher监控ZNode数据变动，当发生数据变动时，获取最新数据，由此实现节点协调和数据同步。</p>
+<h2 id="分布式UUID"><a href="#分布式UUID" class="headerlink" title="分布式UUID"></a>分布式UUID</h2><p><strong>实现思路：</strong>基于ZNode的顺序ID功能，注册一个ZNode, 获取其序号。</p>
+<p><strong>缺点：</strong> ZNode的当前最大ID由其父亲ZNode存储，是一个4Byte的Integer， 存在最大ID数量的限制。</p>
+<h2 id="Master选举"><a href="#Master选举" class="headerlink" title="Master选举"></a>Master选举</h2><p>这里存在两种选举思路：</p>
+<p><strong>思路1：</strong>  客户端集群往zookeeper上创建一个/master临时节点。在这个过程中，只有一个客户端能够成功创建这个节点，那么这个客户端就成了master。同时其他没有在zookeeper上成功创建节点的客户端，都会在节点/master上注册一个变更的watcher，用于监控当前的master机器是否存活，一旦发现当前的master挂了，那么其余的客户端将会重新进行master选举 </p>
+<p><strong>思路2：</strong> 基于顺序ID的功能，所有客户端节点都创建一个子ZNode，谁的顺序ID小谁就是Master并监控所有子Znode的数量，一旦发生Master节点下线，则选举顺序ID最小的节点为新的Master。</p>
+<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p>通过 ZK 实现分布式的共享锁和排他锁。</p>
+<h3 id="排他锁"><a href="#排他锁" class="headerlink" title="排他锁"></a>排他锁</h3><p>排他锁也存在两种实现方式。</p>
+<p><strong>实现1：</strong> </p>
+<p>将一个 ZNode 表示为一个锁，比如/distribute_lock</p>
+<ol>
+<li>获取锁，客户端通过 <code>create()</code>创建 临时ZNode，若创建成功则表示获取锁，当使用完锁，删除临时 ZNode.</li>
+<li>若获取锁失败，则注册<strong>一个节点变更的 Watcher</strong></li>
+<li>当Watcher 被触发，所有等待的客户端重新开始新一轮的竞争锁。</li>
+</ol>
+<p><strong>实现2：</strong></p>
+<p>注册一个ZNode 节点，所有客户端再该节点下创建<strong>临时顺序ZNode </strong>/distribute_lock/Lock-00000000001</p>
+<ol>
+<li>客户端创建 ZNode, 创建完成后，获取所有子节点列表，若序号最小，则获取锁。任务结束后，删除临时子节点。</li>
+<li>创建 ZNode, 发现当前序号非最小，则对前一个序号节点注册监听事件。</li>
+</ol>
+<h3 id="共享锁"><a href="#共享锁" class="headerlink" title="共享锁"></a>共享锁</h3><p>共享锁是基于排他锁实现2的一个扩展，这里我们以读写锁为例，读读共享的一个场景。</p>
+<p>在创建临时的子节点时，我们增加节点<strong>读写属性，</strong>如下所示。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/</span><br><span class="line">├── /host1-R-000000001</span><br><span class="line">├── /host2-R-000000002</span><br><span class="line">├── /host3-W-000000003</span><br><span class="line">├── /host4-R-000000004</span><br><span class="line">├── /host5-R-000000005</span><br><span class="line">├── /host6-R-000000006</span><br><span class="line">└── /host7-W-000000007</span><br></pre></td></tr></table></figure>
+<p><strong>实现方式：</strong></p>
+<ol>
+<li>获取锁，客户端在共享锁目录下创建<strong>临时子节点</strong>，并标注其读写属性。<ul>
+<li>对于读锁而言，在创建节点后判断是否存在比自己节点序号更小的写节点，如果没有则获取锁。如果有，则对序号小于自己且最近的写节点注册监听事件。</li>
+<li>对于写锁而言，在创建节点后判断是否存在比自己节点序号更小的节点，如果没有则获取锁。如果有，则对自己的前一个节点注册监听事件。</li>
+</ul>
+</li>
+<li>释放锁，客户端完成业务逻辑后，删除临时节点来释放锁，后续由监听事件来唤醒等待客户端。</li>
+</ol>
+<h2 id="分布式队列"><a href="#分布式队列" class="headerlink" title="分布式队列"></a>分布式队列</h2><h3 id="FIFO"><a href="#FIFO" class="headerlink" title="FIFO"></a>FIFO</h3><p><strong>PUSH:</strong> 在 <code>queue_fifo</code>节点下，创建自增序号子节点，并将数据放入子节点中。</p>
+<p><strong>POP:</strong> 获取 <code>queue_fifo</code>节点下序号最小的节点，取出数据，然后删除此节点。</p>
+<h3 id="Barrier"><a href="#Barrier" class="headerlink" title="Barrier"></a>Barrier</h3><p>在 Java 提供的同步工具类中就有 CylicBarrier，适用于需要所有线程到达一个共同的检查点后，再同时继续的场景。</p>
+<p>通过 ZK 来实现 Barrier：</p>
+<p>首先创建 <code>queue_barrier</code> 节点，并设置节点的值为需要等待的线程数量，所有线程在该节点下<strong>创建临时子节点。</strong>线程创建子节点结束后，判断子节点数量是否等于等待线程数量，如果是则继续，如果不是则注册子节点数量变更的 Watcher.</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[从Paxos到ZooKeeper]</p>
+<p><a href="https://www.javazhiyin.com/28435.html" target="_blank" rel="noopener">图解ZooKeeper的典型应用场景</a></p>
+<p><a href="http://jm.taobao.org/2011/10/08/1232/" target="_blank" rel="noopener">ZooKeeper典型应用场景一览</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/59669985" target="_blank" rel="noopener">ZooKeeper 的应用场景</a></p>
+<p><a href="https://zookeeper.apache.org/doc/current/recipes.html" target="_blank" rel="noopener">ZooKeeper Recipes and Solutions</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/29/Components/Elasticsearch/ES-CCR/" rel="next" title="ES-CCR">
+                <i class="fa fa-chevron-left"></i> ES-CCR
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/31/Components/分布式/分布式锁的实现方式/" rel="prev" title="分布式锁的实现方式">
+                分布式锁的实现方式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">144</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据发布与订阅-配置中心"><span class="nav-number">1.</span> <span class="nav-text">数据发布与订阅(配置中心)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载均衡"><span class="nav-number">2.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命名服务"><span class="nav-number">3.</span> <span class="nav-text">命名服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式协调-通知"><span class="nav-number">4.</span> <span class="nav-text">分布式协调/通知</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#节点心跳"><span class="nav-number">4.1.</span> <span class="nav-text">节点心跳:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节点协调："><span class="nav-number">4.2.</span> <span class="nav-text">节点协调：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式UUID"><span class="nav-number">5.</span> <span class="nav-text">分布式UUID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master选举"><span class="nav-number">6.</span> <span class="nav-text">Master选举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式锁"><span class="nav-number">7.</span> <span class="nav-text">分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#排他锁"><span class="nav-number">7.1.</span> <span class="nav-text">排他锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#共享锁"><span class="nav-number">7.2.</span> <span class="nav-text">共享锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式队列"><span class="nav-number">8.</span> <span class="nav-text">分布式队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FIFO"><span class="nav-number">8.1.</span> <span class="nav-text">FIFO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Barrier"><span class="nav-number">8.2.</span> <span class="nav-text">Barrier</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
