@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="基础概念从集中式到分布式：单机性能有限，且存在单点故障问题和不利于扩容。 分布式系统的定义:  分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统：  分布式系统的常见问题：  通信异常：节点间通信依赖网络，网络存在不可用风险，即便网络可用，平均网络通信延迟（0.1 - 1ms）也百倍于内存平均访问延迟10ns。巨大的延时差别，也会影响消息的收发，">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式一致性协议">
+<meta property="og:url" content="https://miszibu.github.io/2020/08/06/Components/分布式/分布式一致性协议/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="基础概念从集中式到分布式：单机性能有限，且存在单点故障问题和不利于扩容。 分布式系统的定义:  分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统：  分布式系统的常见问题：  通信异常：节点间通信依赖网络，网络存在不可用风险，即便网络可用，平均网络通信延迟（0.1 - 1ms）也百倍于内存平均访问延迟10ns。巨大的延时差别，也会影响消息的收发，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-08-06T03:21:15.085Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式一致性协议">
+<meta name="twitter:description" content="基础概念从集中式到分布式：单机性能有限，且存在单点故障问题和不利于扩容。 分布式系统的定义:  分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统：  分布式系统的常见问题：  通信异常：节点间通信依赖网络，网络存在不可用风险，即便网络可用，平均网络通信延迟（0.1 - 1ms）也百倍于内存平均访问延迟10ns。巨大的延时差别，也会影响消息的收发，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2020/08/06/Components/分布式/分布式一致性协议/">
+
+
+
+
+
+  <title>分布式一致性协议 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/06/Components/分布式/分布式一致性协议/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式一致性协议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-06T11:20:29+08:00">
+                2020-08-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>从集中式到分布式：单机性能有限，且存在单点故障问题和不利于扩容。</p>
+<p>分布式系统的定义:</p>
+<blockquote>
+<p><strong>分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统：</strong></p>
+</blockquote>
+<p>分布式系统的常见问题：</p>
+<ul>
+<li><strong>通信异常：</strong>节点间通信依赖网络，网络存在不可用风险，即便网络可用，平均网络通信延迟（0.1 - 1ms）也<strong>百倍于</strong>内存平均访问延迟10ns。巨大的延时差别，也会影响消息的收发，因此消息丢失和消息延迟也非常普遍。</li>
+<li><strong>网络分区</strong>：网络异常导致大的集群分成多个小的集群独立工作，也称为<strong>脑裂</strong>。</li>
+<li><strong>三态</strong>：对分布式系统的每一次请求与相应，因为受限于网络问题，存在三个返回状态<strong>：成功，失败，超时</strong></li>
+<li><strong>节点故障</strong>：分布式系统中普遍使用<strong>Replica(副本)</strong>，来在多节点上做数据冗余，从而避免单点故障。</li>
+</ul>
+<h2 id="从ACID到CAP-BASE"><a href="#从ACID到CAP-BASE" class="headerlink" title="从ACID到CAP/BASE"></a>从ACID到CAP/BASE</h2><h3 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h3><p>略</p>
+<h3 id="CAP定理"><a href="#CAP定理" class="headerlink" title="CAP定理"></a>CAP定理</h3><blockquote>
+<p><strong>一个分布式系统不可能同时满足一致性(Consistency), 可用性(Availability)和分区容错性(Partition tolerance)这三个需求，最多只能同时满足两个</strong></p>
+<p>如何快速理解CAP定理呢，想象存在节点分区的场景时，是否允许两个子集群同时工作，允许则数据产生不一致，不允许则失去了可用性。</p>
+<p>由于网络问题不可避免，我们要做的就是在分区情况发生时，如何在CA之间做取舍。</p>
+</blockquote>
+<p>//todo: cap图片</p>
+<h5 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h5><p> <strong>等同于所有节点访问同一份最新的数据副本 。</strong>对于一个数据副本存在不同节点上的分布式系统而言，如果一个更新操作只更新了主分片的数据，而没有更新副本分片的数据。那么对副本分片发起的读取操作就会获取到<strong>脏数据</strong>，这就是数据不一致。<strong>一致性的情况则是，一旦一个数据更新成功，那么所有请求都可以读取到最新的值，这就是强一致性(严格一致性)。</strong></p>
+<p><strong>可用性</strong></p>
+<p> 每次请求都能获取到非错的响应——但是不保证获取的数据为最新数据 </p>
+<p><strong>分区容错性</strong></p>
+<p>以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前操作在C和A之间做出选择 </p>
+<h3 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h3><p>BASE理论是对CAP中一致性和可用性权衡的结果，是对互联网分布式应用时间的总结。</p>
+<blockquote>
+<p>Basically Availibale (基本可用) ， Soft state(软状态)， Eventually Consistent(最终一致性)</p>
+</blockquote>
+<ul>
+<li>基本可用（<strong>B</strong>asically <strong>A</strong>vailable）：系统能够基本运行、一直提供服务。</li>
+<li>软状态（<strong>S</strong>oft-state）：系统不要求一直保持强一致状态。</li>
+<li>最终一致性)（<strong>E</strong>ventual consistency）：系统需要在某一时刻后达到一致性要求。</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在集中式的服务中，我们通过<strong>ACID</strong>的特性保证了<strong>数据的一致性</strong>。在分布式的场景中，<strong>CAP</strong>定理告诉了我们在保证<strong>分区容错性</strong>的情况下，我们需要在<strong>可用性</strong>和<strong>数据一致性</strong>中做权衡。在互联网分布式应用的生产实践中，我们总结了<strong>BASE理论</strong>，来在服务基本可用的情况下，提供了<strong>数据的最终一致性</strong>。</p>
+<h1 id="分布式一致性协议"><a href="#分布式一致性协议" class="headerlink" title="分布式一致性协议"></a>分布式一致性协议</h1><h2 id="2PC-3PC"><a href="#2PC-3PC" class="headerlink" title="2PC | 3PC"></a>2PC | 3PC</h2><p>在分布式事务中，我们引入<strong>Coordinator</strong>节点来统一调度其他所有参与节点。</p>
+<h3 id="两段式提交（Two-Phase-Commit）"><a href="#两段式提交（Two-Phase-Commit）" class="headerlink" title="两段式提交（Two-Phase Commit）"></a>两段式提交（Two-Phase Commit）</h3><h4 id="基本算法"><a href="#基本算法" class="headerlink" title="基本算法"></a>基本算法</h4><p>将事务的提交过程分为了两个阶段，<strong>事务提交阶段，事务执行阶段</strong></p>
+<blockquote>
+<ol>
+<li>协调者联系所有参与者，提交事务</li>
+<li>若所有参与者都同意，协调者再次通知参与者，执行事务。否则则通知所有参与者，终止事务。</li>
+</ol>
+</blockquote>
+<p><strong>事务提交阶段：</strong></p>
+<ol>
+<li>协调者节点向所有参与者节点询问是否可以执行提交操作，并等待参与者节点的响应。</li>
+<li>参与者节点执行询问发起为止的所有事务操作，并将Undo信息和Redo信息写入日志。(基于WAL机制，实现节点内原子性和一致性)</li>
+<li>各参与者节点响应协调者节点发起的询问。如果参与者节点的事务操作实际执行成功，则它返回一个”同意”消息；如果参与者节点的事务操作实际执行失败，则它返回一个”中止”消息。</li>
+</ol>
+<p><strong>事务执行阶段：</strong></p>
+<p>成功：当协调者节点从所有参与者节点获得的响应消息都为”同意”时：</p>
+<ol>
+<li>协调者节点向所有参与者节点发出”正式提交”的请求。</li>
+<li>参与者节点正式完成操作，并释放在整个事务期间内占用的资源。</li>
+<li>参与者节点向协调者节点发送”完成”消息。</li>
+<li>协调者节点收到所有参与者节点反馈的”完成”消息后，完成事务。</li>
+</ol>
+<p>失败：如果任一参与者节点在第一阶段返回的响应消息为”终止”，或者协调者节点在第一阶段的询问超时之前无法获取所有参与者节点的响应消息时：</p>
+<ol>
+<li>协调者节点向所有参与者节点发出”回滚操作”的请求。</li>
+<li>参与者节点利用之前写入的Undo信息执行回滚，并释放在整个事务期间内占用的资源。</li>
+<li>参与者节点向协调者节点发送”回滚完成”消息。</li>
+<li>协调者节点收到所有参与者节点反馈的”回滚完成”消息后，取消事务。</li>
+</ol>
+<p>有时候，第二阶段也被称作<strong>完成阶段</strong>，因为无论结果怎样，<strong>协调者都必须在此阶段结束当前事务。</strong></p>
+<p>//TODO: 插入图片<a href="https://zhuanlan.zhihu.com/p/35298019" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/35298019</a></p>
+<h4 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h4><p>优点：原理简单，实现方便</p>
+<p><strong>缺点：同步阻塞</strong>，单点故障，数据不一致，没有异常中断事务的机制</p>
+<ul>
+<li><strong>同步阻塞</strong>：在任意阶段，所有参与者都会阻塞等待其他参与者响应。</li>
+<li>单点问题：协调者在事务执行阶段挂掉，则所有参与者都会无限期等待</li>
+<li>数据不一致：在事务执行阶段，任一参与者宕机或网络故障，就会导致数据不一致</li>
+<li>没有异常中断事务的机制：在事务提交阶段，任一参与者宕机，协调者无法中断事务，只能超时中断。</li>
+</ul>
+<h3 id="三阶段提交-Three-Phase-Commit"><a href="#三阶段提交-Three-Phase-Commit" class="headerlink" title="三阶段提交 Three-Phase Commit"></a>三阶段提交 Three-Phase Commit</h3><p>在2PC的基础上，新增了一个中间状态<strong>：Pre-Commite Phase 预提交状态。</strong></p>
+<blockquote>
+<p><strong>Note:</strong> 在三阶段提交中，参与者接受到PreCommit消息后，哪怕后续无法收到任何消息，参与者仍然会提交事务，可能导致数据的不一致。</p>
+</blockquote>
+<p><strong>阶段一：CanCommit</strong></p>
+<p>协调者向所有的参与者发送包含事务的请求，参与者返回Yes/No。</p>
+<p><strong>阶段二：PreCommit</strong></p>
+<p>协调者根据上一轮的返回，若全同意则发送PreCommit请求，参与者接受请求，会<strong>事务预提交</strong>, 并将Undo和Redo写入事务日志。</p>
+<p>若存在参与者不同意或无返回，则反送Abort请求，<strong>中止</strong>事务。</p>
+<p><strong>阶段三：DoCommit</strong></p>
+<p>协调者根据上一轮的返回，若全同意则发送DoCommit请求，参与者接受请求，<strong>正式提交事务</strong>，并返回ACK。</p>
+<p>若存在参与者不同意或无返回，则反送Abort请求，<strong>回滚</strong>事务。</p>
+<h2 id="Paxos"><a href="#Paxos" class="headerlink" title="Paxos"></a>Paxos</h2><h3 id="基础概念-1"><a href="#基础概念-1" class="headerlink" title="基础概念"></a>基础概念</h3><p>Paxos将系统中的角色分为提议者 (Proposer)，决策者 (Acceptor)，和最终决策学习者 (Learner):</p>
+<ul>
+<li><strong>Proposer</strong>: 提出提案 (Proposal)。Proposal信息包括提案编号 (Proposal ID) 和提议的值 (Value)。</li>
+<li><strong>Acceptor</strong>：参与决策，回应Proposers的提案。收到Proposal后可以接受提案，若Proposal获得多数Acceptors的接受，则称该Proposal被批准。</li>
+<li><p><strong>Learner</strong>：不参与决策，从Proposers/Acceptors学习最新达成一致的提案（Value）。</p>
+<p>协议的流程已经分为了两个阶段：</p>
+</li>
+</ul>
+<ul>
+<li><strong>预提案阶段(PreProposal)</strong></li>
+<li><strong>提案阶段(Proposal)</strong></li>
+</ul>
+<p>两种消息：</p>
+<ul>
+<li><strong>预提案</strong>: 包含Proposal.id 和 Proposal.value</li>
+<li><strong>提案</strong>: 包含Proposal.id 和 Proposal.value</li>
+</ul>
+<h3 id="实现流程"><a href="#实现流程" class="headerlink" title="实现流程"></a>实现流程</h3><p><strong>阶段一 预提案阶段：</strong></p>
+<p>提议者Proposer：向接受者Acceptor广播预提案，附带提案Proposal的proposal_id和proposal_value.</p>
+<p>接受者Acceptor：收到预提案后更新<code>a_proposal_id = max(proposal_id,a_proposal_id)</code>，如果预提案的proposal_id&gt;a_proposal_id，Acceptor回复记录的接受过的提案中proposal_id最大的。</p>
+<p><strong>阶段二 提案阶段：</strong> </p>
+<p>提议者Proposer：等待直到收到<strong>大多数(Majority)</strong>接受者对预提案的回复，从<strong>所有回复的提案</strong>组成的提案集合中挑选<strong>proposal_id最大的提案</strong>，以该提案的值作为本次提案的值。如果K是空集，那么可以给提案任意赋值。然后把该提案广播给接受者们，提案和预提案共享同一个proposal_id。</p>
+<p>接受者Acceptor：如果收到的提案的proposal_id&gt;= a.proposal_id，那么接受这个提案，更新<code>a_proposal_id = max(proposal_id,a_proposal_id)</code>，更新记录的提案。</p>
+<h3 id="举例说明"><a href="#举例说明" class="headerlink" title="举例说明"></a>举例说明</h3><p>插入三张图来生动说明</p>
+<p><a href="https://zhuanlan.zhihu.com/p/31780743" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/31780743</a></p>
+<h2 id="Multi-Paxos算法"><a href="#Multi-Paxos算法" class="headerlink" title="Multi-Paxos算法"></a>Multi-Paxos算法</h2><blockquote>
+<p>引用自文章<a href="https://www.zhihu.com/column/paxos" target="_blank" rel="noopener">Paxos、Raft分布式一致性最佳实践</a></p>
+</blockquote>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>二段式提交协议，三段式提交协议和Paxos都是典型的分布式一致性算法。</p>
+<p>二段式提交解决了分布式事务的原子性问题，保证了参与分布式事务的各个参与者要么都成功，要么都失败。但是存在着同步阻塞，无限期等待和脑裂等问题。</p>
+<p>在此基础上，提出了三段式提交协议，在二段式的基础上增加了PreCommit阶段，避免了无限期等待的问题。</p>
+<p>Paxos算法引入了多数者的概念，即当同时存在两个提案时，我们要求每个提案都需要被多数者节点同意，那么这两个提案的接受者合集之间必然出现并集。我们只需要确保并集节点只会接受一个提案就可以保证分布式一致性。</p>
+<p>Paxos支持节点角色的轮换，避免了分布式的单点故障，同时避免了脑裂问题，是目前最优秀的分布式一致性协议之一。</p>
+<h1 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h1><p>2PC到3PC 真正解决了什么问题，优点在哪里。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p>&lt;&lt;从PAXOS到ZOOKEEPER分布式一致性原理与实践&gt;&gt;</p>
+<p>&lt;<paxos made="" simple="">&gt;</paxos></p>
+<p> &lt;&lt; The Part-Time Parliament&gt;&gt; </p>
+<p><a href="https://zh.wikipedia.org/wiki/%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93#%E4%BA%8B%E5%8A%A1%E6%80%A7%E8%B4%A8" target="_blank" rel="noopener">分布式数据库</a></p>
+<p><a href="https://zh.wikipedia.org/wiki/CAP%E5%AE%9A%E7%90%86" target="_blank" rel="noopener">CAP定理</a></p>
+<p><a href="https://www.the-paper-trail.org/post/2008-11-27-consensus-protocols-two-phase-commit/" target="_blank" rel="noopener">consensus-protocols-two-phase-commit</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/35298019" target="_blank" rel="noopener">漫话分布式系统共识协议: 2PC/3PC篇</a></p>
+<p><a href="https://www.zhihu.com/question/19787937" target="_blank" rel="noopener">如何浅显易懂地解说 Paxos 的算法？</a></p>
+<p><a href="https://www.zhihu.com/column/paxos" target="_blank" rel="noopener">Paxos、Raft分布式一致性最佳实践</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/03/Components/Zookeeper/ZK-Introduction/" rel="next" title="ZK-Introduction">
+                <i class="fa fa-chevron-left"></i> ZK-Introduction
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/06/Components/Kafka/为什么Kafka这么快/" rel="prev" title="为什么Kafka这么快">
+                为什么Kafka这么快 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">146</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基础概念"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从ACID到CAP-BASE"><span class="nav-number">1.1.</span> <span class="nav-text">从ACID到CAP/BASE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ACID"><span class="nav-number">1.1.1.</span> <span class="nav-text">ACID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CAP定理"><span class="nav-number">1.1.2.</span> <span class="nav-text">CAP定理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#一致性"><span class="nav-number">1.1.2.0.1.</span> <span class="nav-text">一致性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BASE理论"><span class="nav-number">1.1.3.</span> <span class="nav-text">BASE理论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式一致性协议"><span class="nav-number">2.</span> <span class="nav-text">分布式一致性协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2PC-3PC"><span class="nav-number">2.1.</span> <span class="nav-text">2PC | 3PC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两段式提交（Two-Phase-Commit）"><span class="nav-number">2.1.1.</span> <span class="nav-text">两段式提交（Two-Phase Commit）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本算法"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">基本算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优缺点"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">优缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三阶段提交-Three-Phase-Commit"><span class="nav-number">2.1.2.</span> <span class="nav-text">三阶段提交 Three-Phase Commit</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Paxos"><span class="nav-number">2.2.</span> <span class="nav-text">Paxos</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础概念-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现流程"><span class="nav-number">2.2.2.</span> <span class="nav-text">实现流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#举例说明"><span class="nav-number">2.2.3.</span> <span class="nav-text">举例说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Multi-Paxos算法"><span class="nav-number">2.3.</span> <span class="nav-text">Multi-Paxos算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">2.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TODO"><span class="nav-number">3.</span> <span class="nav-text">TODO</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
