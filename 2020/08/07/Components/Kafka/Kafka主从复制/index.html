@@ -104,9 +104,9 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/1.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/data_copy.png">
-<meta property="og:image" content="https://miszibu.github.io/Users/ligaofeng/blog/source/_posts/Components/Kafka/Kafka主从复制/data_save.png">
-<meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/%20hw_Case.png">
-<meta property="og:updated_time" content="2020-08-08T10:17:30.902Z">
+<meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/data_save.png">
+<meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/hw_Case.png">
+<meta property="og:updated_time" content="2020-08-08T10:24:26.838Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka主从复制">
 <meta name="twitter:description" content="转载自再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理">
@@ -358,7 +358,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注：ISR中包括：leader + 与leader保持同步的followers。</span><br></pre></td></tr></table></figure>
 <p>每个 replica 都有 HW，leader 和 follower 各自负责更新自己的 HW 的状态。对于 leader 新写入的消息，consumer 不能立刻消费，leader 会等待该消息被所有 ISR 中的 replicas 同步后更新 HW，此时消息才能被 consumer 消费。这样就保证了如果 leader 所在的 broker 失效，该消息仍然可以从新选举的 leader 中获取。对于来自内部 broker 的读取请求，没有 HW 的限制。</p>
 <p>下图详细的说明了当 producer 生产消息至 broker 后，ISR 以及 HW 和 LEO 的流转过程：</p>
-<p><img src="/Users/ligaofeng/blog/source/_posts/Components/Kafka/Kafka主从复制/data_save.png" alt=""></p>
+<p><img src="/2020/08/07/Components/Kafka/Kafka主从复制/data_save.png" alt=""></p>
 <p>由此可见，Kafka 的复制机制既不是完全的同步复制，也不是单纯的异步复制。事实上，同步复制要求所有能工作的 follower 都复制完，这条消息才会被 commit，这种复制方式受限于复制最慢的 follower，会极大的影响吞吐率。而异步复制方式下，follower 异步的从 leader 复制数据，数据只要被 leader 写入 log 就被认为已经 commit，这种情况下如果 follower 都还没有复制完，落后于 leader 时，突然 leader 宕机，则会丢失数据，降低可靠性。而 Kafka 使用 ISR 的策略则在可靠性和吞吐率方面取得了较好的平衡。</p>
 <p>Kafka 的 ISR 的管理最终都会反馈到 ZooKeeper 节点上，具体位置为：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/brokers/topics/[topic]/partitions/[partition]/state</span><br></pre></td></tr></table></figure>
@@ -376,7 +376,7 @@
 <p>producer 发送数据给 leader，leader 收到数据后要等到 ISR 列表中的所有副本都同步数据完成后（强一致性），才向生产者返回成功消息，如果一直收不到成功消息，则认为发送数据失败会自动重发数据。这是可靠性最高的方案，当然，性能也会受到一定影响。</p>
 <p><strong>注意：参数 min.insync.replicas </strong></p>
 <p>如果要提高数据的可靠性，在设置 request.required.acks=-1 的同时，还需参数 min.insync.replicas 配合，如此才能发挥最大的功效。min.insync.replicas 这个参数用于设定 ISR 中的最小副本数，默认值为1，当且仅当 request.required.acks 参数设置为-1时，此参数才生效。当 ISR 中的副本数少于 min.insync.replicas 配置的数量时，客户端会返回异常：<code>org.apache.kafka.common.errors.NotEnoughReplicasExceptoin: Messages are rejected since there are fewer in-sync replicas than required</code>。不难理解，如果 min.insync.replicas 设置为 2，当 ISR 中实际副本数为 1 时（只有leader），将无法保证可靠性，此时拒绝客户端的写请求以防止消息丢失。</p>
-<h2 id="深入理解-HW-机制"><a href="#深入理解-HW-机制" class="headerlink" title="深入理解 HW 机制"></a>深入理解 HW 机制</h2><p><img src="/2020/08/07/Components/Kafka/Kafka主从复制/ hw_Case.png" alt=""></p>
+<h2 id="深入理解-HW-机制"><a href="#深入理解-HW-机制" class="headerlink" title="深入理解 HW 机制"></a>深入理解 HW 机制</h2><p><img src="/2020/08/07/Components/Kafka/Kafka主从复制/hw_Case.png" alt=""></p>
 <p>在上图中好像出现了 序号4的数据在 Follower Partition 上重复出现的场景，事实上并不会。</p>
 <p>Follower 从 Leader 同步数据时，会从自身HW 位置开始同步，不会同步冗余数据。当原先的 Leader Partition回来后，它首先将自己的 log 文件截断到上次 checkpointed 时刻的 HW 的位置，之后再从 leader 中同步消息。</p>
 <blockquote>
