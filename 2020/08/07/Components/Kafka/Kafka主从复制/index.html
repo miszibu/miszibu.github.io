@@ -106,7 +106,7 @@
 <meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/data_copy.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/data_save.png">
 <meta property="og:image" content="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/hw_Case.png">
-<meta property="og:updated_time" content="2020-08-08T10:24:26.838Z">
+<meta property="og:updated_time" content="2020-08-08T10:33:42.539Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka主从复制">
 <meta name="twitter:description" content="转载自再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理">
@@ -369,7 +369,7 @@
 </ol>
 <h2 id="数据可靠性和持久性保证"><a href="#数据可靠性和持久性保证" class="headerlink" title="数据可靠性和持久性保证"></a>数据可靠性和持久性保证</h2><p>当 producer 向 leader 发送数据时，可以通过 request.required.acks 参数来设置数据可靠性的级别：</p>
 <p><strong>1. request.required.acks = 1</strong></p>
-<p>这是默认情况，即：producer 发送数据到 leader，leader 写本地日志成功，返回客户端成功；此时 ISR 中的其它副本还没有来得及拉取该消息，如果此时 leader 宕机了，那么此次发送的消息就会丢失。</p>
+<p>默认情况，即：producer 发送数据到 leader，leader 写本地日志成功，返回客户端成功；此时 ISR 中的其它副本还没有来得及拉取该消息，如果此时 leader 宕机了，那么此次发送的消息就会丢失。</p>
 <p><strong>2. request.required.acks = 0</strong></p>
 <p>producer 不停向leader发送数据，而不需要 leader 反馈成功消息，这种情况下数据传输效率最高，但是数据可靠性确是最低的。可能在发送过程中丢失数据，可能在 leader 宕机时丢失数据。</p>
 <p><strong>3. request.required.acks = -1（all）</strong></p>
@@ -384,6 +384,7 @@
 </blockquote>
 <h2 id="Leader-选举策略"><a href="#Leader-选举策略" class="headerlink" title="Leader 选举策略"></a>Leader 选举策略</h2><blockquote>
 <p>总结： 只有 ISR 中的 Partition 才能被选举成 Leader, 不使用多数派机制，只要有一个 Follower 存在就可以被选举为 Leader。当所有的 Follower 都失败时，默认会选举第一个恢复的 Partition作为新的 Leader partition。</p>
+<p>在选举时不会参考各Partition中 LEO 和 HW 的位置。</p>
 </blockquote>
 <p>Kafka 在 ZooKeeper 中为每一个 partition 动态的维护了一个 ISR，这个 ISR 里的所有 replica 都与 leader 保持同步，只有 ISR 里的成员才能有被选为 leader 的可能（通过参数配置：<code>unclean.leader.election.enable=false</code>）。</p>
 <p>在这种模式下，对于 f+1 个副本，一个 Kafka topic 能在保证不丢失已经 commit 消息的前提下容忍 f 个副本的失败，在大多数使用场景下，这种模式是十分有利的。事实上，对于任意一条消息，只有它被 ISR 中的所有 follower 都从 leader 复制过去才会被认为已提交，并返回信息给 producer，从而保证可靠性。但与 “少数服从多数” 策略不同的是，Kafka ISR 列表中副本的数量不需要超过副本总数的一半，即不需要满足 “多数派” 原则，通常，ISR 列表副本数大于等于 2 即可，如此，便在可靠性和吞吐量方面取得平衡。</p>
@@ -436,6 +437,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/09/Components/Mysql/Mysql-WAL/" rel="prev" title="Mysql-WAL">
+                Mysql-WAL <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -510,7 +515,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">146</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
