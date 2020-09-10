@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Elasticsearch,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="相关背景介绍AnalysisAnalysis（文本分析）: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫分词。 简单说Analysis是通过Analyzer来实现的。 Index time analysis当文档插入索引时，ES会对text类型的字段建立反向索引，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数">
+<meta name="keywords" content="Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-分词器">
+<meta property="og:url" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="相关背景介绍AnalysisAnalysis（文本分析）: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫分词。 简单说Analysis是通过Analyzer来实现的。 Index time analysis当文档插入索引时，ES会对text类型的字段建立反向索引，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/standardAnalyzerOutput.png">
+<meta property="og:updated_time" content="2020-09-09T15:05:15.425Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ES-分词器">
+<meta name="twitter:description" content="相关背景介绍AnalysisAnalysis（文本分析）: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫分词。 简单说Analysis是通过Analyzer来实现的。 Index time analysis当文档插入索引时，ES会对text类型的字段建立反向索引，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数">
+<meta name="twitter:image" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/standardAnalyzerOutput.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/">
+
+
+
+
+
+  <title>ES-分词器 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES-分词器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-09T22:16:53+08:00">
+                2020-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="相关背景介绍"><a href="#相关背景介绍" class="headerlink" title="相关背景介绍"></a>相关背景介绍</h1><h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><p><strong>Analysis（文本分析）</strong>: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫<strong>分词</strong>。 简单说Analysis是通过Analyzer来实现的。</p>
+<h3 id="Index-time-analysis"><a href="#Index-time-analysis" class="headerlink" title="Index time analysis"></a>Index time analysis</h3><p>当文档插入索引时，ES会对<code>text</code>类型的字段建立<strong>反向索引</strong>，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数据的文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> String被转为tokens, tokens又被转为小写并被简化为基础词根比如 (foxes → fox, jumped → jump, lazy → lazi)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 原句</span></span><br><span class="line">The QUICK brown foxes jumped over the lazy dog!</span><br><span class="line"><span class="meta">#</span><span class="bash"> Tokens</span></span><br><span class="line">[ quick, brown, fox, jump, over, lazi, dog ]</span><br></pre></td></tr></table></figure>
+<h3 id="Search-time-analysis"><a href="#Search-time-analysis" class="headerlink" title="Search time analysis"></a>Search time analysis</h3><p>Analysis同样也会应用到查询过程中，当我们使用<code>full text queries(全文查询)</code>时，比如<code>match query</code>。查询语句也会被分词，从而去匹配反向索引中的tokens/terms，并计算相关性得分。</p>
+<p><strong>指定查询时分词器</strong>： 优先使用查询语句配置的分词器，其次使用template filed中配置的分词器, 然后使用template index setting中配置的<code>defautl</code>,<code>default_search</code>分词器，最后是<code>standard</code> 分词器，最后是<code>standard</code>分词器。</p>
+<ul>
+<li>An analyzer specified in the query itself.</li>
+<li>The search_analyzer mapping parameter.</li>
+<li><p>The analyzer mapping parameter.</p>
+</li>
+<li><p>An analyzer in the index settings called default_search.</p>
+</li>
+<li>An analyzer in the index settings called default.</li>
+<li>The standard analyzer.</li>
+</ul>
+<h2 id="Analyzer的构成"><a href="#Analyzer的构成" class="headerlink" title="Analyzer的构成"></a>Analyzer的构成</h2><p>Analyzer是由三个模块构成的： <code>character filters</code>, <code>tokenizers</code>, <code>tokern filters</code>。</p>
+<p>用户可以使用内置的Analyzer，也可以自己<strong>自定义Analyzer</strong>。</p>
+<ul>
+<li><p>character filters(字符过滤器)： 在对文本进行分词之前，先进行预处理，比如说过滤html标签。</p>
+</li>
+<li><p>tokenizers(分词器)： 将原有的语句切分为一系列的tokens/terms，并记录其起始位置和字符长度。 比如 <code>whitespace分词器</code>就会以空&#26684;来划分tokens</p>
+</li>
+<li><p>token filters(Token过滤器)： 对切分后tokens进行处理，删除，添加或者修改token，如<code>lowercase token filter</code>就会小写化tokens,<code>stop token filter</code>就会删除无意义的助词（a, an, the, and等），<code>synonym token filter</code>则会添加同义词token。</p>
+</li>
+</ul>
+<p>执行顺序: Character filters(0或N个) –&gt; Tokenizer（有且只有一个） –&gt; Token filters(0或N个)</p>
+<h1 id="常见分词器及其使用"><a href="#常见分词器及其使用" class="headerlink" title="常见分词器及其使用"></a>常见分词器及其使用</h1><p>ES内置了许多分词器，这里简单常见的两种<code>Standard Analyzer</code>, <code>Whitespace Anylyzer</code>. 更多分词器和分词器细节配置，使用时再去了解即可，</p>
+<h2 id="Standard-Analyzer（默认）"><a href="#Standard-Analyzer（默认）" class="headerlink" title="Standard Analyzer（默认）"></a>Standard Analyzer（默认）</h2><p>Standard是<strong>默认</strong>的分析器。它提供了基于语法的token划分（基于Unicode文本分割算法），适用于大部分语言<strong>（事实上中文日文就不行，别的语言没测）</strong>。</p>
+<p><img src="/2020/09/09/Components/Elasticsearch/ES-分词器/standardAnalyzerOutput.png" alt="image-20200909230232103"></p>
+<h2 id="Whitespace-Anylyzer"><a href="#Whitespace-Anylyzer" class="headerlink" title="Whitespace Anylyzer"></a>Whitespace Anylyzer</h2><p><code>Whitespace analyzer</code>就是简单的将文本以空&#26684;进行划分。</p>
+<h1 id="如何自定义分词器"><a href="#如何自定义分词器" class="headerlink" title="如何自定义分词器"></a>如何自定义分词器</h1><p>使用自定义分词器来满足一些客制化的需求。直接上例子</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 创建了一个自定义分词器取名为my_custom_analyzer</span><br><span class="line"># 自定义分词器的type需要设置为custom</span><br><span class="line"># tokenizer选择到了standard，当然也可以是任意内置或后续安装的其他tokenizer</span><br><span class="line"># character filter 和 filter选择了内置</span><br></pre></td></tr></table></figure>
+<p>PUT my_index</p>
+<p>{</p>
+<p> &quot;settings&quot;: {</p>
+<p> &quot;analysis&quot;: {</p>
+<p>  &quot;analyzer&quot;: {</p>
+<p>  &quot;my_custom_analyzer&quot;: {</p>
+<p>   &quot;type&quot;:  &quot;custom&quot;, </p>
+<p>   &quot;tokenizer&quot;: &quot;standard&quot;,</p>
+<p>   &quot;char_filter&quot;: [</p>
+<p>   &quot;html_strip&quot;</p>
+<p>   ],</p>
+<p>   &quot;filter&quot;: [</p>
+<p>   &quot;lowercase&quot;,</p>
+<p>   &quot;asciifolding&quot;</p>
+<p>   ]</p>
+<p>  }</p>
+<p>  }</p>
+<p> }</p>
+<p> }</p>
+<p>}</p>
+<p>POST my_index/_analyze</p>
+<p>{</p>
+<p> &quot;analyzer&quot;: &quot;my_custom_analyzer&quot;,</p>
+<p> &quot;text&quot;: &quot;Is this <b>déjà vu</b>?&quot;</p>
+<p>}</p>
+<h1 id="这个例子中，我们的三个组件都使用了自定义的设置。"><a href="#这个例子中，我们的三个组件都使用了自定义的设置。" class="headerlink" title="这个例子中，我们的三个组件都使用了自定义的设置。"></a>这个例子中，我们的三个组件都使用了自定义的设置。</h1><p>PUT my_index</p>
+<p>{</p>
+<p> &quot;settings&quot;: {</p>
+<p> &quot;analysis&quot;: {</p>
+<p>  &quot;analyzer&quot;: {</p>
+<p>  &quot;my_custom_analyzer&quot;: { </p>
+<p>   &quot;type&quot;: &quot;custom&quot;,</p>
+<p>   &quot;char_filter&quot;: [</p>
+<p>   &quot;emoticons&quot;</p>
+<p>   ],</p>
+<p>   &quot;tokenizer&quot;: &quot;punctuation&quot;,</p>
+<p>   &quot;filter&quot;: [</p>
+<p>   &quot;lowercase&quot;,</p>
+<p>   &quot;english_stop&quot;</p>
+<p>   ]</p>
+<p>  }</p>
+<p>  },</p>
+<p>  &quot;tokenizer&quot;: {</p>
+<p>  &quot;punctuation&quot;: { </p>
+<p>   &quot;type&quot;: &quot;pattern&quot;,</p>
+<p>   &quot;pattern&quot;: &quot;[ .,!?]&quot;</p>
+<p>  }</p>
+<p>  },</p>
+<p>  &quot;char_filter&quot;: {</p>
+<p>  &quot;emoticons&quot;: { </p>
+<p>   &quot;type&quot;: &quot;mapping&quot;,</p>
+<p>   &quot;mappings&quot;: [</p>
+<p>   &quot;:) =&gt; <em>happy</em>&quot;,</p>
+<p>   &quot;:( =&gt; <em>sad</em>&quot;</p>
+<p>   ]</p>
+<p>  }</p>
+<p>  },</p>
+<p>  &quot;filter&quot;: {</p>
+<p>  &quot;english_stop&quot;: { </p>
+<p>   &quot;type&quot;: &quot;stop&quot;,</p>
+<p>   &quot;stopwords&quot;: &quot;<em>english</em>&quot;</p>
+<p>  }</p>
+<p>  }</p>
+<p> }</p>
+<p> }</p>
+<p>}</p>
+<p>POST my_index/_analyze</p>
+<p>{</p>
+<p> &quot;analyzer&quot;: &quot;my_custom_analyzer&quot;,</p>
+<p> &quot;text&quot;:  &quot;I’m a :) person, and you?&quot;</p>
+<p>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 如何设置和测试分词器</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 如何在template中设置分词器</span><br><span class="line"></span><br><span class="line">```json</span><br><span class="line"></span><br><span class="line"># 在这里例子中，我们为title字段声明了`analyzer`(数据插入时使用),但并未context字段声明任何analyzer，而是在setting中配置了默认的analyzer，因此context字段将使用simple analyzer。若没有配置默认analyzer,text类型字段将默认使用standard analyzer.</span><br><span class="line"></span><br><span class="line">PUT my_index</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;settings&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">  &amp;quot;analysis&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;analyzer&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">&amp;quot;default&amp;quot;: &#123;</span><br><span class="line"></span><br><span class="line">&amp;quot;type&amp;quot;: &amp;quot;simple&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">   &amp;quot;my_analyzer&amp;quot;:&#123; </span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;custom&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;tokenizer&amp;quot;:&amp;quot;standard&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;filter&amp;quot;:[</span><br><span class="line"></span><br><span class="line">​     &amp;quot;lowercase&amp;quot;</span><br><span class="line"></span><br><span class="line">​    ]</span><br><span class="line"></span><br><span class="line">   &#125;,</span><br><span class="line"></span><br><span class="line">   &amp;quot;my_stop_analyzer&amp;quot;:&#123; </span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;custom&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;tokenizer&amp;quot;:&amp;quot;standard&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;filter&amp;quot;:[</span><br><span class="line"></span><br><span class="line">​     &amp;quot;lowercase&amp;quot;,</span><br><span class="line"></span><br><span class="line">​     &amp;quot;english_stop&amp;quot;</span><br><span class="line"></span><br><span class="line">​    ]</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#125;,</span><br><span class="line"></span><br><span class="line">   &amp;quot;filter&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;english_stop&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;stop&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;stopwords&amp;quot;:&amp;quot;_english_&amp;quot;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> &#125;,</span><br><span class="line"></span><br><span class="line"> &amp;quot;mappings&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">  &amp;quot;_doc&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;properties&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;title&amp;quot;: &#123;</span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;text&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;analyzer&amp;quot;:&amp;quot;my_analyzer&amp;quot;, </span><br><span class="line"></span><br><span class="line">​    &amp;quot;search_analyzer&amp;quot;:&amp;quot;my_stop_analyzer&amp;quot;, </span><br><span class="line"></span><br><span class="line">​    &amp;quot;search_quote_analyzer&amp;quot;:&amp;quot;my_analyzer&amp;quot; </span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&amp;quot;context&amp;quot;: &#123;</span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;text&amp;quot;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PUT my_index/_doc/1</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;title&amp;quot;:&amp;quot;The Quick Brown Fox&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PUT my_index/_doc/2</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;title&amp;quot;:&amp;quot;A Quick Brown Fox&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 当前查询中&amp;quot;the quick brown fox&amp;quot;被引号框起，所以这个短语将会`search_quote_analyzer`所分析，如果没有引号，则会调用`search_analyzer`进行分析。</span><br><span class="line"></span><br><span class="line"># 查询分析器的匹配顺序，见上文Analyzer。</span><br><span class="line"></span><br><span class="line">GET my_index/_search</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;query&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">  &amp;quot;query_string&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;query&amp;quot;:&amp;quot;&amp;quot;the quick brown fox&amp;quot;&amp;quot; </span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="测试分词器"><a href="#测试分词器" class="headerlink" title="测试分词器"></a>测试分词器</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">GET _analyze</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;tokenizer&amp;quot; : &amp;quot;keyword&amp;quot;,</span><br><span class="line"></span><br><span class="line"> &amp;quot;filter&amp;quot; : [&amp;quot;lowercase&amp;quot;],</span><br><span class="line"></span><br><span class="line"> &amp;quot;char_filter&amp;quot; : [&amp;quot;html_strip&amp;quot;],</span><br><span class="line"></span><br><span class="line"> &amp;quot;text&amp;quot; : &amp;quot;this is a &lt;b&gt;test&lt;/b&gt;&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="IK分词器"><a href="#IK分词器" class="headerlink" title="IK分词器"></a>IK分词器</h1><p>在涉及到中文分词时，ES默认提供的分词器会将中文按照每个字来划分，不能正常使用。通常情况下我们会使用IK分词器，来对中文数据进行分词。</p>
+<h2 id="如何安装IK分词器"><a href="#如何安装IK分词器" class="headerlink" title="如何安装IK分词器"></a>如何安装IK分词器</h2><p>直接查看官方Readme</p>
+<p><a href="https://github.com/medcl/elasticsearch-analysis-ik" target="_blank" rel="noopener">https://github.com/medcl/elasticsearch-analysis-ik</a></p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>IK支持两种颗粒度的拆分</p>
+<ul>
+<li><p><code>ik_smart</code>:会做最粗粒度的划分</p>
+</li>
+<li><p><code>ik_max_word</code>： 做最细粒度的划分</p>
+</li>
+</ul>
+<p><code>`</code>shell</p>
+<h1 id="通过例子，直观了解"><a href="#通过例子，直观了解" class="headerlink" title="通过例子，直观了解"></a>通过例子，直观了解</h1><p>GET /_analyze</p>
+<p>{</p>
+<p> &quot;text&quot;:&quot;中华人民共和国国徽&quot;,</p>
+<p> &quot;analyzer&quot;:&quot;ik_smart&quot;</p>
+<p>}</p>
+<p>#TODO</p>
+<p>GET /_analyze</p>
+<p>{</p>
+<p> &quot;text&quot;:&quot;中华人民共和国国徽&quot;,</p>
+<p> &quot;analyzer&quot;:&quot;ik_max_word&quot;</p>
+<p>}</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/15/Components/Redis/Redis数据结构及其底层实现/" rel="next" title="Redis数据结构及其底层实现">
+                <i class="fa fa-chevron-left"></i> Redis数据结构及其底层实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/09/Components/Elasticsearch/ES-Mappings/" rel="prev" title="ES-Mappings">
+                ES-Mappings <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">149</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关背景介绍"><span class="nav-number">1.</span> <span class="nav-text">相关背景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Analysis"><span class="nav-number">1.1.</span> <span class="nav-text">Analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Index-time-analysis"><span class="nav-number">1.1.1.</span> <span class="nav-text">Index time analysis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Search-time-analysis"><span class="nav-number">1.1.2.</span> <span class="nav-text">Search time analysis</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Analyzer的构成"><span class="nav-number">1.2.</span> <span class="nav-text">Analyzer的构成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见分词器及其使用"><span class="nav-number">2.</span> <span class="nav-text">常见分词器及其使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Standard-Analyzer（默认）"><span class="nav-number">2.1.</span> <span class="nav-text">Standard Analyzer（默认）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Whitespace-Anylyzer"><span class="nav-number">2.2.</span> <span class="nav-text">Whitespace Anylyzer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何自定义分词器"><span class="nav-number">3.</span> <span class="nav-text">如何自定义分词器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#这个例子中，我们的三个组件都使用了自定义的设置。"><span class="nav-number">4.</span> <span class="nav-text">这个例子中，我们的三个组件都使用了自定义的设置。</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#测试分词器"><span class="nav-number">4.1.</span> <span class="nav-text">测试分词器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IK分词器"><span class="nav-number">5.</span> <span class="nav-text">IK分词器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何安装IK分词器"><span class="nav-number">5.1.</span> <span class="nav-text">如何安装IK分词器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用"><span class="nav-number">5.2.</span> <span class="nav-text">如何使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过例子，直观了解"><span class="nav-number">6.</span> <span class="nav-text">通过例子，直观了解</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

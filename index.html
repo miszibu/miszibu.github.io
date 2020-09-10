@@ -260,6 +260,664 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-项目实战1-唐诗300首/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/10/Components/Elasticsearch/ES-项目实战1-唐诗300首/" itemprop="url">ES-项目实战1-唐诗300首</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-10T12:57:39+08:00">
+                2020-09-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>本文来自于博主铭毅天下的博文 <a href="https://blog.csdn.net/wojiushiwo987/article/details/108373311" target="_blank" rel="noopener">项目实战 01：将唐诗三百首写入 Elasticsearch 会发生什么？</a></p>
+</blockquote>
+<p>本文将唐诗三百首索引进入ES，并针对分词进行可视化处理，从这个实战项目可以了解以下一系列知识点和整体数据处理流程。</p>
+<ul>
+<li>Elasticsearch 数据建模</li>
+<li>Elasticsearch bulk批量写入</li>
+<li>Elasticsearch 预处理</li>
+<li>Elasticsearch检索</li>
+<li>Elasticsearch聚合</li>
+<li>kibana Visualize 使用</li>
+<li>kibana Dashboard 使用</li>
+</ul>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/09/10/Components/Elasticsearch/ES-项目实战1-唐诗300首/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-Mappings/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/09/Components/Elasticsearch/ES-Mappings/" itemprop="url">ES-Mappings</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-09T23:06:01+08:00">
+                2020-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Mapping"><a href="#Mapping" class="headerlink" title="Mapping"></a>Mapping</h2><h3 id="Dynamic-Mapping"><a href="#Dynamic-Mapping" class="headerlink" title="Dynamic Mapping"></a>Dynamic Mapping</h3><p>在创建索引时，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。<br>但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。</p>
+<p>动态Mapping存在着不足，比如当一个字段被映射为Integer类型后，相同字段值为String类型的文档将无法插入索引。</p>
+<h3 id="手动创建Mapping"><a href="#手动创建Mapping" class="headerlink" title="手动创建Mapping"></a>手动创建Mapping</h3><p>由于Dynamic Mapping的不可控，我们往往需要手动根据字段的类型和需求来创建Mapping。</p>
+<blockquote>
+<p>Tips: 当字段类型较多时，可以先动态生成，再删除数据后，修改错误的mapping后再重新导入数据。</p>
+</blockquote>
+<h3 id="字段类型"><a href="#字段类型" class="headerlink" title="字段类型"></a>字段类型</h3><h4 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h4><ul>
+<li><strong>text:</strong> 支持分词，用于全文搜索</li>
+<li><strong>keyword:</strong> 不支持分词，用于聚合和排序</li>
+</ul>
+<p>如果安装了分词器，我们可以为text类型指定IK分词器。 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 模糊搜索+精确匹配</span><br><span class="line">"contents": &#123;</span><br><span class="line">	"type": "text",</span><br><span class="line">	"fields": &#123;</span><br><span class="line">		"field": &#123;</span><br><span class="line">			"type": "keyword"</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	"analyzer": "ik_max_word",</span><br><span class="line">	"fielddata": true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 模糊搜索</span><br><span class="line">"contents": &#123;</span><br><span class="line">	"type": "text",</span><br><span class="line">	"analyzer": "ik_max_word"</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 精确匹配</span><br><span class="line">"contents": &#123;</span><br><span class="line">	"type": "keyword"</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 不需要索引</span><br><span class="line">"contents": &#123;</span><br><span class="line">	"type": "keyword"</span><br><span class="line">	"index": false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="数字类型"><a href="#数字类型" class="headerlink" title="数字类型"></a>数字类型</h4><ul>
+<li><strong>long</strong>: 带符号的64位整数</li>
+<li><strong>integer</strong>: 带符号的32位整数</li>
+<li><strong>short</strong>: 带符号的16位整数 [-32768，32767]</li>
+<li><strong>byte</strong>: 带符号的8位整数， [-128，127]</li>
+<li><strong>double</strong>: 双精度64位浮点数</li>
+<li><strong>float</strong>: 单精度32位浮点数</li>
+<li><strong>half_float</strong>: 半精度16位浮点数</li>
+<li><strong>scaled_float</strong>: 缩放类型的浮点数，需配合缩放因子（scaling_factor）一起使用</li>
+</ul>
+<p>对于整数类型而言（long, integer, short， byte），从搜索查询的角度而言，尽可能选择小的能提高查询效率。<br>对于浮点数而言（double, float, half_float, scaled_float），<code>-0.0</code>和<code>+0.0</code>是两个不同的数值，这点需要注意，在范围查询时选择两者中范围更大的作为边界。<br>其中scaled_float，比如价格只需要精确到分，那么缩放因子的值就是100, <strong>在选择浮点数时，如果小数位明确，则优先使用<code>scaled_float</code></strong>。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">"mappings": &#123;</span><br><span class="line">	"properties": &#123;</span><br><span class="line">	   "status": &#123;</span><br><span class="line">	      "type": "byte"</span><br><span class="line">	   &#125;,</span><br><span class="line">	   "year": &#123;</span><br><span class="line">	      "type": "short"</span><br><span class="line">	   &#125;,</span><br><span class="line">	   "id": &#123;</span><br><span class="line">	      "type": "long"</span><br><span class="line">	   &#125;,</span><br><span class="line">	   "price": &#123;</span><br><span class="line">	      "type": "scaled_float",</span><br><span class="line">		  "scaling_factor": 100</span><br><span class="line">	   &#125;,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="日期类型-date"><a href="#日期类型-date" class="headerlink" title="日期类型 date"></a>日期类型 date</h4><p>ES支持以下三种日期格式：</p>
+<ul>
+<li>格式化的日期字符串</li>
+<li>一个13位long类型表示的毫秒时间戳</li>
+<li>一个integer类型表示的10位普通时间戳</li>
+</ul>
+<p>在ES内部，日期类型会被转化为UTC时间（如果指定了时区）并存储为long类型表示的毫秒时间戳。<br>值得注意的是在Kibana上的Discovery，它会根据用户所处的时区，来进行转换，查询。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">"mappings": &#123;</span><br><span class="line">	"properties": &#123;</span><br><span class="line">	   "postdate": &#123;</span><br><span class="line">	      "type": "date"</span><br><span class="line">	   &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="布尔类型-boolean"><a href="#布尔类型-boolean" class="headerlink" title="布尔类型 boolean"></a>布尔类型 boolean</h4><h4 id="二进制类型-binary"><a href="#二进制类型-binary" class="headerlink" title="二进制类型 binary"></a>二进制类型 binary</h4><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://segmentfault.com/a/1190000017215813?utm_source=sf-related" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017215813?utm_source=sf-related</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/09/Components/Elasticsearch/ES-分词器/" itemprop="url">ES-分词器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-09T22:16:53+08:00">
+                2020-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="相关背景介绍"><a href="#相关背景介绍" class="headerlink" title="相关背景介绍"></a>相关背景介绍</h1><h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><p><strong>Analysis（文本分析）</strong>: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫<strong>分词</strong>。 简单说Analysis是通过Analyzer来实现的。</p>
+<h3 id="Index-time-analysis"><a href="#Index-time-analysis" class="headerlink" title="Index time analysis"></a>Index time analysis</h3><p>当文档插入索引时，ES会对<code>text</code>类型的字段建立<strong>反向索引</strong>，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数据的文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> String被转为tokens, tokens又被转为小写并被简化为基础词根比如 (foxes → fox, jumped → jump, lazy → lazi)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 原句</span></span><br><span class="line">The QUICK brown foxes jumped over the lazy dog!</span><br><span class="line"><span class="meta">#</span><span class="bash"> Tokens</span></span><br><span class="line">[ quick, brown, fox, jump, over, lazi, dog ]</span><br></pre></td></tr></table></figure>
+<h3 id="Search-time-analysis"><a href="#Search-time-analysis" class="headerlink" title="Search time analysis"></a>Search time analysis</h3><p>Analysis同样也会应用到查询过程中，当我们使用<code>full text queries(全文查询)</code>时，比如<code>match query</code>。查询语句也会被分词，从而去匹配反向索引中的tokens/terms，并计算相关性得分。</p>
+<p><strong>指定查询时分词器</strong>： 优先使用查询语句配置的分词器，其次使用template filed中配置的分词器, 然后使用template index setting中配置的<code>defautl</code>,<code>default_search</code>分词器，最后是<code>standard</code> 分词器，最后是<code>standard</code>分词器。</p>
+<ul>
+<li>An analyzer specified in the query itself.</li>
+<li>The search_analyzer mapping parameter.</li>
+<li><p>The analyzer mapping parameter.</p>
+</li>
+<li><p>An analyzer in the index settings called default_search.</p>
+</li>
+<li>An analyzer in the index settings called default.</li>
+<li>The standard analyzer.</li>
+</ul>
+<h2 id="Analyzer的构成"><a href="#Analyzer的构成" class="headerlink" title="Analyzer的构成"></a>Analyzer的构成</h2><p>Analyzer是由三个模块构成的： <code>character filters</code>, <code>tokenizers</code>, <code>tokern filters</code>。</p>
+<p>用户可以使用内置的Analyzer，也可以自己<strong>自定义Analyzer</strong>。</p>
+<ul>
+<li><p>character filters(字符过滤器)： 在对文本进行分词之前，先进行预处理，比如说过滤html标签。</p>
+</li>
+<li><p>tokenizers(分词器)： 将原有的语句切分为一系列的tokens/terms，并记录其起始位置和字符长度。 比如 <code>whitespace分词器</code>就会以空&#26684;来划分tokens</p>
+</li>
+<li><p>token filters(Token过滤器)： 对切分后tokens进行处理，删除，添加或者修改token，如<code>lowercase token filter</code>就会小写化tokens,<code>stop token filter</code>就会删除无意义的助词（a, an, the, and等），<code>synonym token filter</code>则会添加同义词token。</p>
+</li>
+</ul>
+<p>执行顺序: Character filters(0或N个) –&gt; Tokenizer（有且只有一个） –&gt; Token filters(0或N个)</p>
+<h1 id="常见分词器及其使用"><a href="#常见分词器及其使用" class="headerlink" title="常见分词器及其使用"></a>常见分词器及其使用</h1><p>ES内置了许多分词器，这里简单常见的两种<code>Standard Analyzer</code>, <code>Whitespace Anylyzer</code>. 更多分词器和分词器细节配置，使用时再去了解即可，</p>
+<h2 id="Standard-Analyzer（默认）"><a href="#Standard-Analyzer（默认）" class="headerlink" title="Standard Analyzer（默认）"></a>Standard Analyzer（默认）</h2><p>Standard是<strong>默认</strong>的分析器。它提供了基于语法的token划分（基于Unicode文本分割算法），适用于大部分语言<strong>（事实上中文日文就不行，别的语言没测）</strong>。</p>
+<p><img src="/2020/09/09/Components/Elasticsearch/ES-分词器/standardAnalyzerOutput.png" alt="image-20200909230232103"></p>
+<h2 id="Whitespace-Anylyzer"><a href="#Whitespace-Anylyzer" class="headerlink" title="Whitespace Anylyzer"></a>Whitespace Anylyzer</h2><p><code>Whitespace analyzer</code>就是简单的将文本以空&#26684;进行划分。</p>
+<h1 id="如何自定义分词器"><a href="#如何自定义分词器" class="headerlink" title="如何自定义分词器"></a>如何自定义分词器</h1><p>使用自定义分词器来满足一些客制化的需求。直接上例子</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 创建了一个自定义分词器取名为my_custom_analyzer</span><br><span class="line"># 自定义分词器的type需要设置为custom</span><br><span class="line"># tokenizer选择到了standard，当然也可以是任意内置或后续安装的其他tokenizer</span><br><span class="line"># character filter 和 filter选择了内置</span><br></pre></td></tr></table></figure>
+<p>PUT my_index</p>
+<p>{</p>
+<p> &quot;settings&quot;: {</p>
+<p> &quot;analysis&quot;: {</p>
+<p>  &quot;analyzer&quot;: {</p>
+<p>  &quot;my_custom_analyzer&quot;: {</p>
+<p>   &quot;type&quot;:  &quot;custom&quot;, </p>
+<p>   &quot;tokenizer&quot;: &quot;standard&quot;,</p>
+<p>   &quot;char_filter&quot;: [</p>
+<p>   &quot;html_strip&quot;</p>
+<p>   ],</p>
+<p>   &quot;filter&quot;: [</p>
+<p>   &quot;lowercase&quot;,</p>
+<p>   &quot;asciifolding&quot;</p>
+<p>   ]</p>
+<p>  }</p>
+<p>  }</p>
+<p> }</p>
+<p> }</p>
+<p>}</p>
+<p>POST my_index/_analyze</p>
+<p>{</p>
+<p> &quot;analyzer&quot;: &quot;my_custom_analyzer&quot;,</p>
+<p> &quot;text&quot;: &quot;Is this <b>déjà vu</b>?&quot;</p>
+<p>}</p>
+<h1 id="这个例子中，我们的三个组件都使用了自定义的设置。"><a href="#这个例子中，我们的三个组件都使用了自定义的设置。" class="headerlink" title="这个例子中，我们的三个组件都使用了自定义的设置。"></a>这个例子中，我们的三个组件都使用了自定义的设置。</h1><p>PUT my_index</p>
+<p>{</p>
+<p> &quot;settings&quot;: {</p>
+<p> &quot;analysis&quot;: {</p>
+<p>  &quot;analyzer&quot;: {</p>
+<p>  &quot;my_custom_analyzer&quot;: { </p>
+<p>   &quot;type&quot;: &quot;custom&quot;,</p>
+<p>   &quot;char_filter&quot;: [</p>
+<p>   &quot;emoticons&quot;</p>
+<p>   ],</p>
+<p>   &quot;tokenizer&quot;: &quot;punctuation&quot;,</p>
+<p>   &quot;filter&quot;: [</p>
+<p>   &quot;lowercase&quot;,</p>
+<p>   &quot;english_stop&quot;</p>
+<p>   ]</p>
+<p>  }</p>
+<p>  },</p>
+<p>  &quot;tokenizer&quot;: {</p>
+<p>  &quot;punctuation&quot;: { </p>
+<p>   &quot;type&quot;: &quot;pattern&quot;,</p>
+<p>   &quot;pattern&quot;: &quot;[ .,!?]&quot;</p>
+<p>  }</p>
+<p>  },</p>
+<p>  &quot;char_filter&quot;: {</p>
+<p>  &quot;emoticons&quot;: { </p>
+<p>   &quot;type&quot;: &quot;mapping&quot;,</p>
+<p>   &quot;mappings&quot;: [</p>
+<p>   &quot;:) =&gt; <em>happy</em>&quot;,</p>
+<p>   &quot;:( =&gt; <em>sad</em>&quot;</p>
+<p>   ]</p>
+<p>  }</p>
+<p>  },</p>
+<p>  &quot;filter&quot;: {</p>
+<p>  &quot;english_stop&quot;: { </p>
+<p>   &quot;type&quot;: &quot;stop&quot;,</p>
+<p>   &quot;stopwords&quot;: &quot;<em>english</em>&quot;</p>
+<p>  }</p>
+<p>  }</p>
+<p> }</p>
+<p> }</p>
+<p>}</p>
+<p>POST my_index/_analyze</p>
+<p>{</p>
+<p> &quot;analyzer&quot;: &quot;my_custom_analyzer&quot;,</p>
+<p> &quot;text&quot;:  &quot;I’m a :) person, and you?&quot;</p>
+<p>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 如何设置和测试分词器</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 如何在template中设置分词器</span><br><span class="line"></span><br><span class="line">```json</span><br><span class="line"></span><br><span class="line"># 在这里例子中，我们为title字段声明了`analyzer`(数据插入时使用),但并未context字段声明任何analyzer，而是在setting中配置了默认的analyzer，因此context字段将使用simple analyzer。若没有配置默认analyzer,text类型字段将默认使用standard analyzer.</span><br><span class="line"></span><br><span class="line">PUT my_index</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;settings&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">  &amp;quot;analysis&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;analyzer&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">&amp;quot;default&amp;quot;: &#123;</span><br><span class="line"></span><br><span class="line">&amp;quot;type&amp;quot;: &amp;quot;simple&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">   &amp;quot;my_analyzer&amp;quot;:&#123; </span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;custom&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;tokenizer&amp;quot;:&amp;quot;standard&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;filter&amp;quot;:[</span><br><span class="line"></span><br><span class="line">​     &amp;quot;lowercase&amp;quot;</span><br><span class="line"></span><br><span class="line">​    ]</span><br><span class="line"></span><br><span class="line">   &#125;,</span><br><span class="line"></span><br><span class="line">   &amp;quot;my_stop_analyzer&amp;quot;:&#123; </span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;custom&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;tokenizer&amp;quot;:&amp;quot;standard&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;filter&amp;quot;:[</span><br><span class="line"></span><br><span class="line">​     &amp;quot;lowercase&amp;quot;,</span><br><span class="line"></span><br><span class="line">​     &amp;quot;english_stop&amp;quot;</span><br><span class="line"></span><br><span class="line">​    ]</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#125;,</span><br><span class="line"></span><br><span class="line">   &amp;quot;filter&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;english_stop&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;stop&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;stopwords&amp;quot;:&amp;quot;_english_&amp;quot;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> &#125;,</span><br><span class="line"></span><br><span class="line"> &amp;quot;mappings&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">  &amp;quot;_doc&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;properties&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;title&amp;quot;: &#123;</span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;text&amp;quot;,</span><br><span class="line"></span><br><span class="line">​    &amp;quot;analyzer&amp;quot;:&amp;quot;my_analyzer&amp;quot;, </span><br><span class="line"></span><br><span class="line">​    &amp;quot;search_analyzer&amp;quot;:&amp;quot;my_stop_analyzer&amp;quot;, </span><br><span class="line"></span><br><span class="line">​    &amp;quot;search_quote_analyzer&amp;quot;:&amp;quot;my_analyzer&amp;quot; </span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&amp;quot;context&amp;quot;: &#123;</span><br><span class="line"></span><br><span class="line">​    &amp;quot;type&amp;quot;:&amp;quot;text&amp;quot;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PUT my_index/_doc/1</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;title&amp;quot;:&amp;quot;The Quick Brown Fox&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PUT my_index/_doc/2</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;title&amp;quot;:&amp;quot;A Quick Brown Fox&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 当前查询中&amp;quot;the quick brown fox&amp;quot;被引号框起，所以这个短语将会`search_quote_analyzer`所分析，如果没有引号，则会调用`search_analyzer`进行分析。</span><br><span class="line"></span><br><span class="line"># 查询分析器的匹配顺序，见上文Analyzer。</span><br><span class="line"></span><br><span class="line">GET my_index/_search</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;query&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">  &amp;quot;query_string&amp;quot;:&#123;</span><br><span class="line"></span><br><span class="line">   &amp;quot;query&amp;quot;:&amp;quot;&amp;quot;the quick brown fox&amp;quot;&amp;quot; </span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="测试分词器"><a href="#测试分词器" class="headerlink" title="测试分词器"></a>测试分词器</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">GET _analyze</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"> &amp;quot;tokenizer&amp;quot; : &amp;quot;keyword&amp;quot;,</span><br><span class="line"></span><br><span class="line"> &amp;quot;filter&amp;quot; : [&amp;quot;lowercase&amp;quot;],</span><br><span class="line"></span><br><span class="line"> &amp;quot;char_filter&amp;quot; : [&amp;quot;html_strip&amp;quot;],</span><br><span class="line"></span><br><span class="line"> &amp;quot;text&amp;quot; : &amp;quot;this is a &lt;b&gt;test&lt;/b&gt;&amp;quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="IK分词器"><a href="#IK分词器" class="headerlink" title="IK分词器"></a>IK分词器</h1><p>在涉及到中文分词时，ES默认提供的分词器会将中文按照每个字来划分，不能正常使用。通常情况下我们会使用IK分词器，来对中文数据进行分词。</p>
+<h2 id="如何安装IK分词器"><a href="#如何安装IK分词器" class="headerlink" title="如何安装IK分词器"></a>如何安装IK分词器</h2><p>直接查看官方Readme</p>
+<p><a href="https://github.com/medcl/elasticsearch-analysis-ik" target="_blank" rel="noopener">https://github.com/medcl/elasticsearch-analysis-ik</a></p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>IK支持两种颗粒度的拆分</p>
+<ul>
+<li><p><code>ik_smart</code>:会做最粗粒度的划分</p>
+</li>
+<li><p><code>ik_max_word</code>： 做最细粒度的划分</p>
+</li>
+</ul>
+<p><code>`</code>shell</p>
+<h1 id="通过例子，直观了解"><a href="#通过例子，直观了解" class="headerlink" title="通过例子，直观了解"></a>通过例子，直观了解</h1><p>GET /_analyze</p>
+<p>{</p>
+<p> &quot;text&quot;:&quot;中华人民共和国国徽&quot;,</p>
+<p> &quot;analyzer&quot;:&quot;ik_smart&quot;</p>
+<p>}</p>
+<p>#TODO</p>
+<p>GET /_analyze</p>
+<p>{</p>
+<p> &quot;text&quot;:&quot;中华人民共和国国徽&quot;,</p>
+<p> &quot;analyzer&quot;:&quot;ik_max_word&quot;</p>
+<p>}</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/15/Components/Redis/Redis数据结构及其底层实现/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/08/15/Components/Redis/Redis数据结构及其底层实现/" itemprop="url">Redis数据结构及其底层实现</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-15T14:30:36+08:00">
+                2020-08-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>Redis 具备如下多种数据结构，对于不同的数据结构又有具体不同的底层实现，本文将具体深入到各个数据结构中，给予更深入的了解。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/08/15/Components/Redis/Redis数据结构及其底层实现/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/13/Components/Mysql/Mysql事务/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -330,8 +988,7 @@
 
       
         
-          
-            <p>Mysql依靠锁来实现事务隔离。</p>
+          <p>Mysql依靠锁来实现事务隔离。</p>
 <p>如何设置事务隔离级别</p>
 <h1 id="事务-ACID特性"><a href="#事务-ACID特性" class="headerlink" title="事务 ACID特性"></a>事务 ACID特性</h1><p>ACID：原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability）</p>
 <ol>
@@ -340,77 +997,13 @@
 <li><strong>隔离性</strong>：多个用户并发访问时，一个用户的事务不被其他用户事务干扰，多个并发事务数据相互隔离。</li>
 <li><strong>持久性</strong>：一个事务一旦提交，它对数据库的改变就是永久性，即便数据库发生故障也应该有任何影响。</li>
 </ol>
-<h1 id="MySQL事务隔离级别"><a href="#MySQL事务隔离级别" class="headerlink" title="MySQL事务隔离级别"></a>MySQL事务隔离级别</h1><ul>
-<li><strong>读未提交 Read UnCommited</strong>：完全不加锁，性能最佳事务在执行过程中可以看到其他事务尚未提交的记录，</li>
-<li><strong>可重复读 Repeatable Read：</strong>保证同一个事务中的多次相同的查询的结果是一致的，比如一个事务一开始查询了一条记录然后过了几秒钟又执行了相同的查询，保证两次查询的结果是相同的，<strong>可重复读也是mysql的默认隔离级别</strong></li>
-<li><strong>读已提交数据 Read Commited</strong>，一个事务在执行过程中可以看到其他事务已经提交的记录，而且能看到其他事务对已有记录的更新。</li>
-<li><strong>串行化 Serializable：</strong>事务之间串行执行，彼此不存在并发关系，不会产生任何并发问题，性能最差。</li>
-</ul>
-<h2 id="Read-UnCommitted"><a href="#Read-UnCommitted" class="headerlink" title="Read UnCommitted"></a>Read UnCommitted</h2><p>完全不加锁，性能最佳，但是会出现一切的并发问题。最为直接的就是<strong>脏读</strong>了。</p>
-<p><strong>脏读示例:</strong>  </p>
-<p>同时存在事务A 与 事务B，事务A执行完一半由于失败触发事务回滚机制(基于Undo log &amp; CLR实现)，撤销修改。此时事务B读取了事务A所修改的脏数据，这就是脏读。</p>
-<h2 id="Read-Committed"><a href="#Read-Committed" class="headerlink" title="Read Committed"></a>Read Committed</h2><p><strong>定义:</strong> 一个事务只能读取到其他事务已经提交的数据，也就是已经commit的数据，从而解决了脏读问题。仍然存在<strong>不可重复读</strong>的问题。</p>
-<p><code>Read Committed</code>是绝大多数数据库的默认事务隔离级别，比如Oracle，但MySQL的默认事务隔离级别是<code>Repeatable Read</code>.</p>
-<p><strong>不可重复读示例:</strong></p>
-<p>事务A修改某一行数据为10，原先值是1，那么事务B中多次查询该行数据可能获得1或者10，因为当事务A提交后，对该行的修改则对事务B可见。</p>
-<h2 id="Repeatable-Read"><a href="#Repeatable-Read" class="headerlink" title="Repeatable Read"></a>Repeatable Read</h2><p><strong>定义:</strong> 事务不会读到其他事务对已有数据的修改，即便其他事务已经提交。也就是说在<code>Repeatable Read</code>的隔离级别下，每次查询出的数据视图中的已有数据不会变化。但却可以读到新插入的数据，这就是<strong>幻读</strong>。</p>
-<blockquote>
-<p>在实际的情况中，在Repeatable Read隔离级别下，MySQL不会出现幻读，这是通过行锁和间隙锁实现的。</p>
-</blockquote>
-<h2 id="Serializable"><a href="#Serializable" class="headerlink" title="Serializable"></a>Serializable</h2><p>类似单线程，事务串行执行，解决了幻读，脏读，不可重复读等所有问题，但是性能很差。</p>
-<h1 id="MVCC-如何实现事务隔离"><a href="#MVCC-如何实现事务隔离" class="headerlink" title="MVCC 如何实现事务隔离"></a>MVCC 如何实现事务隔离</h1><h2 id="必要背景知识"><a href="#必要背景知识" class="headerlink" title="必要背景知识"></a>必要背景知识</h2><ul>
-<li><p><strong>数据表中的隐藏列</strong></p>
-<p>当使用 InnoDB 引擎时，Mysql 会创建如下的几个隐藏的数据列。</p>
-<ul>
-<li><strong>RowID</strong>：隐藏的自增 ID，当建表时没有指定主键时，就会使用 RowID 作为主键来创建聚簇索引</li>
-<li><strong>DB_TRX_ID：</strong> 最近修改（更新/删除/插入）该记录的事务ID。事务 ID，是事务创建时，按时间先后顺序获取的一个自增数字。</li>
-<li><strong>DB_ROLL_PTR：</strong>回滚指针，指向这条记录的上一个版本。</li>
-</ul>
-<blockquote>
-<p>其实还有一个删除的flag字段，用来判断该行记录是否已经被删除。</p>
-</blockquote>
-</li>
-<li><p><strong>UndoLog</strong>: 事务的回滚日志，用于当事务失败时回滚事务操作，从而保证事务<strong>原子性</strong>。 Undo Log 可以分为以下两种</p>
-<ul>
-<li><strong>Insert Undo Log</strong>: 插入操作生成，事务执行完可以立即删除</li>
-<li><strong>Update Undo Log:</strong>  更新操作生成（删除也是一种更新）。事务执行完，不能直接删除。因为 Undo Log 除了回滚事务操作以外，也能从中读取该行记录的历史版本。因此只有当系统中没有比这个log更早的<code>read-view</code>了的时候才能删除。</li>
-</ul>
-</li>
-<li><p><strong>Read-View 读视图</strong>: 当一个事务执行查询操作时会生成视图，视图是由就是三个变量组成</p>
-<ol>
-<li>所有活跃的事务 ID 列表</li>
-<li>事务中活跃的最小事务 ID</li>
-<li>事务中活跃的最大事务 ID</li>
-</ol>
-<blockquote>
-<p>在 Repeatable Read 和 Read Committed 隔离级别中，生成视图的不同造成了，这两者事务隔离程度的不同</p>
-<p><strong>Repeatable Read: 在事务开始时生成视图，只有一次</strong></p>
-<p><strong>Read Committed: 在事务中的每次查询操作都会生成视图</strong></p>
-</blockquote>
-</li>
-</ul>
-<h2 id="MVCC-如何实现"><a href="#MVCC-如何实现" class="headerlink" title="MVCC 如何实现"></a>MVCC 如何实现</h2><p><strong>MVCC 是通过 “三个” 隐藏字段 (事务id,回滚指针,删除标志) 加上undo log和可见性算法来实现的版本并发控制</strong>。</p>
-<ol>
-<li>获取该行 DB_TRX_ID，如果<strong>小于 Read-View 中的最小事务 ID</strong> 或者 <strong>等于当前事务 ID</strong> 则该行可见，否则继续判断</li>
-<li>判断该行事务 ID 是否大于视图中最大事务 ID，如果大于，则该行不可见，需要通过 Undo Log 查看历史数据。</li>
-<li>判断该行事务 ID 是否属于视图中活跃事务列表，如果是，则不可见，需要通过 Undo Log 查看历史数据。如果不是，则表眀修改该行的事务已提交，该行可见。</li>
-</ol>
-<h1 id="并发写场景"><a href="#并发写场景" class="headerlink" title="并发写场景"></a>并发写场景</h1><p>当两个事务同时对一个数据行进行更新操作时，存在并发写的问题，先来的事务对该目标行设置行锁，当事务执行完毕释放行锁，后来的事务等待行锁释放，再继续进行修改。但是在一些无索引场景就会存在例外，看具体例子：</p>
-<p><strong>存在索引时：</strong></p>
-<blockquote>
-<p>update user set age=11 where id = 1</p>
-</blockquote>
-<p>在InnoDB中必存在主键索引，因此可以找到对应行数据添加行锁。</p>
-<p><strong>不存在索引时:</strong></p>
-<blockquote>
-<p>update user set age=11 where age=10</p>
-</blockquote>
-<p>当未对age建立索引时，MySQL无法定位该行，则会对所有行数据先加上行锁，然后迭代所有数据并逐步释放不符合过滤条件的行锁，这就产生了极大的资源消耗。</p>
-<p>因此在写SQL时，避免对非索引字段进行过滤查询。</p>
-<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://juejin.im/post/6844903969815265288#heading-1" target="_blank" rel="noopener">你真的懂MVCC吗？来手动实践一下？</a></p>
-<p><a href="https://www.cnblogs.com/fengzheng/p/12557762.html" target="_blank" rel="noopener">一文讲清楚MySQL事务隔离级别和实现原理</a></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/08/13/Components/Mysql/Mysql事务/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1198,514 +1791,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/31/Components/分布式/分布式锁的实现方式/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/07/31/Components/分布式/分布式锁的实现方式/" itemprop="url">分布式锁的实现方式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-31T00:14:53+08:00">
-                2020-07-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>在分布式的场景中，多个实例之间访问共享资源时，我们需要<strong>分布式锁</strong>来控制并发。常见的有 基于 <strong>Redis</strong> 和 <strong>Zookeeper</strong> 的两种实现。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/07/31/Components/分布式/分布式锁的实现方式/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-应用场景/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/07/30/Components/Zookeeper/Zk-应用场景/" itemprop="url">Zk-应用场景</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-30T21:39:07+08:00">
-                2020-07-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。</p>
-<p>我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。</p>
-<ul>
-<li><strong>数据发布与订阅(配置中心)</strong>：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。</li>
-<li><strong>负载均衡</strong>: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户端使用Watcher监控子节点变化，获取可用服务列表。</li>
-<li><strong>命名服务</strong>：实现方式同负载均衡</li>
-<li><strong>分布式协调/通知</strong>: 注册ZNode，通过监控ZNode数量和节点数据来协调通知节点，</li>
-<li><strong>分布式UUID:</strong>：基于ZNode的顺序ID功能，注册一个ZNode, 获取其序号。</li>
-<li><strong>Master 选举：</strong> 有两种实现方式</li>
-<li><strong>分布式锁：</strong> 可以实现共享锁和互斥锁</li>
-<li><strong>分布式队列</strong>：可以实现 FIFO Queue 和 Barrier </li>
-</ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/07/30/Components/Zookeeper/Zk-应用场景/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/29/Components/Elasticsearch/ES-CCR/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/07/29/Components/Elasticsearch/ES-CCR/" itemprop="url">ES-CCR</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-29T23:33:11+08:00">
-                2020-07-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>CCR (Cross Cluster Replication), </p>
-<p>本文会介绍如何在<strong>ES6.7</strong>环境下搭建CCR 双向复制模型， 并测试<strong>HTTP</strong>和<strong>TCP Client</strong>(ES7.0版本为Deprecated, 8.0正式移除)两种模式是否能够实现数据跨集群备份。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/07/29/Components/Elasticsearch/ES-CCR/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/29/General/SSH/RSA免密登录远程机器/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/07/29/General/SSH/RSA免密登录远程机器/" itemprop="url">RSA免密登录远程机器</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-29T23:27:25+08:00">
-                2020-07-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>通过预先配置RSA公钥，可以做到免密登陆远程机器。但是在设置时，往往会遇到很多问题，因此记录步骤和常见问题来快速定位解决。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/07/29/General/SSH/RSA免密登录远程机器/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1754,7 +1839,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-count">149</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
