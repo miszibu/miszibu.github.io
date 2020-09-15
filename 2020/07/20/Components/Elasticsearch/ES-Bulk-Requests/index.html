@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="ES Bulk 请求是使用一个请求来批量执行多个操作的一种方法，可以显著的增加索引数据的速度。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-07-29T15:32:13.406Z">
+<meta property="og:updated_time" content="2020-09-13T09:46:42.437Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES-Bulk-Requests">
 <meta name="twitter:description" content="ES Bulk 请求是使用一个请求来批量执行多个操作的一种方法，可以显著的增加索引数据的速度。">
@@ -347,7 +347,7 @@
 <h3 id="示例Request-Body："><a href="#示例Request-Body：" class="headerlink" title="示例Request Body："></a>示例Request Body：</h3><p>第一步是将要请求的Body写入一个文件中去，注意请求是以换行符来界定Json的，需要使用压缩JSON的格式。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">"index"</span>: &#123; <span class="attr">"_id"</span>: <span class="number">1</span> &#125;&#125;&#123; <span class="attr">"title"</span>: <span class="string">"Elasticsearch: The Definitive Guide"</span>, <span class="attr">"authors"</span>: [<span class="string">"clinton gormley"</span>, <span class="string">"zachary tong"</span>], <span class="attr">"summary"</span> : <span class="string">"A distibuted real-time search and analytics engine"</span>, <span class="attr">"publish_date"</span> : <span class="string">"2015-02-07"</span>, <span class="attr">"num_reviews"</span>: <span class="number">20</span>, <span class="attr">"publisher"</span>: <span class="string">"oreilly"</span> &#125;</span><br><span class="line">&#123; <span class="attr">"index"</span>: &#123; <span class="attr">"_id"</span>: <span class="number">2</span> &#125;&#125;</span><br><span class="line">&#123; <span class="attr">"title"</span>: <span class="string">"Taming Text: How to Find, Organize, and Manipulate It"</span>, <span class="attr">"authors"</span>: [<span class="string">"grant ingersoll"</span>, <span class="string">"thomas morton"</span>, <span class="string">"drew farris"</span>], <span class="attr">"summary"</span> : <span class="string">"organize text using approaches such as full-text search, proper name recognition, clustering, tagging, information extraction, and summarization"</span>, <span class="attr">"publish_date"</span> : <span class="string">"2013-01-24"</span>, <span class="attr">"num_reviews"</span>: <span class="number">12</span>, <span class="attr">"publisher"</span>: <span class="string">"manning"</span> &#125;</span><br><span class="line">&#123; <span class="attr">"index"</span>: &#123; <span class="attr">"_id"</span>: <span class="number">3</span> &#125;&#125;</span><br><span class="line">&#123; <span class="attr">"title"</span>: <span class="string">"Elasticsearch in Action"</span>, <span class="attr">"authors"</span>: [<span class="string">"radu gheorge"</span>, <span class="string">"matthew lee hinman"</span>, <span class="string">"roy russo"</span>], <span class="attr">"summary"</span> : <span class="string">"build scalable search applications using Elasticsearch without having to do complex low-level programming or understand advanced data science algorithms"</span>, <span class="attr">"publish_date"</span> : <span class="string">"2015-12-03"</span>, <span class="attr">"num_reviews"</span>: <span class="number">18</span>, <span class="attr">"publisher"</span>: <span class="string">"manning"</span> &#125;</span><br><span class="line">&#123; <span class="attr">"index"</span>: &#123; <span class="attr">"_id"</span>: <span class="number">4</span> &#125;&#125;</span><br><span class="line">&#123; "title": "Solr in Action", "authors": ["trey grainger", "timothy potter"], "summary" : "Comprehensive guide to implementing a scalable search engine using Apache Solr", "publish_date" : "2014-04-05", "num_reviews": 23, "publisher": "manning" &#125;`</span><br></pre></td></tr></table></figure>
 <h3 id="Curl-请求"><a href="#Curl-请求" class="headerlink" title="Curl 请求"></a>Curl 请求</h3><blockquote>
-<p>curl -s -H “Content-Type: application/x-ndjson” -XPOST http://<hostname>:<port>/bookdb_index/book/_bulk –data-binary “@books” </port></hostname></p>
+<p>curl -s -H “Content-Type: application/x-ndjson” -XPOST http://<hostname>:<port>/bookdb_index/_bulk –data-binary “@books” </port></hostname></p>
 </blockquote>
 <p>请求的URI支持 <code>/_bulk</code>, <code>/{index}/_bulk</code>. 当我们在URI中指定了index时，它们会被默认设置在批量请求的每个请求头的meta-data中。</p>
 <p><strong>Bulk请求携带的消息数量：</strong>没有一个最佳值，这个最佳值需要由用户不断的benchmark 测试来获得。</p>
@@ -471,7 +471,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">149</span>
+                <span class="site-state-item-count">152</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -484,7 +484,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

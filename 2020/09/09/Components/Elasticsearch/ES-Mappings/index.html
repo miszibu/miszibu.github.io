@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="MappingDynamic Mapping在创建索引时，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。 动态Mapping存在着不足，比如当一个字段被映射为Integer类型后，相同字段值为String类型的文档将无法插入">
+<meta name="description" content="Template Mapping 所支持的Type 和 针对不同查询需求，需要设置为什么Type">
 <meta name="keywords" content="Elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES-Mappings">
 <meta property="og:url" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-Mappings/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
-<meta property="og:description" content="MappingDynamic Mapping在创建索引时，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。 动态Mapping存在着不足，比如当一个字段被映射为Integer类型后，相同字段值为String类型的文档将无法插入">
+<meta property="og:description" content="Template Mapping 所支持的Type 和 针对不同查询需求，需要设置为什么Type">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-09-09T15:07:25.312Z">
+<meta property="og:updated_time" content="2020-09-13T09:51:41.118Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES-Mappings">
-<meta name="twitter:description" content="MappingDynamic Mapping在创建索引时，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。 动态Mapping存在着不足，比如当一个字段被映射为Integer类型后，相同字段值为String类型的文档将无法插入">
+<meta name="twitter:description" content="Template Mapping 所支持的Type 和 针对不同查询需求，需要设置为什么Type">
 
 
 
@@ -330,7 +330,10 @@
       
 
       
-        <h2 id="Mapping"><a href="#Mapping" class="headerlink" title="Mapping"></a>Mapping</h2><h3 id="Dynamic-Mapping"><a href="#Dynamic-Mapping" class="headerlink" title="Dynamic Mapping"></a>Dynamic Mapping</h3><p>在创建索引时，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。<br>但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。</p>
+        <p><code>Template Mapping</code> 所支持的<code>Type</code> 和 针对不同查询需求，需要设置为什么<code>Type</code></p>
+<a id="more"></a>
+<h2 id="Mapping"><a href="#Mapping" class="headerlink" title="Mapping"></a>Mapping</h2><p><strong>Mapping的优先级</strong>：在创建索引时，会按照 template 的优先级，由低到高覆盖性的合成的 Mapping。</p>
+<h3 id="Dynamic-Mapping"><a href="#Dynamic-Mapping" class="headerlink" title="Dynamic Mapping"></a>Dynamic Mapping</h3><p>，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。<br>但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。</p>
 <p>动态Mapping存在着不足，比如当一个字段被映射为Integer类型后，相同字段值为String类型的文档将无法插入索引。</p>
 <h3 id="手动创建Mapping"><a href="#手动创建Mapping" class="headerlink" title="手动创建Mapping"></a>手动创建Mapping</h3><p>由于Dynamic Mapping的不可控，我们往往需要手动根据字段的类型和需求来创建Mapping。</p>
 <blockquote>
@@ -480,7 +483,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">149</span>
+                <span class="site-state-item-count">152</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -493,7 +496,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
