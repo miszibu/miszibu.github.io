@@ -102,14 +102,14 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="这篇是上一篇ES-项目实战1-唐诗300首的姊妹篇，从本地磁盘读取个人博客内容，转化格式后，基于 Java High-Level Restful API导入到 ES 集群中，并做数据分析和可视化相关的内容。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.35.18.png">
-<meta property="og:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.47.09.png">
-<meta property="og:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.43.04.png">
-<meta property="og:updated_time" content="2020-09-15T06:59:34.904Z">
+<meta property="og:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/indexPattern.png">
+<meta property="og:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/tagsCloud.png">
+<meta property="og:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/blogNum.png">
+<meta property="og:updated_time" content="2020-09-15T07:06:17.050Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES-项目实战2-个人博客">
 <meta name="twitter:description" content="这篇是上一篇ES-项目实战1-唐诗300首的姊妹篇，从本地磁盘读取个人博客内容，转化格式后，基于 Java High-Level Restful API导入到 ES 集群中，并做数据分析和可视化相关的内容。">
-<meta name="twitter:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.35.18.png">
+<meta name="twitter:image" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/indexPattern.png">
 
 
 
@@ -407,14 +407,14 @@
 <blockquote>
 <p>Note: 在创建 template Mapping环节，我们为 date的 keyword 类型命名为 keyword，而其他字段的 keyword 类型则为 field。因此在Fields 中，存在 date.keyword 和 contents.field这两种不同的 Keyword 类型，本质上是在 Mapping multiple fields 中命名不同产生的。</p>
 </blockquote>
-<p><img src="/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.35.18.png" alt=""></p>
+<p><img src="/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/indexPattern.png" alt=""></p>
 <h2 id="制作-Visualization"><a href="#制作-Visualization" class="headerlink" title="制作 Visualization"></a>制作 Visualization</h2><h3 id="Tags-词云"><a href="#Tags-词云" class="headerlink" title="Tags-词云"></a>Tags-词云</h3><p>Golang 好久没碰了，居然之前写了这么多 Blog。</p>
 <p>Mark 果然不少，打了好多 TODO没写。</p>
 <p>有几个 Tags 黏在一起了，IK-Smart 分词器没有分开吗？可以基于 analyze API去解决下这个问题。</p>
-<p><img src="/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.47.09.png" alt=""></p>
+<p><img src="/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/tagsCloud.png" alt=""></p>
 <h3 id="每月博客数量折线图"><a href="#每月博客数量折线图" class="headerlink" title="每月博客数量折线图"></a>每月博客数量折线图</h3><p>18年底-19年初是相当高产的时间段：正处在离职找工作的状态，博客更新很频繁。</p>
 <p>19年初-20年中更新频率一般，工作繁忙，比较投入。</p>
-<p><img src="/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/截屏2020-09-15下午2.43.04.png" alt=""></p>
+<p><img src="/2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/blogNum.png" alt=""></p>
 
       
     </div>
