@@ -260,6 +260,130 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/07/Components/Kafka/Kafka主从复制/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/08/07/Components/Kafka/Kafka主从复制/" itemprop="url">Kafka主从复制</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-07T15:00:23+08:00">
+                2020-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p> 转载自<a href="https://gitbook.cn/books/5bc446269a9adf54c7ccb8bc/index.html" target="_blank" rel="noopener">再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理</a></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/08/07/Components/Kafka/Kafka主从复制/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/06/Components/Kafka/为什么Kafka这么快/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1510,200 +1634,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/17/Components/Security/openssl证书实战/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Zibu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/img/1.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZibuのHippocampus">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/07/17/Components/Security/openssl证书实战/" itemprop="url">openssl证书实战</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-17T00:09:13+08:00">
-                2020-07-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="生成证书步骤"><a href="#生成证书步骤" class="headerlink" title="生成证书步骤"></a>生成证书步骤</h1><ol>
-<li>自签发Root Key, 生成Root CA, 并将Root CA加入到系统或浏览器信任证书列表中。</li>
-<li>由Root CA 生成Itermidiate CAs(可跳过, Ps: 通常Root CA不会自己签发证书而是签发Intermidate CAs, 由它们来签发证书，从而保护根证书的绝对安全)</li>
-<li>由1或2生成的 CA签发证书， 把该证书用于应用环境。</li>
-</ol>
-<p>OpenSSl是一个免费开源的库，提供了构建数字证书的命令行工具，可以用于构建证书。</p>
-<h1 id="OpenSSL-查看证书"><a href="#OpenSSL-查看证书" class="headerlink" title="OpenSSL 查看证书"></a>OpenSSL 查看证书</h1><p>查看KEY信息</p>
-<p>&gt; openssl rsa -noout -text -in myserver.key</p>
-<p>查看CSR信息</p>
-<p>&gt; openssl req -noout -text -in myserver.csr</p>
-<p>查看证书信息</p>
-<p>&gt; openssl x509 -noout -text -in ca.crt</p>
-<h1 id="OpenSSL-生成证书"><a href="#OpenSSL-生成证书" class="headerlink" title="OpenSSL 生成证书"></a>OpenSSL 生成证书</h1><h2 id="自签发CA-Authority证书"><a href="#自签发CA-Authority证书" class="headerlink" title="自签发CA Authority证书"></a>自签发CA Authority证书</h2><h3 id="1-选择CA-路径"><a href="#1-选择CA-路径" class="headerlink" title="1. 选择CA 路径"></a>1. 选择CA 路径</h3><p>首先选择一个目录，作为工作目录。系统自带的OpenSSl工作目录如下：</p>
-<p>&gt; cd /etc/pki/CA</p>
-<p>当然也可以自定义一个目录进行配置，本文使用默认路径。</p>
-<p>选择CA路径后，需要进行如下配置</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir certs  crl  newcerts  private</span><br><span class="line">chmod 700 private</span><br><span class="line">touch index.txt</span><br><span class="line">touch serial</span><br><span class="line">echo 01 &amp;gt; serial</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果不是默认路径，则需要下载openssl.cnf文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认路径下，该文件路径为/etc/pki/tls/openssl.cnf</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>private，CA的私钥；</li>
-<li>newcerts， 保存CA新签发的证书；</li>
-<li>crl ， 被吊销的证书列表；</li>
-<li>index.txt，保存签发的证书信息；</li>
-<li>serial，保存证书签发的序列号；</li>
-</ul>
-<h3 id="2-生成CA-Root-Pair-Root-Key-Root-Certificate"><a href="#2-生成CA-Root-Pair-Root-Key-Root-Certificate" class="headerlink" title="2. 生成CA Root Pair (Root Key + Root Certificate)"></a>2. 生成CA Root Pair (Root Key + Root Certificate)</h3><p>作为一个CA Authority，需要管理大量的 pair 对，而原始的一对 pair 对叫做 root pair，它包含了 root key（cakey.pem）和 root certificate（cacert.pem）。</p>
-<ul>
-<li>cakey.pem: 一对RSA公钥密钥, </li>
-<li>cacert.pem: 证书</li>
-</ul>
-<p>创建Root key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建root key, 选择一种加密方式生成密钥 并设置密钥长度</span></span><br><span class="line">&amp;gt; openssl genrsa -des3 -out private/cakey.pem 2048 </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改root key的访问权限为只读</span></span><br><span class="line">&amp;gt; chmod 400 private/cakey.pem</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看公钥</span></span><br><span class="line">&amp;gt; cat private/cakey.pem</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看私钥</span></span><br><span class="line">&amp;gt; openssl rsa -in private/cakey.pem -out user_ca_unencrypted.pem -outform PEM</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> ps : key和.pem的格式并没有什么区别, 只是一个后缀名</span></span><br></pre></td></tr></table></figure>
-<p>创建Root Certification</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 自定义目录 直接生成Root Crt</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 若使用openSSL 默认目录, 则无需指定OpenSSL Config路径</span></span><br><span class="line">openssl req -config openssl.cnf -key private/cakey.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out cacert.pem</span><br><span class="line"></span><br><span class="line">Enter pass phrase for ca.key.pem: secretpassword</span><br><span class="line">You are about to be asked to enter information that will be incorporated</span><br><span class="line">into your certificate request.</span><br><span class="line">-----</span><br><span class="line">Country Name (2 letter code) [XX]:CN</span><br><span class="line">State or Province Name []:Zhejiang</span><br><span class="line">Locality Name []: HangZhou</span><br><span class="line">Organization Name []: </span><br><span class="line">Organizational Unit Name []:AMA Certificate Authority</span><br><span class="line">Common Name []: AMA Certificate Authority</span><br><span class="line">Email Address []: test@lab.com</span><br></pre></td></tr></table></figure>
-<p>通常情况下，root CA 不会直接为服务器或者客户端签发证书，它们会先为自己生成几个中间 CA（intermediate CAs），这几个中间 CA 作为 root CA 的代表为服务器和客户端签证。</p>
-<p>如下图所示，DigCert生成中间CA为zhihu.com颁发了证书</p>
-<p><img src="/2020/07/17/Components/Security/openssl证书实战/../files/images/certificate_zhihu.png" alt=""></p>
-<hr>
-<h2 id="为用户签发证书"><a href="#为用户签发证书" class="headerlink" title="为用户签发证书"></a>为用户签发证书</h2><h3 id="1-生成用户的RSA密钥"><a href="#1-生成用户的RSA密钥" class="headerlink" title="1. 生成用户的RSA密钥"></a>1. 生成用户的RSA密钥</h3><p>&gt; openssl genrsa -des3 -out user_ca.key 2048</p>
-<p>查看公钥</p>
-<p>&gt; cat user_ca.key</p>
-<p>查看私钥</p>
-<p>&gt; openssl rsa -in user_ca.key -out user_ca_unencrypted.pem -outform PEM</p>
-<h3 id="2-生成用户CA-Request"><a href="#2-生成用户CA-Request" class="headerlink" title="2. 生成用户CA Request"></a>2. 生成用户CA Request</h3><p>&gt; openssl req -new -days 365 -key user_ca.key -out user_ca.csr </p>
-<p>自定义目录需指定config 路径</p>
-<p>&gt; openssl req -new -days 365 -key user_ca.key -out user_ca.csr -config openssl.cnf</p>
-<h3 id="3-使用CA-Authority证书签发用户CA-证书"><a href="#3-使用CA-Authority证书签发用户CA-证书" class="headerlink" title="3. 使用CA Authority证书签发用户CA 证书"></a>3. 使用CA Authority证书签发用户CA 证书</h3><p>&gt; openssl ca -in user_ca.csr -out user_ca.pem -extensions v3_req</p>
-<hr>
-<h1 id="CN：Common-Name-如何填写"><a href="#CN：Common-Name-如何填写" class="headerlink" title="CN：Common Name 如何填写"></a>CN：Common Name 如何填写</h1><p>当我们生成一个CA证书，需要指定一个Common Name，客户端使用HTTPS访问某个网址时, 会获得并校验网站的CA证书是否合法，其中包括域名合法性检测，匹配当前URL是否匹配CN或DNS或IP Address。</p>
-<p>在证书不支持SubjectAltName情况下，默认匹配Common Name.</p>
-<p>因此我们需要绑定CN到某个具体的Host Name，这里需要引入通配符。</p>
-<p>&gt; SSL通配符证书是在一个单一的证书中，在通用名（域名）中包含一个“*”通配符字段。这使得该证书可以保护无限数量的多个子域名（主机）。</p>
-<ul>
-<li>*.domain.com 可以匹配 <a href="http://www.domain.com" target="_blank" rel="noopener">www.domain.com</a> ， mail.domain.com ，pay.domain.com .</li>
-<li>通配符只能匹配当前一级且只能设置一个，当设置多个通配符无效。</li>
-<li>通配符后面的域名必须有两级或以上。如<em>.domain.com 有效，</em>.com无效</li>
-<li>通配符不可匹配空。 如*.domain.com 不可匹配 domain.com</li>
-</ul>
-<hr>
-<h1 id="如何签发多域名证书"><a href="#如何签发多域名证书" class="headerlink" title="如何签发多域名证书"></a>如何签发多域名证书</h1><h2 id="多域名机制"><a href="#多域名机制" class="headerlink" title="多域名机制"></a>多域名机制</h2><p>使用Common Name,即便使用通配符，也只能匹配一类的域名。</p>
-<p>SubjectAlternativeName（简称：san）是X509 Version 3 (RFC 2459)的扩展，允许ssl证书指定多个可以匹配的名称。</p>
-<p><img src="/2020/07/17/Components/Security/openssl证书实战/../files/images/google_san.png" alt=""></p>
-<h2 id="生成证书请求文件"><a href="#生成证书请求文件" class="headerlink" title="生成证书请求文件"></a>生成证书请求文件</h2><p>生成一个通用的Csr文件时，会交互式的键入Subject所属的内容，但是SAN则不会要求输入。我们需要修改openssl.cnf的x509 V3扩展的配置和san的参数。</p>
-<p>SubjectAltName 可以包含email 地址，ip地址，正则匹配DNS主机名，等等。<br>ssl这样的一个特性叫做：SubjectAlternativeName（简称：san）</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">vi  /etc/pki/tls/openssl.cnf</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置启动req_extensions， 并使用v3_req的配置</span></span><br><span class="line">[ req ]</span><br><span class="line">...</span><br><span class="line">req_extensions = v3_req </span><br><span class="line"></span><br><span class="line">[ v3_req ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> Extensions to add to a certificate request</span></span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = nonRepudiation, digitalSignature, keyEncipherment</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加subjectAltName， 并使用alt_names的配置</span></span><br><span class="line">subjectAltName = @alt_names</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置DNS 和 IP </span></span><br><span class="line">[ alt_names ]</span><br><span class="line">DNS.1 = *.statestr.com</span><br><span class="line">DNS.2 = *.it.statestr.com</span><br><span class="line">IP.1 = 10.248.66.59</span><br></pre></td></tr></table></figure>
-<p>在配置完openssl.cnf后，后续生成crt操作参照本文对应章节。</p>
-<p>如图所示，IP Address 通过了HTTPS认证</p>
-<p><img src="/2020/07/17/Components/Security/openssl证书实战/../files/images/san.png" alt=""></p>
-<h1 id="使用NodeJS-校验SSL-证书"><a href="#使用NodeJS-校验SSL-证书" class="headerlink" title="使用NodeJS 校验SSL 证书"></a>使用NodeJS 校验SSL 证书</h1><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// https-server.js</span></span><br><span class="line">var https = require(&amp;#39;https&amp;#39;);</span><br><span class="line">var fs = require(&amp;#39;fs&amp;#39;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> options = &#123;</span><br><span class="line">  key: fs.readFileSync(&amp;quot;C:\\Users\\e662491\\Desktop\\https\\user_ca.key&amp;quot;),</span><br><span class="line">  cert: fs.readFileSync(&amp;#39;C:\\Users\\e662491\\Desktop\\https\\user_ca.pem&amp;#39;),</span><br><span class="line">  passphrase: &amp;#39;123456789&amp;#39;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">https.createServer(options, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  res.writeHead(<span class="number">200</span>);</span><br><span class="line">  res.end(&amp;#39;hello world&amp;#39;);</span><br><span class="line">&#125;).listen(<span class="number">8000</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  console.log(&amp;#39;Right URL: https://10.248.66.59:8000&amp;#39;);</span><br><span class="line">  console.log(&amp;#39;Error URL: https://localhost:8000&amp;#39;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>启动 HTTPS Server</p>
-<p>&gt; node https-server.js</p>
-<h1 id="CA-证书链"><a href="#CA-证书链" class="headerlink" title="CA 证书链"></a>CA 证书链</h1><p>通过CA 证书加密HTTPS请求，数据实现了加密，那么CA证书又是如何被确认为真实的证书的呢。<br>这里同样需要一套机制来确保CA 证书的正确性。<br>详情可见下文</p>
-<p><a href="https://www.jianshu.com/p/46e48bc517d0" target="_blank" rel="noopener">证书链-Digital Certificates</a></p>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://zhuanlan.zhihu.com/p/26646377" target="_blank" rel="noopener">使用OpenSSL生成多域名自签名证书进行HTTPS开发调试</a></p>
-<p><a href="https://webcache.googleusercontent.com/search?q=cache:rJFd3sHjYcMJ:https://blog.creke.net/777.html+&amp;cd=7&amp;hl=en&amp;ct=clnk&amp;gl=us" target="_blank" rel="noopener">关于SSL证书通用名（CN）通配符的实验</a></p>
-<p><a href="https://www.barretlee.com/blog/2016/04/24/detail-about-ca-and-certs/" target="_blank" rel="noopener">细说 CA 和证书</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1752,7 +1682,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-count">153</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

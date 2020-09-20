@@ -94,19 +94,19 @@
 
 
 
-<meta name="description" content="相关背景介绍AnalysisAnalysis（文本分析）: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫分词。 简单说Analysis是通过Analyzer来实现的。 Index time analysis当文档插入索引时，ES会对text类型的字段建立反向索引，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数">
+<meta name="description" content="涉及知识点：  ES 分词器工作原理 ES 内置分词器 IK 中文分词器 在Template Mapping中对不同field 配置分词器">
 <meta name="keywords" content="Elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES-分词器">
 <meta property="og:url" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
-<meta property="og:description" content="相关背景介绍AnalysisAnalysis（文本分析）: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫分词。 简单说Analysis是通过Analyzer来实现的。 Index time analysis当文档插入索引时，ES会对text类型的字段建立反向索引，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数">
+<meta property="og:description" content="涉及知识点：  ES 分词器工作原理 ES 内置分词器 IK 中文分词器 在Template Mapping中对不同field 配置分词器">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/standardAnalyzerOutput.png">
-<meta property="og:updated_time" content="2020-09-13T09:48:54.682Z">
+<meta property="og:updated_time" content="2020-09-15T13:19:20.967Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES-分词器">
-<meta name="twitter:description" content="相关背景介绍AnalysisAnalysis（文本分析）: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫分词。 简单说Analysis是通过Analyzer来实现的。 Index time analysis当文档插入索引时，ES会对text类型的字段建立反向索引，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数">
+<meta name="twitter:description" content="涉及知识点：  ES 分词器工作原理 ES 内置分词器 IK 中文分词器 在Template Mapping中对不同field 配置分词器">
 <meta name="twitter:image" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-分词器/standardAnalyzerOutput.png">
 
 
@@ -332,7 +332,15 @@
       
 
       
-        <h1 id="相关背景介绍"><a href="#相关背景介绍" class="headerlink" title="相关背景介绍"></a>相关背景介绍</h1><h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><p><strong>Analysis（文本分析）</strong>: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫<strong>分词</strong>。 简单说Analysis是通过Analyzer来实现的。</p>
+        <p>涉及知识点：</p>
+<ul>
+<li>ES 分词器工作原理</li>
+<li>ES 内置分词器</li>
+<li>IK 中文分词器</li>
+<li>在Template Mapping中对不同field 配置分词器</li>
+</ul>
+<a id="more"></a>
+<h1 id="相关背景介绍"><a href="#相关背景介绍" class="headerlink" title="相关背景介绍"></a>相关背景介绍</h1><h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><p><strong>Analysis（文本分析）</strong>: 将一段文本通过Analyzer划分为一系列term/token的过程称为Analysis，也叫<strong>分词</strong>。 简单说Analysis是通过Analyzer来实现的。</p>
 <h3 id="Index-time-analysis"><a href="#Index-time-analysis" class="headerlink" title="Index time analysis"></a>Index time analysis</h3><p>当文档插入索引时，ES会对<code>text</code>类型的字段建立<strong>反向索引</strong>，反向索引通过Analyzer将文本拆分为tokens/terms,再将其指向包含对应数据的文档。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> String被转为tokens, tokens又被转为小写并被简化为基础词根比如 (foxes → fox, jumped → jump, lazy → lazi)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 原句</span></span><br><span class="line">The QUICK brown foxes jumped over the lazy dog!</span><br><span class="line"><span class="meta">#</span><span class="bash"> Tokens</span></span><br><span class="line">[ quick, brown, fox, jump, over, lazi, dog ]</span><br></pre></td></tr></table></figure>
 <h3 id="Search-time-analysis"><a href="#Search-time-analysis" class="headerlink" title="Search time analysis"></a>Search time analysis</h3><p>Analysis同样也会应用到查询过程中，当我们使用<code>full text queries(全文查询)</code>时，比如<code>match query</code>。查询语句也会被分词，从而去匹配反向索引中的tokens/terms，并计算相关性得分。</p>
@@ -491,7 +499,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-count">153</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
