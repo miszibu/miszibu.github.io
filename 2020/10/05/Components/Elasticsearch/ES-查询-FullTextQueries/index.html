@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Elasticsearch,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="当你需要做全文查询时，如果你对查询的terms顺序没有要求，则使用match query，如果对顺序有要求，则使用 match_phrase query 。如果你对你需要更细粒度的查询则可以考虑 query_string, intervals。  intervals: 可以对匹配项的顺序和之间的距离进行的细粒度的匹配。 match: 对输入进行分词，默认情况只要文档字段匹配任意一个Term即可。（">
+<meta name="keywords" content="Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-查询-FullTextQueries">
+<meta property="og:url" content="https://miszibu.github.io/2020/10/05/Components/Elasticsearch/ES-查询-FullTextQueries/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="当你需要做全文查询时，如果你对查询的terms顺序没有要求，则使用match query，如果对顺序有要求，则使用 match_phrase query 。如果你对你需要更细粒度的查询则可以考虑 query_string, intervals。  intervals: 可以对匹配项的顺序和之间的距离进行的细粒度的匹配。 match: 对输入进行分词，默认情况只要文档字段匹配任意一个Term即可。（">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-10-05T09:37:02.545Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ES-查询-FullTextQueries">
+<meta name="twitter:description" content="当你需要做全文查询时，如果你对查询的terms顺序没有要求，则使用match query，如果对顺序有要求，则使用 match_phrase query 。如果你对你需要更细粒度的查询则可以考虑 query_string, intervals。  intervals: 可以对匹配项的顺序和之间的距离进行的细粒度的匹配。 match: 对输入进行分词，默认情况只要文档字段匹配任意一个Term即可。（">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2020/10/05/Components/Elasticsearch/ES-查询-FullTextQueries/">
+
+
+
+
+
+  <title>ES-查询-FullTextQueries | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/10/05/Components/Elasticsearch/ES-查询-FullTextQueries/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES-查询-FullTextQueries</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-05T15:50:50+08:00">
+                2020-10-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>当你需要做全文查询时，如果你对查询的terms顺序没有要求，则使用<code>match query</code>，如果对顺序有要求，则使用 <code>match_phrase query</code> 。如果你对你需要更细粒度的查询则可以考虑 <code>query_string, intervals</code>。</p>
+<ul>
+<li><code>intervals</code>: 可以对匹配项的顺序和之间的距离进行的细粒度的匹配。</li>
+<li><code>match</code>: 对输入进行分词，默认情况只要文档字段<strong>匹配任意一个Term</strong>即可。（可设置为Terms全匹配,即词组匹配，match_phrase）。 支持模糊，同义词，最小匹配terms等查询。</li>
+<li><code>match_bool_prefix</code>: Analyzer对输入的参数进行分词，最后一个分词会变为<code>prefix</code>查询，其他分词将会变为<code>term</code>查询。所有这些查询会以<code>Boolean.should</code>进行连接。</li>
+<li><code>match_phrase</code>: 对分词后的Terms进行<strong>顺序和内容的全匹配</strong>，即只有目标字段同时包含所有分词，分词顺序按序且分词间隔在规定范围内（默认为0，分词需要紧挨，参数slop调整）才行。</li>
+<li><code>match_phrase_prefix</code>：  基本等同于match_phrase, 只是最后一个Terms只需要前缀匹配即可。</li>
+<li><code>multi_match</code>: 对多个字段使用<code>match query</code>,字段名称可以使用通配符。 至于使用哪种 Match Query，取决于Type（<code>best_fields</code>,<code>most_fields</code>等）设置。</li>
+<li><code>common</code>: 暂时没有深入了解，相对专业化，与<code>stopwords</code>相关。</li>
+<li><code>query_string</code>: 支持简洁的Lucene查询字符串语法，允许您在单个查询字符串中指定AND | OR | NOT条件和多字段搜索。 仅限于专业用户。</li>
+<li><code>simple_query_string</code>: 一个相对简化的<code>query_string</code>查询。</li>
+</ul>
+<a id="more"></a>
+<h1 id="match"><a href="#match" class="headerlink" title="match"></a>match</h1><p>match查询对输入的String进行分词查询，默认情况下<code>operator为 or</code>，因此文档具有任意一个 term就算匹配。</p>
+<p>以下参数相对重要且高频：</p>
+<ul>
+<li><strong>operator</strong>: <strong>or(default) | and</strong>, and 表示需要匹配所有 terms, or 表示只要匹配任意一个 term 即可。</li>
+<li><strong>analyzer</strong>：指定查询所使用的分词器，当不声明时将按照 字段分析器，index 默认分析器，standard 分析器的顺序向下匹配。</li>
+<li><strong>minimum_should_match</strong>:  默认情况下，operator 为 or，那么实际上match 查询会被转为 boolean should查询，该参数就可以用于控制 should子句匹配的数量。</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">GET /_search</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"query"</span>: &#123;</span><br><span class="line">        <span class="attr">"match"</span> : &#123;</span><br><span class="line">            <span class="attr">"message"</span> : &#123;</span><br><span class="line">                <span class="attr">"query"</span> : <span class="string">"this is a test"</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="match-bool-prefix"><a href="#match-bool-prefix" class="headerlink" title="match_bool_prefix"></a>match_bool_prefix</h1><p><code>match query</code> 的本质实际上就是将输入文本进行分词，将每一个词作为<code>term query</code>的输入，以 <code>boolean query</code>的 should连接组合在一起。</p>
+<p>而 <code>match_bool_prefix</code> 则是将最后一个term 作为 <code>prefix query</code>的输入。</p>
+<p>所有的参数同 <code>match query</code> 一致。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">GET /_search</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"query"</span>: &#123;</span><br><span class="line">        <span class="attr">"match_bool_prefix"</span> : &#123;</span><br><span class="line">            <span class="attr">"message"</span> : <span class="string">"quick brown f"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GET /_search</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"query"</span>: &#123;</span><br><span class="line">        <span class="attr">"bool"</span> : &#123;</span><br><span class="line">            <span class="attr">"should"</span>: [</span><br><span class="line">                &#123; <span class="attr">"term"</span>: &#123; <span class="attr">"message"</span>: <span class="string">"quick"</span> &#125;&#125;,</span><br><span class="line">                &#123; <span class="attr">"term"</span>: &#123; <span class="attr">"message"</span>: <span class="string">"brown"</span> &#125;&#125;,</span><br><span class="line">                &#123; <span class="attr">"prefix"</span>: &#123; <span class="attr">"message"</span>: <span class="string">"f"</span>&#125;&#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="match-phrase"><a href="#match-phrase" class="headerlink" title="match_phrase"></a>match_phrase</h1><p>短语匹配，相较于<code>match query</code> 额外增加了对 terms顺序的要求，默认情况下要求文档字段中的 terms 顺序要与查询文本中 terms 顺序完全一致才能返回，但是可以通过修改 <code>slop</code>参数来调整最大允许的间隔 terms 数量。</p>
+<p>举例说当未设置 slop 值时，该参数默认值为0，则 dog pig cat 不会被匹配，dog cat 可以被匹配。</p>
+<p>当设置 slop为1，dog pig cat，dog cat 都能被匹配。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /_search</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"query"</span>: &#123;</span><br><span class="line">        <span class="attr">"match_phrase"</span> : &#123;</span><br><span class="line">            <span class="attr">"message"</span> : <span class="string">"dog cat "</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="match-phrase-prefix"><a href="#match-phrase-prefix" class="headerlink" title="match_phrase_prefix"></a>match_phrase_prefix</h1><p>同<code>match_phrase</code>，但是一个 term会以<code>prefix query</code>的形式去匹配。</p>
+<blockquote>
+<p>Note: 有可能出现 quick brown fox无法被以下查询所匹配的可能性，这是由于 ES 自动补充查询的机制造成的，一般情况下可以基于延长关键词来解决。</p>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">GET /_search</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"query"</span>: &#123;</span><br><span class="line">        <span class="attr">"match_phrase_prefix"</span> : &#123;</span><br><span class="line">            <span class="attr">"message"</span> : &#123;</span><br><span class="line">                <span class="attr">"query"</span> : <span class="string">"quick brown f"</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="multi-match"><a href="#multi-match" class="headerlink" title="multi_match"></a>multi_match</h1><p>其实这是一个很鸡肋的查询，它提供了对多个 filed 的查询和许多不同的 type 用于支持不同的场景，但是实际上我们当我们有相关的需求时，第一个会想到 boolean 查询，因此本小节略过，参考 <code>boolean query</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">GET /_search</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"multi_match"</span> : &#123;</span><br><span class="line">      <span class="attr">"query"</span> : <span class="string">"this is a test"</span>,</span><br><span class="line">      <span class="attr">"fields"</span> : [ <span class="string">"subject^3"</span>, <span class="string">"*.name"</span> ] // ^<span class="number">3</span> 表示 boost 值为<span class="number">3</span>， 通配符*也支持</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/03/Components/Elasticsearch/ES-查询-CompoundQueries/" rel="next" title="ES-查询-CompoundQueries">
+                <i class="fa fa-chevron-left"></i> ES-查询-CompoundQueries
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/06/Components/Elasticsearch/ES-查询-Sort/" rel="prev" title="ES-查询-Sort">
+                ES-查询-Sort <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">159</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#match"><span class="nav-number">1.</span> <span class="nav-text">match</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#match-bool-prefix"><span class="nav-number">2.</span> <span class="nav-text">match_bool_prefix</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#match-phrase"><span class="nav-number">3.</span> <span class="nav-text">match_phrase</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#match-phrase-prefix"><span class="nav-number">4.</span> <span class="nav-text">match_phrase_prefix</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#multi-match"><span class="nav-number">5.</span> <span class="nav-text">multi_match</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

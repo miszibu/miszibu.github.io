@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型  Bucketing: 该类型的聚合函数，会将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 GroupBy） Metric: 计算一组文档的数据，如 max，min，avg 等。当直接使用时会对所有文档计算，通常作为在 Bucketing 函数的">
+<meta name="description" content="聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型  Bucketing: 将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 GroupBy） Metric: 计算一组文档的数据，如 max，min，avg 等。当直接使用时会对所有文档计算，通常作为在 Bucketing 函数的子函数出现，计算每个">
 <meta name="keywords" content="Elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES-查询-聚合篇">
 <meta property="og:url" content="https://miszibu.github.io/2020/09/20/Components/Elasticsearch/ES-查询-聚合篇/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
-<meta property="og:description" content="聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型  Bucketing: 该类型的聚合函数，会将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 GroupBy） Metric: 计算一组文档的数据，如 max，min，avg 等。当直接使用时会对所有文档计算，通常作为在 Bucketing 函数的">
+<meta property="og:description" content="聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型  Bucketing: 将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 GroupBy） Metric: 计算一组文档的数据，如 max，min，avg 等。当直接使用时会对所有文档计算，通常作为在 Bucketing 函数的子函数出现，计算每个">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-09-20T11:30:01.370Z">
+<meta property="og:updated_time" content="2020-10-12T13:23:28.520Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES-查询-聚合篇">
-<meta name="twitter:description" content="聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型  Bucketing: 该类型的聚合函数，会将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 GroupBy） Metric: 计算一组文档的数据，如 max，min，avg 等。当直接使用时会对所有文档计算，通常作为在 Bucketing 函数的">
+<meta name="twitter:description" content="聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型  Bucketing: 将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 GroupBy） Metric: 计算一组文档的数据，如 max，min，avg 等。当直接使用时会对所有文档计算，通常作为在 Bucketing 函数的子函数出现，计算每个">
 
 
 
@@ -332,7 +332,7 @@
       
         <p>聚合函数用于在查询和过滤后的数据集上，进行按类聚合以获取总体统计数据。聚合函数根据其作用方式和原理，被分为以下四个类型</p>
 <ul>
-<li><strong>Bucketing</strong>: 该类型的聚合函数，会将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 <strong>GroupBy</strong>）</li>
+<li><strong>Bucketing</strong>: 将文档根据设置好的判定条件，划分到不同的 Bucket 中去。（类似 SQL 的 <strong>GroupBy</strong>）</li>
 <li><strong>Metric</strong>: 计算一组文档的数据，如 <strong>max，min，avg</strong> 等。当直接使用时会对所有文档计算，<strong>通常作为在 Bucketing 函数的子函数出现</strong>，计算每个 Bucket 的相关 Metric 数据。</li>
 <li><strong>Matrix:</strong> 顾名思义，该类聚合函数在多个字段上生效，用于生成矩阵。不支持 Scripting（自定义脚本）。</li>
 <li><strong>Pipeline:</strong> 用于聚合其他聚合函数的结果。</li>
@@ -538,6 +538,7 @@
 </tr>
 </tbody>
 </table>
+<h1 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h1><h1 id="Matrix"><a href="#Matrix" class="headerlink" title="Matrix"></a>Matrix</h1><p>略，<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html" target="_blank" rel="noopener">自行官方文档获取</a></p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://elasticsearch.cn/article/629#tip4" target="_blank" rel="noopener">Elasticsearch如何实现 SQL语句中 Group By 和 Limit 的功能</a></p>
 <p><a href="https://blog.csdn.net/laoyang360/article/details/82932516" target="_blank" rel="noopener">干货 | 通透理解Elasticsearch聚合</a></p>
 <p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html" target="_blank" rel="noopener">ES Reference 7.9 Aggregations</a></p>
@@ -580,6 +581,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/26/Components/Elasticsearch/ES-CertificatedEngineer-试题/" rel="prev" title="ES-CertificatedEngineer-试题">
+                ES-CertificatedEngineer-试题 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -654,7 +659,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">153</span>
+                <span class="site-state-item-count">159</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -737,7 +742,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聚合函数的-Json结构"><span class="nav-number">1.</span> <span class="nav-text">聚合函数的 Json结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Demo-case-for-introduction"><span class="nav-number">2.</span> <span class="nav-text">Demo case for introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Summary"><span class="nav-number">2.1.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态-Mapping-导入原始数据"><span class="nav-number">2.2.</span> <span class="nav-text">动态 Mapping 导入原始数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看动态-Mapping"><span class="nav-number">2.3.</span> <span class="nav-text">查看动态 Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Buckets-Terms-聚合"><span class="nav-number">2.4.</span> <span class="nav-text">Buckets Terms 聚合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Metrics-Sum-计算总价"><span class="nav-number">2.5.</span> <span class="nav-text">Metrics Sum 计算总价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pipeline-Bucket-selector-过滤"><span class="nav-number">2.6.</span> <span class="nav-text">Pipeline Bucket_selector 过滤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pipeline-Bucket-sort-基于Bucket-排序"><span class="nav-number">2.7.</span> <span class="nav-text">Pipeline Bucket_sort 基于Bucket 排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Final-Result"><span class="nav-number">2.8.</span> <span class="nav-text">Final Result</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Buckets"><span class="nav-number">3.</span> <span class="nav-text">Buckets</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Metrics"><span class="nav-number">4.</span> <span class="nav-text">Metrics</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聚合函数的-Json结构"><span class="nav-number">1.</span> <span class="nav-text">聚合函数的 Json结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Demo-case-for-introduction"><span class="nav-number">2.</span> <span class="nav-text">Demo case for introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Summary"><span class="nav-number">2.1.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态-Mapping-导入原始数据"><span class="nav-number">2.2.</span> <span class="nav-text">动态 Mapping 导入原始数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看动态-Mapping"><span class="nav-number">2.3.</span> <span class="nav-text">查看动态 Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Buckets-Terms-聚合"><span class="nav-number">2.4.</span> <span class="nav-text">Buckets Terms 聚合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Metrics-Sum-计算总价"><span class="nav-number">2.5.</span> <span class="nav-text">Metrics Sum 计算总价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pipeline-Bucket-selector-过滤"><span class="nav-number">2.6.</span> <span class="nav-text">Pipeline Bucket_selector 过滤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pipeline-Bucket-sort-基于Bucket-排序"><span class="nav-number">2.7.</span> <span class="nav-text">Pipeline Bucket_sort 基于Bucket 排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Final-Result"><span class="nav-number">2.8.</span> <span class="nav-text">Final Result</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Buckets"><span class="nav-number">3.</span> <span class="nav-text">Buckets</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Metrics"><span class="nav-number">4.</span> <span class="nav-text">Metrics</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pipeline"><span class="nav-number">5.</span> <span class="nav-text">Pipeline</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Matrix"><span class="nav-number">6.</span> <span class="nav-text">Matrix</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
             
 
           </div>
