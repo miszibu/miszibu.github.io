@@ -102,10 +102,13 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="“In computer science, write-ahead logging (WAL) is a family of techniques for providing atomicity and durability (two of the ACID properties) in database systems.”——维基百科">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-09T14:36:35.921Z">
+<meta property="og:image" content="https://miszibu.github.io/2020/08/09/Components/Mysql/Mysql-WAL/redolog.image">
+<meta property="og:image" content="https://miszibu.github.io/2020/08/09/Components/Mysql/Mysql-WAL/redolog_writefile.image">
+<meta property="og:updated_time" content="2020-12-07T14:31:44.165Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mysql-WAL">
 <meta name="twitter:description" content="“In computer science, write-ahead logging (WAL) is a family of techniques for providing atomicity and durability (two of the ACID properties) in database systems.”——维基百科">
+<meta name="twitter:image" content="https://miszibu.github.io/2020/08/09/Components/Mysql/Mysql-WAL/redolog.image">
 
 
 
@@ -332,13 +335,109 @@
       
         <p>“In computer science, write-ahead logging (WAL) is a family of techniques for providing atomicity and durability (two of the ACID properties) in database systems.”——维基百科</p>
 <a id="more"></a>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>在计算机领域，<strong>WAL（Write-ahead logging，预写式日志）</strong>是数据库系统提供<strong>原子性</strong>和<strong>持久化</strong>的一系列技术。</p>
-<p>在使用WAL的系统中，所有的修改都先被写入到日志中，然后再被应用到系统状态中。通常包含<strong>redo</strong>和<strong>undo</strong>两部分信息。</p>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>在计算机领域，<strong>WAL（Write-ahead logging，预写式日志）</strong>是数据库系统提供<strong>原子性</strong>和<strong>持久化</strong>的一系列技术。</p>
 <ul>
-<li><strong>redo log:</strong> 实现<strong>持久性</strong>，在执行实际操作前，先将操作写入 redo log。即便系统意外宕机，也能从 redo log 中恢复未执行完操作。</li>
+<li><p><strong>binlog</strong>: 记录数据库执行的写入操作，用于主从同步和数据恢复。</p>
+</li>
+<li><p><strong>redo log:</strong> 实现<strong>持久性</strong>，在执行实际操作前，先将操作写入 redo log。即便系统意外宕机，也能从 redo log 中恢复未执行完操作。</p>
+</li>
 <li><strong>undo log</strong>：实现<strong>原子性</strong>，可以通过 undo log 撤销执行完的部分操作</li>
 </ul>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://cloud.tencent.com/developer/article/1163460" target="_blank" rel="noopener">什么是WAL？</a></p>
+<h1 id="binlog-vs-redolog"><a href="#binlog-vs-redolog" class="headerlink" title="binlog vs redolog"></a>binlog vs redolog</h1><table>
+<thead>
+<tr>
+<th></th>
+<th>redo log</th>
+<th>binlog</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文件组织</td>
+<td>循环写，文件大小固定</td>
+<td>追加写，文件大小可以设置</td>
+</tr>
+<tr>
+<td>实现方式</td>
+<td>innodb 引擎实现</td>
+<td>server 层实现，所有引擎都有</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>崩溃恢复 crash-safe</td>
+<td>主从复制和数据恢复</td>
+</tr>
+</tbody>
+</table>
+<h1 id="binlog"><a href="#binlog" class="headerlink" title="binlog"></a>binlog</h1><p>binlog用于记录数据库执行的写入性操作, 是一种逻辑日志。</p>
+<ul>
+<li><strong>逻辑日志</strong>：可以简单理解为记录的SQL语句</li>
+<li><strong>物理日志</strong>：因为 mysql 数据最终保存在磁盘页上，物理日志记录的是数据页的变更。</li>
+</ul>
+<p>binlog 是追加写入文件，可以设置单个 binlog 文件的大小，当达到最大时，生成新的文件来保存日志。</p>
+<h2 id="binlog使用场景"><a href="#binlog使用场景" class="headerlink" title="binlog使用场景"></a>binlog使用场景</h2><ol>
+<li><strong>主从复制</strong>：在Master端开启binlog，然后将binlog发送到slave端，Slave端重放 binlog 从而实现主从一致。</li>
+<li><strong>数据恢复</strong>：通过使用mysqlbinlog工具来恢复数据。</li>
+</ol>
+<h2 id="binlog刷盘时间"><a href="#binlog刷盘时间" class="headerlink" title="binlog刷盘时间"></a>binlog刷盘时间</h2><p>对于InnoDB存储引擎而言，只有在事务提交时才会记录binlog，此时记录还在内存中。<br>Mysql通过sync_binlog参数控制binlog的刷盘时机:</p>
+<ul>
+<li><strong>0:</strong> 由系统自行判断何时写入磁盘</li>
+<li><strong>1:</strong> 每次commit时将binlog写入磁盘</li>
+<li><strong>N:</strong> 每N个事务，才会将binlog 写入磁盘</li>
+</ul>
+<p><strong>总结：</strong>sync_binlog 参数为1时最安全，这也是 MySQL5.7.7之后版本的默认值。实际中可以适当调整，以降低fsync频率，牺牲部分一致性来换取更好的性能。</p>
+<h2 id="binlog日志格式"><a href="#binlog日志格式" class="headerlink" title="binlog日志格式"></a>binlog日志格式</h2><blockquote>
+<p>在 MySQL 5.7.7之前，默认的格式是STATEMENT，MySQL 5.7.7之后，默认值是ROW。日志格式通过binlog-format指定。</p>
+</blockquote>
+<ul>
+<li><strong>STATMENT:</strong>基于SQL语句的复制(statement-based replication, SBR)，每一条会修改数据的sql语句会记录到binlog中。<br>优点：不需要记录每一行的变化，减少了binlog日志量，节约了IO, 从而提高了性能；<br>缺点：在某些情况下会导致主从数据不一致，比如执行sysdate()、sleep()等。</li>
+<li><strong>ROW:</strong> 基于行的复制(row-based replication, RBR)，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了。<br>优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题；<br>缺点：会产生大量的日志，尤其是alter table的时候会让日志暴涨</li>
+<li><strong>MIXED</strong>: 基于STATMENT和ROW两种模式的混合复制(mixed-based replication, MBR)，一般的复制使用STATEMENT模式保存binlog，对于STATEMENT模式无法复制的操作使用ROW模式保存binlog</li>
+</ul>
+<h1 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h1><p>数据库需要实现<strong>持久性</strong>: 只要事务成功提交，那么对数据库的修改就会永久性的保存下来。</p>
+<p>因此为了实现持久性，最直接的办法就是每次提交成功，就直接将数据页的变动更新到磁盘上去，但这样频繁的磁盘操作严重影响性能。因此提出了 <strong>redo log</strong>， <strong>用于记录事务对数据页做了哪些修改。</strong></p>
+<p>redo log 包括了</p>
+<ul>
+<li>内存中的 redo log buffer</li>
+<li>磁盘中的 redo log file</li>
+</ul>
+<p>每当 Mysql 执行一条 DML(数据库操作语言)语句，就将计入写入 redo log buffer，后续批量将 buffer 通过 fsync()刷入磁盘中的 redo log file。</p>
+<p>在计算机操作系统中，用户空间(<code>user space</code>)下的缓冲区数据一般情况下是无法直接写入磁盘的，中间必须经过操作系统内核空间(<code>kernel space</code>)缓冲区(<code>OS Buffer</code>)。因此，<code>redo log buffer</code>写入<code>redo log file</code>实际上是先写入<code>OS Buffer</code>，然后再通过系统调用<code>fsync()</code>将其刷到<code>redo log file</code>中，过程如下：</p>
+<p><img src="/2020/08/09/Components/Mysql/Mysql-WAL/redolog.image" alt=""></p>
+<h2 id="redo-log-刷盘时机"><a href="#redo-log-刷盘时机" class="headerlink" title="redo log 刷盘时机"></a>redo log 刷盘时机</h2><table>
+<thead>
+<tr>
+<th>参数值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0（延迟写）</td>
+<td>事务提交时不会将<code>redo log buffer</code>中日志写入到<code>os buffer</code>，而是每秒写入<code>os buffer</code>并调用<code>fsync()</code>写入到<code>redo log file</code>中。也就是说设置为0时是(大约)每秒刷新写入到磁盘中的，当系统崩溃，会丢失1秒钟的数据。</td>
+</tr>
+<tr>
+<td>1（实时写，实时刷）</td>
+<td>事务每次提交都会将<code>redo log buffer</code>中的日志写入<code>os buffer</code>并调用<code>fsync()</code>刷到<code>redo log file</code>中。这种方式即使系统崩溃也不会丢失任何数据，但是因为每次提交都写入磁盘，IO的性能较差。</td>
+</tr>
+<tr>
+<td>2（实时写，延迟刷）</td>
+<td>每次提交都仅写入到<code>os buffer</code>，然后是每秒调用<code>fsync()</code>将<code>os buffer</code>中的日志写入到<code>redo log file</code>。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="redo-log-记录形式"><a href="#redo-log-记录形式" class="headerlink" title="redo log 记录形式"></a>redo log 记录形式</h2><p>redo log 采用了循环写的机制，不同 binlog 的AOF机制。当写到结尾时，会回到开头循环写日志。</p>
+<ul>
+<li><strong>write pos</strong>: redo log 当前写入位置</li>
+<li><strong>check point</strong>: 已经被持久化的 redo log的位置</li>
+</ul>
+<p>顺时针来看，check point-&gt; write pos 之间的 redo log 即为尚未被执行的 redo log。</p>
+<p>write pos-&gt; check point 之间的则是已经被执行过，数据变动已经落盘的 redo log，可以理解为空的。</p>
+<p>当 write pos追上 check point 时，会先推动 check point 向前移动，释放出位置用于记录新的日志。</p>
+<p><img src="/2020/08/09/Components/Mysql/Mysql-WAL/redolog_writefile.image" alt=""></p>
+<h2 id="redo-log-与宕机恢复"><a href="#redo-log-与宕机恢复" class="headerlink" title="redo log 与宕机恢复"></a>redo log 与宕机恢复</h2><p>当启动 innodb 时，总会进行恢复操作，从 redo log file 文件中恢复出尚未落盘的数据变动。</p>
+<h1 id="Undolog"><a href="#Undolog" class="headerlink" title="Undolog"></a>Undolog</h1><p><a href="https://miszibu.github.io/2020/08/13/Components/Mysql/Mysql%E4%BA%8B%E5%8A%A1/">Mysql事务</a></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://juejin.cn/post/6860252224930070536#heading-0" target="_blank" rel="noopener">必须了解的mysql三大日志-binlog、redo log和undo log</a></p>
 
       
     </div>
@@ -456,7 +555,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">159</span>
+                <span class="site-state-item-count">160</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -539,7 +638,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#binlog-vs-redolog"><span class="nav-number">2.</span> <span class="nav-text">binlog vs redolog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#binlog"><span class="nav-number">3.</span> <span class="nav-text">binlog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#binlog使用场景"><span class="nav-number">3.1.</span> <span class="nav-text">binlog使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#binlog刷盘时间"><span class="nav-number">3.2.</span> <span class="nav-text">binlog刷盘时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#binlog日志格式"><span class="nav-number">3.3.</span> <span class="nav-text">binlog日志格式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#redo-log"><span class="nav-number">4.</span> <span class="nav-text">redo log</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#redo-log-刷盘时机"><span class="nav-number">4.1.</span> <span class="nav-text">redo log 刷盘时机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redo-log-记录形式"><span class="nav-number">4.2.</span> <span class="nav-text">redo log 记录形式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redo-log-与宕机恢复"><span class="nav-number">4.3.</span> <span class="nav-text">redo log 与宕机恢复</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Undolog"><span class="nav-number">5.</span> <span class="nav-text">Undolog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">5.1.</span> <span class="nav-text">Reference</span></a></li></ol></li></ol></div>
             
 
           </div>
