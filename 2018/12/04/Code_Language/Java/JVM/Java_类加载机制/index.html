@@ -94,20 +94,20 @@
 
 
 
-<meta name="description" content="Java类加载器是Java语言的一个创新，用于动态装载Java字节码文件，最早用于Applet从远程动态下载调用Java文件。 类加载器加载字节码文件，并转换为java.lang.Class类的一个实例。用于标识Java类，使用该示例的newInstance()方法动态创建该类的对象。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
+<meta name="description" content="当程序需要某个类时，如果该类尚未加载至内存，则JVM会使用加载、链接、初始化三个步骤加载Java Class文件，并为其创建java.lang.Class对象。 类加载器由 JVM提供，也可以继承 ClassLoader类来实现自定义的加载器。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
 <meta name="keywords" content="Java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java_类加载机制">
 <meta property="og:url" content="https://miszibu.github.io/2018/12/04/Code_Language/Java/JVM/Java_类加载机制/index.html">
 <meta property="og:site_name" content="ZibuのHippocampus">
-<meta property="og:description" content="Java类加载器是Java语言的一个创新，用于动态装载Java字节码文件，最早用于Applet从远程动态下载调用Java文件。 类加载器加载字节码文件，并转换为java.lang.Class类的一个实例。用于标识Java类，使用该示例的newInstance()方法动态创建该类的对象。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
+<meta property="og:description" content="当程序需要某个类时，如果该类尚未加载至内存，则JVM会使用加载、链接、初始化三个步骤加载Java Class文件，并为其创建java.lang.Class对象。 类加载器由 JVM提供，也可以继承 ClassLoader类来实现自定义的加载器。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://miszibu.github.io/2018/12/04/Code_Language/Java/JVM/Java_类加载机制/800fcstug3.png">
 <meta property="og:image" content="https://miszibu.github.io/2018/12/04/Code_Language/Java/JVM/Java_类加载机制/d330251551f6de988239494ce2773095.png">
-<meta property="og:updated_time" content="2020-05-24T08:27:20.510Z">
+<meta property="og:updated_time" content="2021-01-04T08:53:44.768Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java_类加载机制">
-<meta name="twitter:description" content="Java类加载器是Java语言的一个创新，用于动态装载Java字节码文件，最早用于Applet从远程动态下载调用Java文件。 类加载器加载字节码文件，并转换为java.lang.Class类的一个实例。用于标识Java类，使用该示例的newInstance()方法动态创建该类的对象。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
+<meta name="twitter:description" content="当程序需要某个类时，如果该类尚未加载至内存，则JVM会使用加载、链接、初始化三个步骤加载Java Class文件，并为其创建java.lang.Class对象。 类加载器由 JVM提供，也可以继承 ClassLoader类来实现自定义的加载器。 常见的是ClassNotFoundException和NoClassDefFoundError等异常。">
 <meta name="twitter:image" content="https://miszibu.github.io/2018/12/04/Code_Language/Java/JVM/Java_类加载机制/800fcstug3.png">
 
 
@@ -334,8 +334,8 @@
 
       
         <blockquote>
-<p>Java类加载器是Java语言的一个创新，用于动态装载Java字节码文件，最早用于Applet从远程动态下载调用Java文件。</p>
-<p>类加载器加载字节码文件，并转换为java.lang.Class类的一个实例。用于标识Java类，使用该示例的newInstance()方法动态创建该类的对象。</p>
+<p>当程序需要某个类时，如果该类尚未加载至内存，则JVM会使用<strong>加载、链接、初始化</strong>三个步骤加载Java Class文件，并为其创建java.lang.Class对象。</p>
+<p>类加载器由 JVM提供，也可以继承 ClassLoader类来实现自定义的加载器。</p>
 <p>常见的是ClassNotFoundException和NoClassDefFoundError等异常。</p>
 </blockquote>
 <a id="more"></a>
@@ -540,7 +540,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">160</span>
+                <span class="site-state-item-count">153</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -553,7 +553,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -646,7 +646,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

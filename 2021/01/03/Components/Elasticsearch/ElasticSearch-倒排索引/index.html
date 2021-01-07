@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Elasticsearch,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Inverted Index，反向索引，又名倒排索引，用于实现全文搜索。在本文中，我们会深入介绍ES的反向索引机制。 索引数据流程: 在数据进入ES 中时，我们会对数据进行分词，将其划分出多个Terms，然后建立 Terms 到 Document ID 的映射，然后将 Terms加入了字典树Term index中。 查询数据: 先从字典树 Term index 中找到对应 terms，从而获取对应">
+<meta name="keywords" content="Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch_倒排索引">
+<meta property="og:url" content="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Inverted Index，反向索引，又名倒排索引，用于实现全文搜索。在本文中，我们会深入介绍ES的反向索引机制。 索引数据流程: 在数据进入ES 中时，我们会对数据进行分词，将其划分出多个Terms，然后建立 Terms 到 Document ID 的映射，然后将 Terms加入了字典树Term index中。 查询数据: 先从字典树 Term index 中找到对应 terms，从而获取对应">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/%20es_inverted_index_structure.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/for.png">
+<meta property="og:image" content="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/roaring.png">
+<meta property="og:image" content="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/roaring_memory.png">
+<meta property="og:updated_time" content="2021-01-04T05:54:03.819Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ElasticSearch_倒排索引">
+<meta name="twitter:description" content="Inverted Index，反向索引，又名倒排索引，用于实现全文搜索。在本文中，我们会深入介绍ES的反向索引机制。 索引数据流程: 在数据进入ES 中时，我们会对数据进行分词，将其划分出多个Terms，然后建立 Terms 到 Document ID 的映射，然后将 Terms加入了字典树Term index中。 查询数据: 先从字典树 Term index 中找到对应 terms，从而获取对应">
+<meta name="twitter:image" content="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/%20es_inverted_index_structure.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/">
+
+
+
+
+
+  <title>ElasticSearch_倒排索引 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZibuのHippocampus</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">人生天地间，忽如远行客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zibu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ElasticSearch_倒排索引</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-03T23:06:34+08:00">
+                2021-01-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>Inverted Index</strong>，反向索引，又名倒排索引，用于实现全文搜索。在本文中，我们会深入介绍ES的反向索引机制。</p>
+<p>索引数据流程: 在数据进入ES 中时，我们会对数据进行分词，将其划分出多个<strong>Terms</strong>，然后建立 Terms 到 Document ID 的映射，然后将 Terms加入了<strong>字典树Term index</strong>中。</p>
+<p>查询数据: 先从字典树 Term index 中找到对应 terms，从而获取对应的 document id，最后获取真实的数据。</p>
+<blockquote>
+<p>Term Index -&gt; Term Dictionary -&gt; IDs (Posting List)-&gt;Docs</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="入门倒排索引"><a href="#入门倒排索引" class="headerlink" title="入门倒排索引"></a>入门倒排索引</h1><h2 id="Mysql的模糊查询"><a href="#Mysql的模糊查询" class="headerlink" title="Mysql的模糊查询"></a>Mysql的模糊查询</h2><p>举个例子: 在外卖软件上搜索鸡排饭，给我找出附近几KM内的所有售卖鸡排饭的商家，如果没有，则展示高度相关联的店家如盖浇饭和鸡排等。</p>
+<p>本文主要目标在倒排搜索，涉及空间区域查找则略过，在 Mysql中我们对附近商家的商品记录中的商品名称进行查找，我们需要使用模糊查询来匹配任一存在’鸡排饭’字符串的记录，而<strong>前置模糊查询的存在使得查询无法利用索引，必须走全表查询。</strong>这无疑极大的影响了查询性能。</p>
+<p>而且我们更需要对’鸡排’,’饭’等关键词进行二次查询，来满足不存在’鸡排饭’的场景。相当的冗余，对于全文查找的场景，传统的索引场景并不适合。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> goods <span class="keyword">where</span> goods_name <span class="keyword">like</span> <span class="string">'%鸡排饭%'</span></span><br></pre></td></tr></table></figure>
+<h2 id="ES中的全文查询-基于倒排索引"><a href="#ES中的全文查询-基于倒排索引" class="headerlink" title="ES中的全文查询(基于倒排索引)"></a>ES中的全文查询(基于倒排索引)</h2><p>还是上面的’鸡排饭’场景，ES会怎么做呢？</p>
+<p>首先在使用了<code>Full-text queries</code>的场景下，首先会根据预设的分词器将输入分词为多个 <code>terms</code>(中文分词器默认不支持，这个场景中可以自定义餐饮分词器)。分词后，我们得到了’鸡排’，’饭’，’鸡排饭’这三个分词，对其在 <code>terms index</code>(内存查找)中进行查询获取到对应 terms在 terms dictionary 中的位置，经过一次磁盘IO，获取到 terms 对 documents id 的映射，接下来就是正常索引的查找过程了。</p>
+<p>对于查找出的所有数据集，根据所匹配的分词内容进行打分计算，然后根据评分的高低进行降序排序，展示给用户。</p>
+<blockquote>
+<p>查找过程: Terms Index -&gt; Terms dictionary -&gt; Documents Id -&gt; Documents</p>
+</blockquote>
+<h2 id="ES-vs-Mysql"><a href="#ES-vs-Mysql" class="headerlink" title="ES vs Mysql"></a>ES vs Mysql</h2><p>很显然在这个例子中，Mysql的<strong>全表查询</strong>和 ES的高效<strong>反向索引查询</strong>在查询的速度上有了巨大的差距。其实不仅仅是查询性能的差距，更多的在于ES所能对复杂的联合查询，自定义的分词器，自定义的打分算法所能实现的高度客制化的查询需求和能力上，更是 Mysql普通索引所远不能及的。</p>
+<blockquote>
+<p>Mysql也有全文查找索引，这里以Mysql普通索引为例，只是想比较普通索引和反向索引的区别。</p>
+</blockquote>
+<p>初步了解了反向索引后，我们继续深入 ES 的反向索引实现。</p>
+<hr>
+<h1 id="实践：ES中的反向索引实现"><a href="#实践：ES中的反向索引实现" class="headerlink" title="实践：ES中的反向索引实现"></a>实践：ES中的反向索引实现</h1><p><img src="/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/ es_inverted_index_structure.jpeg" alt="img"></p>
+<h2 id="Term-Index-amp-Term-Dictionary"><a href="#Term-Index-amp-Term-Dictionary" class="headerlink" title="Term Index &amp; Term Dictionary"></a>Term Index &amp; Term Dictionary</h2><p><strong>查询流程:</strong> Term  Index 是一棵字典树，<strong>存储了terms的前缀</strong>，通过前缀匹配找到对应前缀在 Term Dictionary中的块，将整个块加载到内存中，对其进行<strong>二分查找</strong>，找到对应的term，再找到对应的 Posting List(IDs)。</p>
+<p><strong>Term Index优化:</strong> 通过只存储前缀和 Lucene的 FST(Finite State Transducers)机制进一步对Term Index进行压缩，使得方便将其维持在内存中，以提高查询效率。</p>
+<p><strong>Term Dictionary优化:</strong> Term Dictionary将相同前缀Term组成一个块进行存储且省去了公有前缀，进一步减少了磁盘占用。</p>
+<p><strong>总结：</strong>与 Mysql B+Tree 相比，只需要一次内存IO(Term Index)，一次磁盘IO(Term Dictionary)，就获取了 Posting List. Mysql 则需要多次磁盘IO(B+Tree)才能获取到对应 Term的数据，在存储介质的读取上，取得极大的优势。</p>
+<h2 id="Posting-List"><a href="#Posting-List" class="headerlink" title="Posting List"></a>Posting List</h2><p>对于一些低区分度的，高频率的Term而言，比如性别，它所对应的 documents ids数量是非常庞大的，可以百万千万级别。而在联合查询中我们又需要对所有Terms的 posting list 进行高效的交并集查询和计算，因此原生的 Posting List出现了两个痛点：</p>
+<ul>
+<li><strong>如何压缩以节省磁盘空间</strong>:Frame Of Reference</li>
+<li><strong>如何快速求交并集（intersections and unions）</strong>: Roaring bitmaps</li>
+</ul>
+<h3 id="Frame-Of-Reference"><a href="#Frame-Of-Reference" class="headerlink" title="Frame Of Reference"></a><strong>Frame Of Reference</strong></h3><p>首先我们在<strong>更新Posting List是有序的</strong>，这是为了后续方便求多个 Posting List 的交并集，有序性也带来了一个好的副作用，<strong>增量编码(delta-encoding)</strong>，举个例子，如果原先的 Posting list为<code>[73, 300, 302, 332, 343, 372]</code>在增量编码后就变成了 <code>[73, 227, 2, 30, 11, 29]</code>，原来列表中的最大值为372，现在变成了227，一个字节就能存储。</p>
+<p>Lucene又将 Posting List 分为最大为256个元素的块进行存储，将每一个块通过增量编码(delta-encoding)和 <strong>Bit Packing</strong>进行压缩，然后更新当前块的单个元素所需的 bits长度到块头中，最后以新的最小 bits重写块。</p>
+<p><strong>Bit packing:</strong> Lucene计算出存储每一个块中最大的元素的值所需要的位，比如上面例子中，在分块后(实际是256个元素的块，为展示我们以三个元素进行分块)变成了<code>[73, 227, 2]</code>,<code>30, 11, 29]</code>，对于第二块言，最大值仅仅为30，只需要5个 bits 就能存储，因此我们将5bits 作为该块数据读取的步长，记录在块头中。</p>
+<p>最后我们总结下：</p>
+<ol>
+<li><strong>Delta-encode —— 增量编码</strong>：只记录Posting List(有序)中各元素的增量</li>
+<li><strong>Split into blocks —— 分割成块</strong>：将 Posting List 分割成每个最大256元素的小块，分块是为了降低各块的步长，以最小的成本存储数据。</li>
+<li><strong>Bit packing —— 按需分配空间</strong>：在块头上记录最小的步长，读取时以该步长读取数据。</li>
+</ol>
+<p>以上三个步骤，共同组成了一项编码技术，Frame Of Reference(FOR)，看到这里，我也不由的感叹 ，对于一个底层的存储引擎而言，对存储大小的极致压缩，真的是不留余力。</p>
+<p><img src="/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/for.png" alt="img"></p>
+<h3 id="Roaring-bitmaps"><a href="#Roaring-bitmaps" class="headerlink" title="Roaring bitmaps"></a><strong>Roaring bitmaps</strong></h3><p>接着来聊聊 Posting List 的第二个痛点 —— 如何快速求交并集（intersections and unions）。</p>
+<p>在真实的场景中，我们会创建复杂的多条件查询（比如 boolean query），lucene收到请求后，会从 Frame Of Reference 压缩的数据中，还原出可读的 posting list，再将其根据原先的逻辑进行交并集查询，这里就需要一个能高速查询交并集的方式，而且 lucene会缓存高频率的 filter query，将其对应 posting list 直接存储在内存中，方便下次查询直接返回，因此我们对 posting list的存储方式也提出了一定的要求。</p>
+<blockquote>
+<p>Note: ES的单个 shard中将数据存储在多个segments中，每个shard就是一个 lucene index，因此即使没有多条件查询， Lucene 也需要频繁求并集，因为数据本身就是分片存储的。</p>
+</blockquote>
+<h4 id="Option-1-Integer-数组"><a href="#Option-1-Integer-数组" class="headerlink" title="Option 1: Integer 数组"></a><strong>Option 1: Integer 数组</strong></h4><p>最简单的方式了，直接遍历多个数组来求交集，但是空间上是极其的不友好，让我们简单计算一下，ES是Java 应用，一个int需要占用4个 bytes，假设一个segment中有100M个文档，那就是 400 MB的空间占用。毫无疑问，对于大数据量的集合，我们需要更高效的方式。</p>
+<h4 id="Option-2-Bitmap"><a href="#Option-2-Bitmap" class="headerlink" title="Option 2: Bitmap"></a><strong>Option 2: Bitmap</strong></h4><p>大数据量的Integers 天生就适合 <strong>bitmap</strong> 进行存储，同样100M个文档，我们只需要12.5MB 来存储，很明显在大数据量存储时，极大减少了空间占用，但是对于数据量较小的情况，bitmap需要固定的大小的空间来存储，并不适合，</p>
+<blockquote>
+<p>Bitmap: 以 bit 进行操作的数据结构，在存储 integer时，将对应数字位数的 bit 置为1，表示该数字存在。比如01000000则表示7存在。</p>
+</blockquote>
+<h4 id="Option-3-Roaring-Bitmaps"><a href="#Option-3-Roaring-Bitmaps" class="headerlink" title="Option 3: Roaring Bitmaps"></a><strong>Option 3: Roaring Bitmaps</strong></h4><p>Roaring bitmaps则是为了同时利用以上两种方式在不同数据量下的优势而设计的机制，它的机制如下：</p>
+<p>首先还是分块机制，将posting list 中的 documents id根据高16位分块，这样就分出了65536个块，每个块最多有65536个元素，比如第一个块只有0-65535的值，第二块只有65536-131071的值，以此类推。分块完成后，根据各个块中数据量不同，选用不同的策略，如果元素个数少于4096个，则使用 integer array，否则使用 bitmap。</p>
+<blockquote>
+<p>Note: 由于分块了，单个块中只有16位，因此我们将 integer的值也同步使用了2个字节来存储.</p>
+</blockquote>
+<p><img src="/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/roaring.png" alt="img"></p>
+<p>至于为什么选择4096作为不同策略切换的阈值呢，很简单，integer数组单个元素2Bytes，4096个元素则是8kb。Bitmap 存储65536则需要65536个 bits，即8kb。</p>
+<p><img src="/2021/01/03/Components/Elasticsearch/ElasticSearch-倒排索引/roaring_memory.png" alt="img"></p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://www.elastic.co/cn/blog/frame-of-reference-and-roaring-bitmaps" target="_blank" rel="noopener">Frame of Reference and Roaring Bitmaps</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/76485252" target="_blank" rel="noopener">聊聊 Elasticsearch 的倒排索引 Author:柳树</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/12/23/Code_Language/Java/Java多线程/Java-线程与进程/" rel="next" title="Java-线程与进程">
+                <i class="fa fa-chevron-left"></i> Java-线程与进程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/img/1.jpg" alt="Zibu">
+          <p class="site-author-name" itemprop="name">Zibu</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">153</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/miszibu" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/VarZibu" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/li-zi-bu-70/activities" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#入门倒排索引"><span class="nav-number">1.</span> <span class="nav-text">入门倒排索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Mysql的模糊查询"><span class="nav-number">1.1.</span> <span class="nav-text">Mysql的模糊查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ES中的全文查询-基于倒排索引"><span class="nav-number">1.2.</span> <span class="nav-text">ES中的全文查询(基于倒排索引)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ES-vs-Mysql"><span class="nav-number">1.3.</span> <span class="nav-text">ES vs Mysql</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实践：ES中的反向索引实现"><span class="nav-number">2.</span> <span class="nav-text">实践：ES中的反向索引实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Term-Index-amp-Term-Dictionary"><span class="nav-number">2.1.</span> <span class="nav-text">Term Index &amp; Term Dictionary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Posting-List"><span class="nav-number">2.2.</span> <span class="nav-text">Posting List</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Frame-Of-Reference"><span class="nav-number">2.2.1.</span> <span class="nav-text">Frame Of Reference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Roaring-bitmaps"><span class="nav-number">2.2.2.</span> <span class="nav-text">Roaring bitmaps</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Option-1-Integer-数组"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">Option 1: Integer 数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Option-2-Bitmap"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">Option 2: Bitmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Option-3-Roaring-Bitmaps"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">Option 3: Roaring Bitmaps</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">3.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zibu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
