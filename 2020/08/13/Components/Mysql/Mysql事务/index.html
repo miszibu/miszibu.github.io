@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Mysql依靠锁来实现事务隔离。 如何设置事务隔离级别 事务 ACID特性ACID：原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability）  原子性：事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。 一致性：事务前后数据的完整性保持一致。例如转账后，双方总额不变。 隔离性：多个用户并发访问时，一个用户的事务不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql事务">
+<meta property="og:url" content="https://miszibu.github.io/2020/08/13/Components/Mysql/Mysql%E4%BA%8B%E5%8A%A1/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Mysql依靠锁来实现事务隔离。 如何设置事务隔离级别 事务 ACID特性ACID：原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability）  原子性：事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。 一致性：事务前后数据的完整性保持一致。例如转账后，双方总额不变。 隔离性：多个用户并发访问时，一个用户的事务不">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/63b1dbd65c2e9a08e07a29664c11047f.png">
+<meta property="article:published_time" content="2020-08-13T09:58:42.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.053Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/63b1dbd65c2e9a08e07a29664c11047f.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/08/13/Components/Mysql/Mysql%E4%BA%8B%E5%8A%A1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/08/13/Components/Mysql/Mysql%E4%BA%8B%E5%8A%A1/","path":"2020/08/13/Components/Mysql/Mysql事务/","title":"Mysql事务"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Mysql事务 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1-ACID%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">事务 ACID特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">MySQL事务隔离级别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Read-UnCommitted"><span class="nav-number">2.1.</span> <span class="nav-text">Read UnCommitted</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Read-Committed"><span class="nav-number">2.2.</span> <span class="nav-text">Read Committed</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Repeatable-Read"><span class="nav-number">2.3.</span> <span class="nav-text">Repeatable Read</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Serializable"><span class="nav-number">2.4.</span> <span class="nav-text">Serializable</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MVCC-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB"><span class="nav-number">3.</span> <span class="nav-text">MVCC 如何实现事务隔离</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E8%A6%81%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86"><span class="nav-number">3.1.</span> <span class="nav-text">必要背景知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MVCC-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.</span> <span class="nav-text">MVCC 如何实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E5%86%99%E5%9C%BA%E6%99%AF"><span class="nav-number">4.</span> <span class="nav-text">并发写场景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/13/Components/Mysql/Mysql%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Mysql事务 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql事务
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-13 17:58:42" itemprop="dateCreated datePublished" datetime="2020-08-13T17:58:42+08:00">2020-08-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Mysql依靠锁来实现事务隔离。</p>
+<p>如何设置事务隔离级别</p>
+<h1 id="事务-ACID特性"><a href="#事务-ACID特性" class="headerlink" title="事务 ACID特性"></a>事务 ACID特性</h1><p>ACID：原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability）</p>
+<ol>
+<li><strong>原子性</strong>：事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。</li>
+<li><strong>一致性</strong>：事务前后数据的完整性保持一致。例如转账后，双方总额不变。</li>
+<li><strong>隔离性</strong>：多个用户并发访问时，一个用户的事务不被其他用户事务干扰，多个并发事务数据相互隔离。</li>
+<li><strong>持久性</strong>：一个事务一旦提交，它对数据库的改变就是永久性，即便数据库发生故障也应该有任何影响。</li>
+</ol>
+<span id="more"></span>
+
+<h1 id="MySQL事务隔离级别"><a href="#MySQL事务隔离级别" class="headerlink" title="MySQL事务隔离级别"></a>MySQL事务隔离级别</h1><ul>
+<li><strong>读未提交 Read UnCommited</strong>：完全不加锁，性能最佳事务在执行过程中可以看到其他事务尚未提交的记录，</li>
+<li><strong>可重复读 Repeatable Read：</strong>保证同一个事务中的多次相同的查询的结果是一致的，比如一个事务一开始查询了一条记录然后过了几秒钟又执行了相同的查询，保证两次查询的结果是相同的，<strong>可重复读也是mysql的默认隔离级别</strong></li>
+<li><strong>读已提交数据 Read Commited</strong>，一个事务在执行过程中可以看到其他事务已经提交的记录，而且能看到其他事务对已有记录的更新。</li>
+<li><strong>串行化 Serializable：</strong>事务之间串行执行，彼此不存在并发关系，不会产生任何并发问题，性能最差。</li>
+</ul>
+<h2 id="Read-UnCommitted"><a href="#Read-UnCommitted" class="headerlink" title="Read UnCommitted"></a>Read UnCommitted</h2><p>完全不加锁，性能最佳，但是会出现一切的并发问题。最为直接的就是<strong>脏读</strong>了。</p>
+<p><strong>脏读示例:</strong>  </p>
+<p>同时存在事务A 与 事务B，事务A执行完一半由于失败触发事务回滚机制(基于Undo log &amp; CLR实现)，撤销修改。此时事务B读取了事务A所修改的脏数据，这就是脏读。</p>
+<h2 id="Read-Committed"><a href="#Read-Committed" class="headerlink" title="Read Committed"></a>Read Committed</h2><p><strong>定义:</strong> 一个事务只能读取到其他事务已经提交的数据，也就是已经commit的数据，从而解决了脏读问题。仍然存在<strong>不可重复读</strong>的问题。</p>
+<p><code>Read Committed</code>是绝大多数数据库的默认事务隔离级别，比如Oracle，但MySQL的默认事务隔离级别是<code>Repeatable Read</code>.</p>
+<p><strong>不可重复读示例:</strong></p>
+<p>事务A修改某一行数据为10，原先值是1，那么事务B中多次查询该行数据可能获得1或者10，因为当事务A提交后，对该行的修改则对事务B可见。</p>
+<h2 id="Repeatable-Read"><a href="#Repeatable-Read" class="headerlink" title="Repeatable Read"></a>Repeatable Read</h2><p><strong>定义:</strong> 事务不会读到其他事务对已有数据的修改，即便其他事务已经提交。也就是说在<code>Repeatable Read</code>的隔离级别下，每次查询出的数据视图中的已有数据不会变化。但却可以读到新插入的数据，这就是<strong>幻读</strong>。</p>
+<blockquote>
+<p>在实际的情况中，在Repeatable Read隔离级别下，MySQL不会出现幻读，这是通过行锁和间隙锁实现的。</p>
+</blockquote>
+<h2 id="Serializable"><a href="#Serializable" class="headerlink" title="Serializable"></a>Serializable</h2><p>类似单线程，事务串行执行，解决了幻读，脏读，不可重复读等所有问题，但是性能很差。</p>
+<h1 id="MVCC-如何实现事务隔离"><a href="#MVCC-如何实现事务隔离" class="headerlink" title="MVCC 如何实现事务隔离"></a>MVCC 如何实现事务隔离</h1><h2 id="必要背景知识"><a href="#必要背景知识" class="headerlink" title="必要背景知识"></a>必要背景知识</h2><ul>
+<li><p><strong>数据表中的隐藏列</strong></p>
+<p>当使用 InnoDB 引擎时，Mysql 会创建如下的几个隐藏的数据列。</p>
+<ul>
+<li><strong>RowID</strong>：隐藏的自增 ID，当建表时没有指定主键时，就会使用 RowID 作为主键来创建聚簇索引</li>
+<li><strong>DB_TRX_ID：</strong> 最近修改（更新&#x2F;删除&#x2F;插入）该记录的事务ID。事务 ID，是事务创建时，按时间先后顺序获取的一个自增数字。</li>
+<li><strong>DB_ROLL_PTR：</strong>回滚指针，指向这条记录的上一个版本。</li>
+</ul>
+<blockquote>
+<p>其实还有一个删除的flag字段，用来判断该行记录是否已经被删除。</p>
+</blockquote>
+</li>
+<li><p><strong>UndoLog</strong>: 事务的回滚日志，用于当事务失败时回滚事务操作，从而保证事务<strong>原子性</strong>。 Undo Log 可以分为以下两种</p>
+<ul>
+<li><strong>Insert Undo Log</strong>: 插入操作生成，事务执行完可以立即删除</li>
+<li><strong>Update Undo Log:</strong>  更新操作生成（删除也是一种更新）。事务执行完，不能直接删除。因为 Undo Log 除了用于回滚当前事务操作以外，也能为其他事务提供该行数据的历史版本。因此只有当系统中没有比这个undo-log更早的<code>read-view</code>了的时候才能删除。</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/63b1dbd65c2e9a08e07a29664c11047f.png"></p>
+</li>
+<li><p><strong>Read-View 读视图</strong>: 当一个事务执行查询操作时会生成视图，视图是由就是三个变量组成</p>
+<ol>
+<li>所有活跃的事务 ID 列表</li>
+<li>事务中活跃的最小事务 ID</li>
+<li>事务中活跃的最大事务 ID</li>
+</ol>
+<blockquote>
+<p>在 Repeatable Read 和 Read Committed 隔离级别中，生成视图的不同造成了，这两者事务隔离程度的不同</p>
+<p><strong>Repeatable Read: 在事务开始时生成视图，只有一次</strong></p>
+<p><strong>Read Committed: 在事务中的每次查询操作都会生成视图</strong></p>
+</blockquote>
+</li>
+</ul>
+<h2 id="MVCC-如何实现"><a href="#MVCC-如何实现" class="headerlink" title="MVCC 如何实现"></a>MVCC 如何实现</h2><p><strong>MVCC 是通过 “三个” 隐藏字段 (事务id,回滚指针,删除标志) 加上undo log和可见性算法来实现的版本并发控制</strong>。</p>
+<ol>
+<li>获取该行 DB_TRX_ID，如果<strong>小于 Read-View 中的最小事务 ID</strong> 或者 <strong>等于当前事务 ID</strong>，表明该行事务在生成Read-View 之前已经提交， 该行数据可见，否则继续判断. </li>
+<li>判断该行事务 ID 是否大于视图中最大事务 ID，如果大于，表明该行事务在生成 Read-View 之后才生成，该行不可见，需要通过 Undo Log 查看历史数据。</li>
+<li>判断该行事务 ID 是否属于视图中活跃事务列表，如果是，表明在创建 Read-View 时生成该版本记录的事务仍活跃，因此数据不可见，需要通过 Undo Log 查看历史数据。如果不是，则表眀修改该行的事务已提交，该行可见。</li>
+</ol>
+<h1 id="并发写场景"><a href="#并发写场景" class="headerlink" title="并发写场景"></a>并发写场景</h1><p>当两个事务同时对一个数据行进行更新操作时，存在并发写的问题，先来的事务对该目标行设置行锁，当事务执行完毕释放行锁，后来的事务等待行锁释放，再继续进行修改。但是在一些无索引场景就会存在例外，看具体例子：</p>
+<p><strong>存在索引时：</strong></p>
+<blockquote>
+<p>update user set age&#x3D;11 where id &#x3D; 1</p>
+</blockquote>
+<p>在InnoDB中必存在主键索引，因此可以找到对应行数据添加行锁。</p>
+<p><strong>不存在索引时:</strong></p>
+<blockquote>
+<p>update user set age&#x3D;11 where age&#x3D;10</p>
+</blockquote>
+<p>当未对age建立索引时，MySQL无法定位该行，则会对所有行数据先加上行锁，然后迭代所有数据并逐步释放不符合过滤条件的行锁，这就产生了极大的资源消耗。</p>
+<p>因此在写SQL时，避免对非索引字段进行过滤查询。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a target="_blank" rel="noopener" href="https://juejin.im/post/6844903969815265288#heading-1">你真的懂MVCC吗？来手动实践一下？</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fengzheng/p/12557762.html">一文讲清楚MySQL事务隔离级别和实现原理</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/09/Components/Mysql/Mysql-WAL/" rel="prev" title="Mysql-WAL">
+                  <i class="fa fa-angle-left"></i> Mysql-WAL
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/15/Components/Redis/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8F%8A%E5%85%B6%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" rel="next" title="Redis数据结构及其底层实现">
+                  Redis数据结构及其底层实现 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

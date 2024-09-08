@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="异常分类按照异常需要处理的时机分为编译时异常（强制性异常）也叫CheckedException和运行时异常（非强制性异常）也叫RuntimeException。只有Java语言提供了Checked异常，Java认为Checked异常都是可以被处理的异常，所以Java程序必须显式处理异常，否则就会编译报错。这就是Java设计哲学之一，没有妥善处理异常的代码根本没有机会被执行。方法有两种  当前方法知">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java_异常">
+<meta property="og:url" content="https://miszibu.github.io/2018/05/19/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_%E5%BC%82%E5%B8%B8/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="异常分类按照异常需要处理的时机分为编译时异常（强制性异常）也叫CheckedException和运行时异常（非强制性异常）也叫RuntimeException。只有Java语言提供了Checked异常，Java认为Checked异常都是可以被处理的异常，所以Java程序必须显式处理异常，否则就会编译报错。这就是Java设计哲学之一，没有妥善处理异常的代码根本没有机会被执行。方法有两种  当前方法知">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-05-19T06:40:02.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.025Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/05/19/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_%E5%BC%82%E5%B8%B8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/05/19/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_%E5%BC%82%E5%B8%B8/","path":"2018/05/19/Code_Language/Java/Java应用基础/Java_异常/","title":"Java_异常"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java_异常 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%88%86%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">异常分类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Try-catch-finally"><span class="nav-number">1.1.</span> <span class="nav-text">Try catch finally</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Error%E5%92%8CException%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.2.</span> <span class="nav-text">Error和Exception的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84RuntimeException"><span class="nav-number">1.3.</span> <span class="nav-text">常见的RuntimeException</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Throw-%E5%92%8C-Throws%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.4.</span> <span class="nav-text">Throw 和 Throws的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#final%EF%BC%8Cfinally%EF%BC%8Cfinalize%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.5.</span> <span class="nav-text">final，finally，finalize的区别</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/05/19/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_%E5%BC%82%E5%B8%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java_异常 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java_异常
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-05-19 14:40:02" itemprop="dateCreated datePublished" datetime="2018-05-19T14:40:02+08:00">2018-05-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="异常分类"><a href="#异常分类" class="headerlink" title="异常分类"></a>异常分类</h3><p>按照异常需要处理的时机分为<strong>编译时异常（强制性异常）</strong>也叫<strong>CheckedException</strong>和<strong>运行时异常（非强制性异常）</strong>也叫<strong>RuntimeException</strong>。只有Java语言提供了Checked异常，Java认为Checked异常都是可以被处理的异常，所以Java程序必须显式处理异常，否则就会编译报错。这就是Java设计哲学之一，没有妥善处理异常的代码根本没有机会被执行。方法有两种</p>
+<ol>
+<li>当前方法知道如何处理异常，则用<strong>try…catch</strong>语句处理异常。</li>
+<li>当前方法不知道如何处理异常，则<strong>向上抛出</strong>该异常。</li>
+</ol>
+<p>运行时异常，只有在当代码运行时才会发现，如除数是0，数组下标越界等，根据具体情况选择是否处理。</p>
+<span id="more"></span>
+
+<h4 id="Try-catch-finally"><a href="#Try-catch-finally" class="headerlink" title="Try catch finally"></a>Try catch finally</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getNum</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">1</span>/<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span> ;</span><br><span class="line">    &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<pre><code> 当try语句中遇到异常时，向上抛出异常接下来的语句就不会执行。
+
+ 在Catch中如果遇到return或异常使当前函数无法继续执行时。若存在finally，则执行finally中的语句。
+</code></pre>
+<h4 id="Error和Exception的区别"><a href="#Error和Exception的区别" class="headerlink" title="Error和Exception的区别"></a>Error和Exception的区别</h4><p>​	Error类跟Exception类都是继承自<strong>Throwable类</strong>，他们的区别如下:</p>
+<p>​	<strong>Error类</strong>一般是与<strong>JVM虚拟机相关</strong>的问题，如系统崩溃，虚拟机错误，内存空间不足，方法调用栈溢出等。对于这类错误导致的应用程序中断，仅靠程序本身无法恢复和预防，因此遇到这种问题，建议让程序中止。</p>
+<p>​	<strong>Exception类</strong>表示<strong>程序可以处理的异常</strong>，可以捕获且可能恢复。遇到这类异常，应该尽可能处理，是程序运行，而不是随意终止异常。</p>
+<h4 id="常见的RuntimeException"><a href="#常见的RuntimeException" class="headerlink" title="常见的RuntimeException"></a>常见的RuntimeException</h4><ol>
+<li>java.lang.NullPointerException 空指针异常，出现原因：调用了未被初始化的对象或者不存在的对象。</li>
+<li>java.lang.ClassNotFoundException 指定的类找不到，出现原因：无法找到指定的类</li>
+<li>java.lang.NumberFormatException 字符串转换为数字异常，出现原因：字符串中包含非数字字符</li>
+<li>java.lang.IndexOutOfBoundsException 数组下标越界异常</li>
+<li>java.lang.IllegalArgumentException 方法传递参数错误</li>
+<li>java.lang.ClassCastException 数据类型转换异常</li>
+<li>还有很多 不赘述了</li>
+</ol>
+<h4 id="Throw-和-Throws的区别"><a href="#Throw-和-Throws的区别" class="headerlink" title="Throw 和 Throws的区别"></a>Throw 和 Throws的区别</h4><p><strong>throw:</strong></p>
+<ol>
+<li><strong>方法体内</strong>，表示抛出异常，由方法体内的异常处理语句处理</li>
+<li>throw是具体向外抛出异常的动作，所以它抛出的是一个异常实例，执行throw一定是抛出了某种异常。</li>
+</ol>
+<p><strong>throws:</strong></p>
+<ol>
+<li>throws语句用在<strong>方法声明后面</strong>，表示如果抛出异常，由调用该方法的调用者来进行异常的处理。</li>
+<li>throws不一定执行，只是一种抛出异常的可能性。使得调用者知道需要捕获何种异常。</li>
+</ol>
+<h4 id="final，finally，finalize的区别"><a href="#final，finally，finalize的区别" class="headerlink" title="final，finally，finalize的区别"></a>final，finally，finalize的区别</h4><ol>
+<li><strong>final</strong>:声明属性，方法，类为<strong>常量</strong>，分别表示属性不可变，方法不可覆盖，类不可被继承。</li>
+<li><strong>finally</strong>：<strong>异常处理语句</strong>结构的一部分，表示总是执行。</li>
+<li><strong>finalize</strong>：Object类的一个方法，<strong>当GC回收一个Object类时，会调用finalize方法</strong>，可以重写该方法提供GC时回收其他资源或者打Logger等等。例如关闭文件等。该方法只有当GC回收对象时会被被动调用，当我们主动调用时并不代表着该对象会被回收。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/05/16/General/OS/BaseKnowledge/OS_%E6%9C%AC%E5%9C%B0%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1IPC/" rel="prev" title="操作系统-本地进程通信IPC">
+                  <i class="fa fa-angle-left"></i> 操作系统-本地进程通信IPC
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/05/28/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E4%BB%A5%E5%A4%AA%E5%9D%8A%E6%A6%82%E8%BF%B0/" rel="next" title="区块链技术-以太坊概述">
+                  区块链技术-以太坊概述 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="IO综述“对语言设计人员来说，创建好的输入／输出系统是一项特别困难的任务。” ​													――《Think in Java》 输入覆盖的范围太大了，文件，控制台，网络，内存等等不同的种类，而且还要处理不同的读取方式，如：顺序读取、随机读取，二进制读取、字符读取，按行读取、按字符读取……">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java_IO">
+<meta property="og:url" content="https://miszibu.github.io/2018/03/16/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_IO/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="IO综述“对语言设计人员来说，创建好的输入／输出系统是一项特别困难的任务。” ​													――《Think in Java》 输入覆盖的范围太大了，文件，控制台，网络，内存等等不同的种类，而且还要处理不同的读取方式，如：顺序读取、随机读取，二进制读取、字符读取，按行读取、按字符读取……">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/Java_IO/JAVAIO1.jpg">
+<meta property="og:image" content="https://miszibu.github.io/Java_IO/JAVAIO2.jpg">
+<meta property="article:published_time" content="2018-03-16T15:37:35.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.022Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/Java_IO/JAVAIO1.jpg">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/03/16/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_IO/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/03/16/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_IO/","path":"2018/03/16/Code_Language/Java/Java应用基础/Java_IO/","title":"Java_IO"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java_IO | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IO%E7%BB%BC%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">IO综述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Java%E6%B5%81%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.0.1.</span> <span class="nav-text">Java流的类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%B5%81%E5%A6%82%E4%BD%95%E8%BD%AC%E4%B8%BA%E5%AD%97%E7%AC%A6%E6%B5%81"><span class="nav-number">1.0.2.</span> <span class="nav-text">字节流如何转为字符流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%B5%81%E5%92%8C%E5%AD%97%E7%AC%A6%E6%B5%81%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.0.3.</span> <span class="nav-text">字节流和字符流的区别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%BC%95%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">相关引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/16/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_IO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java_IO | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java_IO
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-03-16 23:37:35" itemprop="dateCreated datePublished" datetime="2018-03-16T23:37:35+08:00">2018-03-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="IO综述"><a href="#IO综述" class="headerlink" title="IO综述"></a>IO综述</h2><p><strong>“对语言设计人员来说，创建好的输入／输出系统是一项特别困难的任务。”</strong></p>
+<p>​													――《Think in Java》</p>
+<p>输入覆盖的范围太大了，文件，控制台，网络，内存等等不同的种类，而且还要处理不同的读取方式，如：顺序读取、随机读取，二进制读取、字符读取，按行读取、按字符读取……</p>
+<span id="more"></span>
+
+<p>​       <strong>Linux是第一个将设备抽象为文件的操作系统</strong>，在Linux中所有的外部设备都可以用读取文件的方法读取，这样编程人员就可以以操作文件的方法操作任何设备。	    </p>
+<p>​       C++则引进了流的概念，我们可以通过cin、cout读写一些对象。</p>
+<p>​	Java语言在IO设计方面取得较大的成功，它是完全面向对象的，主要采用装饰器模式避免大量的类，包括了最大的可能性，提供了较好的扩展机制。</p>
+<p>​       “Java库的设计者通过创建大量类来攻克这个难题。事实上，Java的IO系统采用了如此多的类，以致刚开始会产生不知从何处入手的感觉（具有讽刺意味的是，Java的IO设计初衷实际要求避免过多的类）。”Java的IO比较复杂，但如何从Java设计者的角度理解了装饰器模式（Decorator）的用意、场景及其在Java的IO包中的使用，你可能会真正领会整个IO的FrameWork。</p>
+<p>​	HH 上面的一番话，反倒颇具喜感，人生又何不如此呢。往往我们处心积虑想要解决的一个问题，本以为轻轻松松完成，结果写出的代码确实一塌糊涂。这怕是全天下人的烦恼了。</p>
+<h4 id="Java流的类型"><a href="#Java流的类型" class="headerlink" title="Java流的类型"></a>Java流的类型</h4><p>流的方向：<strong>输入流</strong>（inputStream）,<strong>输出流</strong>（OutputStream）</p>
+<p>流的功能：<strong>节点流</strong>（可以从或向一个特定的地方读写数据：FileReader）**,处理流**（是对一个已存在的流的连接和封装，通过所封装的流的功能调用实现数据读写。如BufferReader。处理流的构造方法总是要带一个其他的流对象做参数。）</p>
+<p>处理的数据：<strong>字节流和字符流</strong>。字节流继承于InputStream和OutputStream。字符流继承于InputStreamReader和OutputStreamWriter。</p>
+<p><img src="/Java_IO/JAVAIO1.jpg"></p>
+<p><img src="/Java_IO/JAVAIO2.jpg"></p>
+<h4 id="字节流如何转为字符流"><a href="#字节流如何转为字符流" class="headerlink" title="字节流如何转为字符流"></a>字节流如何转为字符流</h4><p>字节输入流转字符输入流通过<strong>InputStreamReader</strong>实现，该类的构造函数可以传如<strong>InputStream</strong>对象。</p>
+<p>字节输出流转字符输出流通过<strong>OutputStreamWriter</strong>实现，该类的构造函数可以传入<strong>OutputStream</strong>对象</p>
+<h4 id="字节流和字符流的区别"><a href="#字节流和字符流的区别" class="headerlink" title="字节流和字符流的区别"></a>字节流和字符流的区别</h4><p><strong>字节流</strong>读取的时候，读到<strong>一个字节</strong>就返回一个字节；</p>
+<p><strong>字符流</strong>使用了<strong>字节流</strong>读到一个或多个字节（中文对应的字节数是两个，在UTF-8码表中是3个字节）时。先去查指定的编码表，将查到的字符返回。</p>
+<p>字节流可以处理所有类型数据，如：图片，MP3，AVI视频文件，而字符流只能处理字符数据。只要是处理纯文本数据，就要优先考虑使用字符流，除此之外都用字节流。字节流主要是操作byte类型数据，以byte数组为准，主要操作类就是OutputStream、InputStream字符流处理的单元为2个字节的Unicode字符，分别操作字符、字符数组或字符串，而字节流处理单元为1个字节，操作字节和字节数组。所以字符流是由Java虚拟机将字节转化为2个字节的Unicode字符为单位的字符而成的，所以它对多国语言支持性比较好！如果是音频文件、图片、歌曲，就用字节流好点，如果是关系到中文（文本）的，用字符流好点。在程序中一个字符等于两个字节，java提供了Reader、Writer两个专门操作字符流的类</p>
+<h2 id="相关引用"><a href="#相关引用" class="headerlink" title="相关引用"></a>相关引用</h2><p>&lt;<Thinking In Java>&gt;</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/baobeisimple/article/details/1713797">https://blog.csdn.net/baobeisimple/article/details/1713797</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/08/20/Components/Mysql/Mysql-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="prev" title="Mysql-常用命令">
+                  <i class="fa fa-angle-left"></i> Mysql-常用命令
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/03/18/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java_%E7%BA%BF%E7%A8%8B%E6%B1%A0/" rel="next" title="Java_线程池">
+                  Java_线程池 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

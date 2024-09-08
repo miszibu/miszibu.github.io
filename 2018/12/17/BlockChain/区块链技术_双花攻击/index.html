@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="51%攻击或是双花攻击是指一部分矿工当他们掌握了51%的算力（PoW），通过修改区块链来重构花销，使得已经被确认的交易重新被放弃，从而实现双花甚至多花。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区块链技术_双花攻击">
+<meta property="og:url" content="https://miszibu.github.io/2018/12/17/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="51%攻击或是双花攻击是指一部分矿工当他们掌握了51%的算力（PoW），通过修改区块链来重构花销，使得已经被确认的交易重新被放弃，从而实现双花甚至多花。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_WPK5t9zuCyMob5FgPkoHUw.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_VIMfRRhgaSp9yM-GUZUyew.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_arn5LoSL2gHyerJo4btuow.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_wsfcuDbXnSeVJHCA611oyg.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_5abTUgF0OYIi6hqmfWgaLg.png">
+<meta property="article:published_time" content="2018-12-17T07:07:16.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.003Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="区块链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_WPK5t9zuCyMob5FgPkoHUw.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/12/17/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/12/17/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/","path":"2018/12/17/BlockChain/区块链技术_双花攻击/","title":"区块链技术_双花攻击"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>区块链技术_双花攻击 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.</span> <span class="nav-text">双花攻击示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%B8%B8%E4%BA%A4%E6%98%93%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">正常交易流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E5%BD%A2%E6%8C%96%E7%9F%BF-%E5%88%9B%E9%80%A0%E6%94%AF%E9%93%BE"><span class="nav-number">3.</span> <span class="nav-text">隐形挖矿 - 创造支链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%9E%E8%B5%9B-%E9%80%9A%E8%BF%87%E5%B9%BF%E6%92%AD%E6%96%B0%E9%93%BE%E6%9D%A5%E6%89%AD%E8%BD%AC%E7%8E%B0%E6%9C%89%E4%BA%A4%E6%98%93"><span class="nav-number">4.</span> <span class="nav-text">竞赛 - 通过广播新链来扭转现有交易</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E7%89%B9%E5%B8%81%E5%A6%82%E4%BD%95%E9%98%B2%E8%8C%83"><span class="nav-number">5.</span> <span class="nav-text">比特币如何防范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/12/17/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="区块链技术_双花攻击 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          区块链技术_双花攻击
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-17 15:07:16" itemprop="dateCreated datePublished" datetime="2018-12-17T15:07:16+08:00">2018-12-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>51%攻击或是双花攻击是指一部分矿工当他们掌握了51%的算力（PoW），通过修改区块链来重构花销，使得已经被确认的交易重新被放弃，从而实现双花甚至多花。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="双花攻击示例"><a href="#双花攻击示例" class="headerlink" title="双花攻击示例"></a>双花攻击示例</h2><ol>
+<li><strong>Race attack</strong> : 一个人同时向网络中发送两笔交易，一笔交易发给自己（为了提高攻击成功率，他给这笔交易增加足够的小费），一笔交易发给商家。由于发送给自己的交易中含有较高的小费，会被矿工打包成区块的概率比较高。</li>
+<li><strong>Finney attack</strong>:一个人挖到了一个区块（这个区块中包含一个交易 ：A向B转10BTC，其中A和B都是自己的地址），他先不广播这个区块，先找一个愿意接受未确认交易的商家向他购买一个物品，向商家发一笔交易：A向C转10BTC，付款后向网络中广播刚刚挖到的区块，由于区块中包含一个向自己付款的交易，所以他实现了一次双花</li>
+<li><strong>51% attack</strong>:攻击者占有超过全网50%的算力，所以他可以创造一条高度大于原来链的新链。那么旧链中的交易会被回滚。攻击者可以发送一笔新的交易到新链上。<ul>
+<li>在主链消费加密货币</li>
+<li>创造支链，不包含自己花费的交易记录。且不广播支链区块。</li>
+<li>加长支链，直至支链长于主链</li>
+<li>广播支链，利用<code>最长链共识</code>，使得支链替代主链</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>Tips: 1,2中的攻击，只要验证一个区块就可以轻松规避。</p>
+</blockquote>
+<hr>
+<h2 id="正常交易流程"><a href="#正常交易流程" class="headerlink" title="正常交易流程"></a>正常交易流程</h2><p>当比特币所有者在交易中签字时，它会被放入<code>Unconfirm Transaction Pool</code>中。出块节点从中选择交易（选择最多小费的交易来达到区块最大值）以形成交易块。出块节点通过计算Hash值来获取出块权利。出块节点广播打包节点，当其他节点接收新区块时，验证新区块的Hash值和TX是否都在未确认交易池中。交易必须有所有者私钥签名方可被确认。</p>
+<hr>
+<h2 id="隐形挖矿-创造支链"><a href="#隐形挖矿-创造支链" class="headerlink" title="隐形挖矿 - 创造支链"></a>隐形挖矿 - 创造支链</h2><p>当一个矿工挖到一个区块后，</p>
+<ul>
+<li><strong>正常逻辑</strong>：广播该区块给所有其他矿工，其他矿工验证区块，若成功，则继续挖下一个区块。</li>
+<li><strong>恶意矿工</strong>：挖出区块后，不广播该区块，而是继续挖下一个区块。这样就出现了一条支链。</li>
+</ul>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_WPK5t9zuCyMob5FgPkoHUw.png"></p>
+<p>现在，其他的矿工们都工作在主链上，这条支链只有这个恶意矿工在挖矿。</p>
+<p>攻击者现在在主链上花费自己的所有BTC。那么在默认7个区块后，他的交易就被确认可信，完成交易。他不在支链中花费自己的BTC。</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_VIMfRRhgaSp9yM-GUZUyew.png"></p>
+<p>与此同时，攻击者不断的挖矿，打包交易，出块。支链上的交易都是真实的交易，并没有问题，只是少了它花费BTC的交易。由于区块链遵循<code>最长链共识</code>，这是一场算力竞赛，拥有更大算力的人能够构建更长的区块链。</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_arn5LoSL2gHyerJo4btuow.png"></p>
+<h2 id="竞赛-通过广播新链来扭转现有交易"><a href="#竞赛-通过广播新链来扭转现有交易" class="headerlink" title="竞赛 - 通过广播新链来扭转现有交易"></a>竞赛 - 通过广播新链来扭转现有交易</h2><p>当这个支链的长度长于主链时，攻击者广播该支链。网络中的其他矿工，收到了这条支链，且发现该链长度更长。根据<code>最长链共识</code>，其余矿工将在长链上进行挖矿，</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_wsfcuDbXnSeVJHCA611oyg.png"></p>
+<p>支链成为了主链，因此此链中未包含的所有交易将立即被撤销。 攻击者重新获取到了本来已经花费的BTC，这时候上次花费的btc对应商品或服务也已获得，一次双花攻击就此实现。</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8F%8C%E8%8A%B1%E6%94%BB%E5%87%BB/1_5abTUgF0OYIi6hqmfWgaLg.png"></p>
+<p>双花攻击。 通常被称为51％攻击，因为恶意矿工需要拥有高于网络其他矿工的散列计算能力（51%的全网算力），从而更快的打包出块，最终允许创建一条更长的支链，从而利用<code>最长链共识</code>，强行替换主链。</p>
+<hr>
+<h2 id="比特币如何防范"><a href="#比特币如何防范" class="headerlink" title="比特币如何防范"></a>比特币如何防范</h2><p>实际上，这些攻击非常<strong>难以执行</strong>。</p>
+<p>为实现目标 ，矿工需要拥有高于全网其他矿工算力总和的算力。考虑到比特币区块链上甚至可能有成千上万的矿工，全网矿工算力总和是非常大的，几乎没有可能来组合出这么大的算力。而且即便有如此能力后，双花攻击的所获取的利益也无法Cover矿机，电费等成本的巨额开销。更何况，当一个组织获取了如此大的算力后，它也不会毁坏BTC的信誉，这是没有利益的。</p>
+<p>但是在其他算力小的区块链中，双花攻击是普遍存在的。</p>
+<hr>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p><a target="_blank" rel="noopener" href="https://medium.com/coinmonks/what-is-a-51-attack-or-double-spend-attack-aa108db63474">Blockchain: how a 51% attack works (double spend attack)</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/" rel="tag"># 区块链</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/12/13/Components/Container/Dockerfile%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3/" rel="prev" title="Dockerfile命令详解">
+                  <i class="fa fa-angle-left"></i> Dockerfile命令详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/12/17/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B/" rel="next" title="区块链技术_完整流程">
+                  区块链技术_完整流程 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

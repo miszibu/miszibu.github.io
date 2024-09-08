@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="为什么需要分布式 ID以 Mysql 举例，当数据量逐步上升，读写分离和主从同步也遇到性能瓶颈时，我们就需要对数据库进行分库分表，但是分库分表原来的自增表主键就不能使用了，否则就会遇到主键冲突的情况。 当然在微服务的场景下，系统以模块被划分为更细的粒度，因此有一个全局生成分布式 UUID的系统是非常有必要的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式唯一ID">
+<meta property="og:url" content="https://miszibu.github.io/2020/07/15/Components/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="为什么需要分布式 ID以 Mysql 举例，当数据量逐步上升，读写分离和主从同步也遇到性能瓶颈时，我们就需要对数据库进行分库分表，但是分库分表原来的自增表主键就不能使用了，否则就会遇到主键冲突的情况。 当然在微服务的场景下，系统以模块被划分为更细的粒度，因此有一个全局生成分布式 UUID的系统是非常有必要的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/DB_CLSUTER.jpg">
+<meta property="og:image" content="https://miszibu.github.io/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/snowflake.jpg">
+<meta property="article:published_time" content="2020-07-15T15:05:42.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.058Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/DB_CLSUTER.jpg">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/07/15/Components/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/07/15/Components/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/","path":"2020/07/15/Components/分布式/分布式唯一ID/","title":"分布式唯一ID"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式唯一ID | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%88%86%E5%B8%83%E5%BC%8F-ID"><span class="nav-number">1.</span> <span class="nav-text">为什么需要分布式 ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F-ID-%E9%9C%80%E8%A6%81%E6%BB%A1%E8%B6%B3%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">分布式 ID 需要满足的条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-java-util-uuid-%E7%94%9F%E6%88%90"><span class="nav-number">3.</span> <span class="nav-text">基于 java.util.uuid 生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E8%87%AA%E5%A2%9E-ID"><span class="nav-number">4.</span> <span class="nav-text">基于数据库自增 ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">基于数据库集群模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%8F%B7%E6%AE%B5%E6%A8%A1%E5%BC%8F"><span class="nav-number">6.</span> <span class="nav-text">基于数据库的号段模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-Redis-%E6%A8%A1%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">基于 Redis 模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%EF%BC%88Snowflake%EF%BC%89"><span class="nav-number">8.</span> <span class="nav-text">基于雪花算法（Snowflake）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/15/Components/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式唯一ID | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式唯一ID
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-15 23:05:42" itemprop="dateCreated datePublished" datetime="2020-07-15T23:05:42+08:00">2020-07-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="为什么需要分布式-ID"><a href="#为什么需要分布式-ID" class="headerlink" title="为什么需要分布式 ID"></a>为什么需要分布式 ID</h2><p>以 Mysql 举例，当数据量逐步上升，读写分离和主从同步也遇到性能瓶颈时，我们就需要对数据库进行分库分表，但是分库分表原来的自增表主键就不能使用了，否则就会遇到主键冲突的情况。</p>
+<p>当然在微服务的场景下，系统以模块被划分为更细的粒度，因此有一个全局生成分布式 UUID的系统是非常有必要的。</p>
+<span id="more"></span>
+
+<h2 id="分布式-ID-需要满足的条件"><a href="#分布式-ID-需要满足的条件" class="headerlink" title="分布式 ID 需要满足的条件"></a>分布式 ID 需要满足的条件</h2><ul>
+<li>全局唯一</li>
+<li>高性能：若性能较差，会影响到所有系统</li>
+<li>高可用：尽可能达到100%可用性</li>
+<li>好接入：</li>
+</ul>
+<h2 id="基于-java-util-uuid-生成"><a href="#基于-java-util-uuid-生成" class="headerlink" title="基于 java.util.uuid 生成"></a>基于 java.util.uuid 生成</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; </span><br><span class="line">       <span class="type">String</span> <span class="variable">uuid</span> <span class="operator">=</span> UUID.randomUUID().toString().replaceAll(<span class="string">&quot;-&quot;</span>,<span class="string">&quot;&quot;</span>);</span><br><span class="line">       System.out.println(uuid);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>java 默认提供 UUID 类，用以生成全球唯一的 UUID 键，但是<strong>并不推荐！</strong></p>
+<p>比如说<code>c2b8c2b9e46c47e3b30dca3b0d447718</code>就是其生成的 UUID，是由16进制表示的128位二进制数据。</p>
+<p>首先，这样生成的 UUID不具备可读性，没有携带时间等有意义的信息；同时，在 Mysql 场景中（默认 InnoDB）我们希望<strong>主键尽量短且自增</strong>，这是由 InnoDB聚簇索引的特性决定，较短的主键，B+树每个节点可以存储更多的主键，从而降低树的高度，而且主键不自增，会导致数据位置变动频繁，严重影响性能。</p>
+<h2 id="基于数据库自增-ID"><a href="#基于数据库自增-ID" class="headerlink" title="基于数据库自增 ID"></a>基于数据库自增 ID</h2><p>基于数据库的<code>auto_increment</code>自增ID完全可以充当<code>分布式ID</code>，具体实现：需要一个单独的MySQL实例用来生成ID，建表结构如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE `SEQ_ID`;</span><br><span class="line">CREATE TABLE SEQID.SEQUENCE_ID (</span><br><span class="line">    id <span class="title function_">bigint</span><span class="params">(<span class="number">20</span>)</span> unsigned NOT NULL auto_increment, </span><br><span class="line">    value <span class="title function_">char</span><span class="params">(<span class="number">10</span>)</span> NOT NULL <span class="keyword">default</span> <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    PRIMARY <span class="title function_">KEY</span> <span class="params">(id)</span>,</span><br><span class="line">) ENGINE=MyISAM;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">insert into <span class="title function_">SEQUENCE_ID</span><span class="params">(value)</span>  VALUES (<span class="string">&#x27;values&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>当我们需要获取一个 UUID 时，就插入一条记录返回<strong>主键 ID</strong>, 但是这种方式非常依赖于 Mysql 的性能，而 Mysql 的性能本身就相当有限，在访问量较大时，就会成为系统的瓶颈。</p>
+<p><strong>优点：</strong> 实现简单，UUID 自增，ID 为数字</p>
+<p><strong>缺点：</strong> DB存在宕机风险，性能有限，无法抗住高并发的场景</p>
+<h2 id="基于数据库集群模式"><a href="#基于数据库集群模式" class="headerlink" title="基于数据库集群模式"></a>基于数据库集群模式</h2><p><img src="/./%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/DB_CLSUTER.jpg"></p>
+<p>基于数据库生成UUID的方式，可用性差。我们可以做一些高可用的优化，来提高Mysql的可用性，比如<strong>主从模式集群</strong>。使用<strong>双主模式集群</strong>，也就是两个Mysql实例都能单独的生产自增ID.</p>
+<p>为了避免多个Mysql实例来生成UUID所出现ID重复的问题，我们可以为每个Mysql表，设置其<strong>自增的步长</strong>。</p>
+<p>解决方案： 设置<code>起始值</code>和<code>自增步长</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MySQL_1 配置：</span><br><span class="line"></span><br><span class="line">set @@auto_increment_offset = 1;     -- 起始值</span><br><span class="line">set @@auto_increment_increment = 2;  -- 步长</span><br><span class="line"></span><br><span class="line">MySQL_2 配置：</span><br><span class="line"></span><br><span class="line">set @@auto_increment_offset = 2;     -- 起始值</span><br><span class="line">set @@auto_increment_increment = 2;  -- 步长</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="基于数据库的号段模式"><a href="#基于数据库的号段模式" class="headerlink" title="基于数据库的号段模式"></a>基于数据库的号段模式</h2><p>号段模式是当下分布式ID生成器的主流实现方式之一，号段模式可以理解为<strong>从数据库批量的获取自增ID</strong>，每次从数据库取出一个号段范围，例如 [1,1000] 代表1000个ID，具体的业务服务将本号段，生成1~1000的自增ID并加载到内存。</p>
+<p>表结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE id_generator (</span><br><span class="line">  id int(10) NOT NULL,</span><br><span class="line">  max_id bigint(20) NOT NULL COMMENT &#x27;当前最大id&#x27;,</span><br><span class="line">  step int(20) NOT NULL COMMENT &#x27;号段的步长&#x27;,</span><br><span class="line">  biz_type	int(20) NOT NULL COMMENT &#x27;业务类型&#x27;,</span><br><span class="line">  version int(20) NOT NULL COMMENT &#x27;版本号&#x27;,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>biz_type ：代表不同业务类型</li>
+<li>max_id ：当前最大的可用id</li>
+<li><strong>step ：代表号段的长度</strong></li>
+<li>version ：是一个乐观锁，每次都更新version，保证并发时数据的正确性</li>
+</ul>
+<p>![](.&#x2F;分布式唯一ID&#x2F; db_range.png)</p>
+<p>当号段的ID用完，再次向数据库申请新号段，对<code>max_id</code>字段做一次<code>update</code>操作， 将max_id的值设置为max_id+step, 使用乐观锁控制更新，更新成功则获取新的号段中的所有ID.</p>
+<blockquote>
+<p>update id_generator set <strong>max_id &#x3D; #{max_id+step},</strong> version &#x3D; version + 1 where version &#x3D; # {version} and biz_type &#x3D; XXX</p>
+</blockquote>
+<p>由于多业务端同时进行操作，所以我们需要对数据进行并发处理，这里我们采用乐观锁控制，因为号段模式决定了，是批量获取的，不会同时有大量请求。乐观锁模式更为高效。</p>
+<p>优点： 批量获取ID，减少了对数据库的依赖，减少了对数据库的访问压力。</p>
+<h2 id="基于-Redis-模式"><a href="#基于-Redis-模式" class="headerlink" title="基于 Redis 模式"></a>基于 Redis 模式</h2><p><code>Redis</code>可以使用<code>incr</code>命令实现ID的原子性自增。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set seq_id 1     // 初始化自增ID为1</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; incr seq_id      // 增加1，并返回递增后的数值</span><br><span class="line">(integer) 2</span><br></pre></td></tr></table></figure>
+
+<p>使用Redis来实现，需要注意Redis持久化的问题，</p>
+<ul>
+<li>RDB: 会导致数据丢失，从而引起重复ID的问题</li>
+<li>AOF: 取决于fsync的策略，而且要最好优化Rewrite操作的触发条件，incr命令很多，rewrite可以直接全部合并成一条，很好的优化，否则Data Recovery 会很慢。</li>
+</ul>
+<h2 id="基于雪花算法（Snowflake）"><a href="#基于雪花算法（Snowflake）" class="headerlink" title="基于雪花算法（Snowflake）"></a>基于雪花算法（Snowflake）</h2><p><img src="/./%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID/snowflake.jpg"></p>
+<p><code>Snowflake</code>生成Long类型的ID， 一个Long类型的ID为8个字节，64个bit. 我们将其以一定的规律进行划分</p>
+<blockquote>
+<p>Snowflake Id: 正数位（占1比特）+ 时间戳（占41比特）+ 机器ID（占5比特）+ 数据中心（占5比特）+ 自增值（占12比特），总共64比特组成的一个Long类型。</p>
+</blockquote>
+<ul>
+<li><p>第一个bit位（1bit）：Java中long的最高位是符号位代表正负，正数是0，负数是1，一般生成ID都为正数，所以默认为0。</p>
+</li>
+<li><p>时间戳部分（41bit）：毫秒级的时间，不建议存当前时间戳，而是用（当前时间戳 - 固定开始时间戳）的差值，可以使产生的ID从更小的值开始；41位的时间戳可以使用69年，(1L &lt;&lt; 41) &#x2F; (1000L * 60 * 60 * 24 * 365) &#x3D; 69年</p>
+</li>
+<li><p>工作机器id（10bit）：也被叫做workId，这个可以灵活配置，机房或者机器号组合都可以。</p>
+</li>
+<li><p>序列号部分（12bit），自增值支持同一毫秒内同一个节点可以生成4096个ID</p>
+</li>
+</ul>
+<p>根据这个规则，写一个工具类，来获取ID即可。 每个业务应用都可以有自己的工作ID， 不需要使用分布式ID的应用。<br>缺点是： 生成的ID也不是自增的，同样会产生InnoDB插入数据，频繁抖动的问题。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/107939861">一口气说出9种分布式ID生成方式，面试官有点懵了</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/15/Code_Language/Java/Java%E9%9B%86%E5%90%88%E7%B1%BB/Java-PriorityQueue/" rel="prev" title="Java-PriorityQueue">
+                  <i class="fa fa-angle-left"></i> Java-PriorityQueue
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/16/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-HappenBefore/" rel="next" title="Java-HappenBefore">
+                  Java-HappenBefore <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

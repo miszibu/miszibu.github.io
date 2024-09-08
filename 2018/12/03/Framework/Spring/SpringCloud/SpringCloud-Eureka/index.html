@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Eureka, SpringCloud组件成员之一，负责服务注册与发现，支持服务动态扩容，缩容，失效剔除等体型。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringCloud_Eureka">
+<meta property="og:url" content="https://miszibu.github.io/2018/12/03/Framework/Spring/SpringCloud/SpringCloud-Eureka/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Eureka, SpringCloud组件成员之一，负责服务注册与发现，支持服务动态扩容，缩容，失效剔除等体型。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/SpringCloud-Eureka.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/7ecbi5uebx.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/800fcstug3.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/r77lpo57d5.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/3ytte8eedm.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/yg2dq6qkji.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/ehvtgsl7ea.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/vtzdnzzign.jpeg">
+<meta property="og:image" content="https://miszibu.github.io/SpringCloud-Eureka/9vrt8q1p8q.jpeg">
+<meta property="article:published_time" content="2018-12-03T03:54:39.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.062Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="SpringCloud">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/SpringCloud-Eureka/SpringCloud-Eureka.jpeg">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/12/03/Framework/Spring/SpringCloud/SpringCloud-Eureka/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/12/03/Framework/Spring/SpringCloud/SpringCloud-Eureka/","path":"2018/12/03/Framework/Spring/SpringCloud/SpringCloud-Eureka/","title":"SpringCloud_Eureka"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SpringCloud_Eureka | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8%E7%AF%87"><span class="nav-number">1.</span> <span class="nav-text">1. 使用篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%9F%E7%90%86%E7%AF%87"><span class="nav-number">2.</span> <span class="nav-text">2. 原理篇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-OverView"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 OverView</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Register"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Register</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Renew"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 Renew</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Cancel"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 Cancel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-Fetch-Registeries"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 Fetch Registeries</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-Eviction"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 Eviction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-EurekaServer%E8%8A%82%E7%82%B9%E9%80%9A%E4%BF%A1"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 EurekaServer节点通信</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-8-Eureka%E8%8A%82%E7%82%B9%E5%90%AF%E5%8A%A8%E6%B3%A8%E5%86%8C"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 Eureka节点启动注册</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-9-EurekaServer%E8%8A%82%E7%82%B9%E5%8F%91%E7%8E%B0-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">2.9.</span> <span class="nav-text">2.9 EurekaServer节点发现&#x2F;初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">3. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/12/03/Framework/Spring/SpringCloud/SpringCloud-Eureka/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SpringCloud_Eureka | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringCloud_Eureka
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-03 11:54:39" itemprop="dateCreated datePublished" datetime="2018-12-03T11:54:39+08:00">2018-12-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>Eureka, SpringCloud组件成员之一，负责服务注册与发现，支持服务动态扩容，缩容，失效剔除等体型。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="1-使用篇"><a href="#1-使用篇" class="headerlink" title="1. 使用篇"></a>1. 使用篇</h2><ul>
+<li><p>1.<strong>Eureka server</strong></p>
+<ul>
+<li>1.1 创建运行Eureka服务器<ul>
+<li>引用org.springframework.cloud的spring-cloud-starter-eureka-server</li>
+<li>@EnableEurekaServer 注解运行Eureka服务器</li>
+<li>查看Eureka 运行状态 访问端口即可</li>
+</ul>
+</li>
+<li>1.2 高可用性，区块和区域<ul>
+<li>Eureka服务器没有后台存储，注册表中的所有服务实例都需要发送心跳消息来更新注册信息。</li>
+<li>客户端也会有维持一个Eureka注册信息的缓存（通过心跳消息 注册 更新）</li>
+<li>多个Eureka服务器相互注册，实现高可用</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ol start="2">
+<li><strong>Eureka Client</strong></li>
+</ol>
+<ul>
+<li>2.1 创建运行Eureka客户机<ul>
+<li>引入org.springframework.cloud的spring-cloud-starter-eureka</li>
+<li>@EnableEurekaClient 注解运行Eureka客户端</li>
+<li>当在配置时间段没收到心跳信息，服务实例会被从注册表中移除(默认心跳 消息间隔为30S，清除无效实例间隔为90S)</li>
+<li>相关参数：EurekaInstanceConfigBean，EurekaClientConfigBean</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-原理篇"><a href="#2-原理篇" class="headerlink" title="2. 原理篇"></a>2. 原理篇</h2><h3 id="2-1-OverView"><a href="#2-1-OverView" class="headerlink" title="2.1 OverView"></a>2.1 OverView</h3><p><img src="/SpringCloud-Eureka/SpringCloud-Eureka.jpeg"></p>
+<p>在一整个Eureka架构中，主要分为三个角色</p>
+<ol>
+<li><strong>Eureka Server</strong>: 提供服务注册和发现</li>
+<li><strong>Service Provider</strong>: 服务提供方，将自身服务注册到Eureka，从而使服务消费方能够找到</li>
+<li><strong>Service Comsumer</strong>: 服务消费方，从Eureka获取注册服务列表，从而能够消费服务。</li>
+</ol>
+<blockquote>
+<p> Tips:Provider 和 Comsumer 是个相对的概念，一个EurekaClient即可以是提供方也可以是消费方。</p>
+<p>​	 甚至于说EureakServer 同样可以是EurekaClient。</p>
+</blockquote>
+<p><img src="/SpringCloud-Eureka/7ecbi5uebx.jpeg"></p>
+<p>上图是更为完整的架构，展示了三个角色之间的关系。</p>
+<p><strong>Service Provider和EurekaServer的交互</strong>：</p>
+<ul>
+<li>Register 服务注册:注册到Eureka Server</li>
+<li>Renew   服务续约: HeartBeat 心跳事件，默认30s, 可在yml文件中动态设置参数配置。</li>
+<li>Cancel   服务下线：默认90S未续约，则默认下线服务</li>
+</ul>
+<h3 id="2-2-Register"><a href="#2-2-Register" class="headerlink" title="2.2 Register"></a>2.2 Register</h3><p><img src="/SpringCloud-Eureka/800fcstug3.jpeg"></p>
+<ol>
+<li><code>ApplicationResource</code>类addInstance方法接收Http服务请求，进行参数校验和对AmazonIInfo(亚马逊云服务器)进行特殊校验</li>
+<li>调用<code>PeerAwareInstanceRegistryImpl</code>的<code>register</code>方法，往注册表中添加数据</li>
+<li><code>PeerAwareInstanceRegistryImpl</code>完成服务注册后，调用<code>replicateToPeers</code>向其它Eureka Server节点（Peer）做状态同步（异步操作）</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注册表数据 存储InstanceInfo </span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, Map&lt;String, Lease&lt;InstanceInfo&gt;&gt;&gt; registry</span><br><span class="line">            = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;String, Map&lt;String, Lease&lt;InstanceInfo&gt;&gt;&gt;();</span><br><span class="line"><span class="comment">// 双层嵌套的HashMap </span></span><br><span class="line"><span class="comment">// 第一层存储key 为AppName 应用名称(同一微服务节点 可能会有多个实例)</span></span><br><span class="line"><span class="comment">// 第二层存储Key 为InstanceName 实例名称</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-Renew"><a href="#2-3-Renew" class="headerlink" title="2.3 Renew"></a>2.3 Renew</h3><p><img src="/SpringCloud-Eureka/r77lpo57d5.jpeg"></p>
+<p>实现基本等同于 Register，先更新本地数据，更新成功，广播给所有节点。</p>
+<h3 id="2-4-Cancel"><a href="#2-4-Cancel" class="headerlink" title="2.4 Cancel"></a>2.4 Cancel</h3><p><img src="/SpringCloud-Eureka/3ytte8eedm.jpeg"></p>
+<p>当Service Provider shut down时调用Cancel(服务下线)。</p>
+<h3 id="2-5-Fetch-Registeries"><a href="#2-5-Fetch-Registeries" class="headerlink" title="2.5 Fetch Registeries"></a>2.5 Fetch Registeries</h3><p><img src="/SpringCloud-Eureka/yg2dq6qkji.jpeg"></p>
+<p>Service Comsumer调用Fetch Registeries接口，传入对应Key，获取对应服务提供商或者返回所有实例节点。</p>
+<p>为了提高性能，服务列表在EurekaServer维持一份缓存，每30S更新。</p>
+<h3 id="2-6-Eviction"><a href="#2-6-Eviction" class="headerlink" title="2.6 Eviction"></a>2.6 Eviction</h3><p><img src="/SpringCloud-Eureka/ehvtgsl7ea.jpeg"></p>
+<p>Eviction（失效服务剔除）用来定期（默认为每60秒）在Eureka Server检测失效的服务，检测标准就是超过一定时间没有Renew的服务。</p>
+<p>默认失效时间为90秒，也就是如果有服务超过90秒没有向Eureka Server发起Renew请求的话，就会被当做失效服务剔除掉。</p>
+<p>失效时间可以通过<code>eureka.instance.leaseExpirationDurationInSeconds</code>进行配置，定期扫描时间可以通过<code>eureka.server.evictionIntervalTimerInMs</code>进行配置。</p>
+<h3 id="2-7-EurekaServer节点通信"><a href="#2-7-EurekaServer节点通信" class="headerlink" title="2.7 EurekaServer节点通信"></a>2.7 EurekaServer节点通信</h3><p>在前面接口实现中，都复用了replicateToPeers函数，来做Peers之间的状态同步。</p>
+<p>通过这个方式，每个EurekaServer在所维护的节点状态更新时，都会向所有节点广播，从而实现一致性。</p>
+<p>该函数传入一个isReplication参数，初次调用时为False,后续调用时为True。</p>
+<p>由于Peers之间的通信是异步的，因此不保证节点间的状态是一致的，只能保证最终一致性。</p>
+<blockquote>
+<p>CAP理论：一致性（Consistency),  可用性(Availability), 分区容错性(Partition tolerance), Eureka舍弃了一致性来满足AP。</p>
+</blockquote>
+<h3 id="2-8-Eureka节点启动注册"><a href="#2-8-Eureka节点启动注册" class="headerlink" title="2.8 Eureka节点启动注册"></a>2.8 Eureka节点启动注册</h3><p><img src="/SpringCloud-Eureka/vtzdnzzign.jpeg"></p>
+<p>Eureka Server在启动后会调用<code>PeerEurekaNodes.getEurekaServerServiceUrls</code>来获取所有的Peer节点，并且会定期更新。定期更新频率可以通过<code>eureka.server.peerEurekaNodesUpdateIntervalMs</code>配置。</p>
+<p>这个方法的默认实现是从配置文件读取，所以如果Eureka Server节点相对固定的话，可以通过在配置文件中配置来实现。</p>
+<p>如果希望能更灵活的控制Eureka Server节点，比如动态扩容&#x2F;缩容，那么可以override <code>getEurekaServerServiceUrls</code>方法，提供自己的实现，比如通过数据库读取Eureka Server列表。</p>
+<h3 id="2-9-EurekaServer节点发现-初始化"><a href="#2-9-EurekaServer节点发现-初始化" class="headerlink" title="2.9 EurekaServer节点发现&#x2F;初始化"></a>2.9 EurekaServer节点发现&#x2F;初始化</h3><p><img src="/SpringCloud-Eureka/9vrt8q1p8q.jpeg"></p>
+<p>当一个EurekaServer初始化后或重启，本地注册服务为空。</p>
+<p>首先调用syncUp()，从别的节点获取所有的注册服务，然后依次在这里执行Register，isReplication&#x3D;true的操作，从而完成初始化，同步所有服务。</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><p>  本文主要介绍了Eureka的实现思路，通过深入了解EurekaServer，ServiceProvider,ServiceConsumer的实现，清晰深入的看见了服务注册，发现等一系列过程和实现方式。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringCloud/" rel="tag"># SpringCloud</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/11/30/General/OS/Linux/Linux_IO%E6%A8%A1%E5%BC%8F/" rel="prev" title="Linux_IO模式">
+                  <i class="fa fa-angle-left"></i> Linux_IO模式
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/12/04/Framework/Spring/SpringCloud/SpringCloud-Hystrix/" rel="next" title="SpringCloud Hystrix">
+                  SpringCloud Hystrix <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

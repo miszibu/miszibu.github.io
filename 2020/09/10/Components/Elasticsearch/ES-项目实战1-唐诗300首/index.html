@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文思路来自于博主铭毅天下的博文 项目实战 01：将唐诗三百首写入 Elasticsearch 会发生什么？  本文将唐诗三百首索引进入ES，并针对分词进行可视化处理，从这个实战项目可以了解以下一系列知识点和整体数据处理流程。  Elasticsearch 数据建模 Elasticsearch bulk批量写入 Elasticsearch 预处理 Elasticsearch检索 Elastics">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-项目实战1-唐诗300首">
+<meta property="og:url" content="https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="本文思路来自于博主铭毅天下的博文 项目实战 01：将唐诗三百首写入 Elasticsearch 会发生什么？  本文将唐诗三百首索引进入ES，并针对分词进行可视化处理，从这个实战项目可以了解以下一系列知识点和整体数据处理流程。  Elasticsearch 数据建模 Elasticsearch bulk批量写入 Elasticsearch 预处理 Elasticsearch检索 Elastics">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/procedure.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/top10author.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/piechart.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/vertical.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/tagcloud.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/dashboard.png">
+<meta property="article:published_time" content="2020-09-10T04:57:39.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.038Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/procedure.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/","path":"2020/09/10/Components/Elasticsearch/ES-项目实战1-唐诗300首/","title":"ES-项目实战1-唐诗300首"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ES-项目实战1-唐诗300首 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">项目介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-number">2.</span> <span class="nav-text">测试环境准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AF%BC%E5%85%A5%E5%8F%8A%E5%85%B6%E5%87%86%E5%A4%87"><span class="nav-number">3.</span> <span class="nav-text">数据导入及其准备</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Templates"><span class="nav-number">3.1.</span> <span class="nav-text">创建 Templates</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ingest-Pipeline"><span class="nav-number">3.2.</span> <span class="nav-text">Ingest Pipeline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">3.3.</span> <span class="nav-text">批量导入数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">数据可视化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%81%E7%9A%84%E4%BD%9C%E5%93%81%E6%9C%80%E5%A4%9A%EF%BC%9ATOP10"><span class="nav-number">4.1.</span> <span class="nav-text">谁的作品最多：TOP10</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E8%A8%80%E7%BB%9D%E5%8F%A5%E5%92%8C%E4%B8%83%E8%A8%80%E5%BE%8B%E8%AF%97%E5%8D%A0%E6%AF%94%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AF%B9%E5%BA%94%E4%BD%9C%E8%80%85%E5%8D%A0%E6%AF%94%E7%BB%9F%E8%AE%A1"><span class="nav-number">4.2.</span> <span class="nav-text">五言绝句和七言律诗占比，以及对应作者占比统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E5%90%8D%E8%AF%97%E6%8E%92%E8%A1%8C%E7%BB%9F%E8%AE%A1"><span class="nav-number">4.3.</span> <span class="nav-text">同名诗排行统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%99%BE%E9%A6%96%E8%AF%97%E5%88%86%E8%AF%8D%E5%BD%A2%E6%88%90%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84%E8%AF%8D%E4%BA%91"><span class="nav-number">4.4.</span> <span class="nav-text">三百首诗分词形成什么样的词云</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E8%A7%86%E5%9B%BE"><span class="nav-number">4.5.</span> <span class="nav-text">全局视图</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ES-项目实战1-唐诗300首 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES-项目实战1-唐诗300首
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-09-10 12:57:39" itemprop="dateCreated datePublished" datetime="2020-09-10T12:57:39+08:00">2020-09-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>本文思路来自于博主铭毅天下的博文 <a target="_blank" rel="noopener" href="https://blog.csdn.net/wojiushiwo987/article/details/108373311">项目实战 01：将唐诗三百首写入 Elasticsearch 会发生什么？</a></p>
+</blockquote>
+<p>本文将唐诗三百首索引进入ES，并针对分词进行可视化处理，从这个实战项目可以了解以下一系列知识点和整体数据处理流程。</p>
+<ul>
+<li>Elasticsearch 数据建模</li>
+<li>Elasticsearch bulk批量写入</li>
+<li>Elasticsearch 预处理</li>
+<li>Elasticsearch检索</li>
+<li>Elasticsearch聚合</li>
+<li>kibana Visualize 使用</li>
+<li>kibana Dashboard 使用</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h1><p>数据来源：<a target="_blank" rel="noopener" href="https://github.com/xuchunyang/300">https://github.com/xuchunyang/300</a><br>注意数据源bug： 第1753行中的”id”:253 需要手动改成  “id”: 252。</p>
+<p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/procedure.png"><br>整体data flow 如上图所示，具体而言分为以下步骤</p>
+<ol>
+<li>根据数据结构和分词设置，预先创建 <code>Template</code> 和<code>Mapping</code></li>
+<li>创建 Ingest Pipeline 并绑定到 template 上</li>
+<li>通过 Bulk Request 批量导入数据</li>
+<li>数据 可视化</li>
+</ol>
+<h1 id="测试环境准备"><a href="#测试环境准备" class="headerlink" title="测试环境准备"></a>测试环境准备</h1><p>基于 Docker Container 创建一个 ES 单节点和对应 Kibana。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Create ES/Kibana Contaienr</span></span><br><span class="line">docker run -itd --privileged --name es_single_node -p 9200:9200 -p 9300:9300 -e &quot;discovery.type=single-node&quot; elasticsearch:7.6.2</span><br><span class="line">docker run -itd --name kibana --privileged -p 5601:5601 kibana:7.6.2 /bin/bash</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Build a docker network to connect container kibana and es</span></span><br><span class="line">docker network create myNetwork</span><br><span class="line">docker network connect myNetwork kibana</span><br><span class="line">docker network connect myNetwork es_single_node</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Do some configuration changes</span> </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">download IK analyzer paclage: lasticsearch-analysis-ik-7.6.2.zip</span></span><br><span class="line">docker cp ~/Downloads/elasticsearch-analysis-ik-7.6.2.zip es_single_node:/usr/share/elasticsearch/</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Instal IK Package</span></span><br><span class="line">./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> Recycle es container to take effect plugins</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="数据导入及其准备"><a href="#数据导入及其准备" class="headerlink" title="数据导入及其准备"></a>数据导入及其准备</h1><h2 id="创建-Templates"><a href="#创建-Templates" class="headerlink" title="创建 Templates"></a>创建 Templates</h2><p>创建 template poem_tpl,这里需要注意的是<code>Mapping</code>设置和绑定<code>ingest pipeline</code>.</p>
+<p>Mapping的设置非常重要，基于如下的数据结构</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">251</span><span class="punctuation">,</span></span><br><span class="line"><span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="string">&quot;打起黄莺儿，莫教枝上啼。啼时惊妾梦，不得到辽西。&quot;</span><span class="punctuation">,</span></span><br><span class="line"><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;五言绝句&quot;</span><span class="punctuation">,</span></span><br><span class="line"><span class="attr">&quot;author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;金昌绪&quot;</span><span class="punctuation">,</span></span><br><span class="line"><span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;春怨&quot;</span></span><br></pre></td></tr></table></figure>
+<p>我们的建模逻辑如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">字段名称</th>
+<th align="left">字段类型</th>
+<th align="left">备注说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">_id</td>
+<td align="left"></td>
+<td align="left">对应自增id</td>
+</tr>
+<tr>
+<td align="left">contents</td>
+<td align="left">text &amp; keyword</td>
+<td align="left">涉及分词，注意开启：fielddata：true</td>
+</tr>
+<tr>
+<td align="left">type</td>
+<td align="left">text &amp; keyword</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">author</td>
+<td align="left">text &amp; keyword</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">title</td>
+<td align="left">text &amp; keyword</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">timestamp</td>
+<td align="left">date</td>
+<td align="left">代表插入时间</td>
+</tr>
+<tr>
+<td align="left">cont_length</td>
+<td align="left">long</td>
+<td align="left">contents长度， 排序用</td>
+</tr>
+</tbody></table>
+<p>在分词器的选择方面，我们使用了 <code>IK分词器</code>，ES原生的分词器对中文支持都是对字分词，起不到预期的作用<br>Ik词典的选择建议：自带词典不完备，网上搜索互联网的一些常用语词典、行业词典如（诗词相关词典）作为补充完善。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">PUT _template/poem_tpl</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;index_patterns&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;poem*&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;aliases&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;poem_index_alias&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;index.default_pipeline&quot;</span><span class="punctuation">:</span> <span class="string">&quot;add_timestamp&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;number_of_replicas&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;refresh_interval&quot;</span><span class="punctuation">:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;cont_length&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;long&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;author&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;fielddata&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;date&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Ingest-Pipeline"><a href="#Ingest-Pipeline" class="headerlink" title="Ingest Pipeline"></a>Ingest Pipeline</h2><p>我们希望在每个文档中，新增 timestamp 和 cont_length 字段，这就依赖于 ingest pipeline 了，当然也可以通过 Logstash 等数据 ETL 工具实现。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">PUT _ingest/pipeline/add_timestamp</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Adds timestamp  to documents&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;processors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;set&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;_source.timestamp&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        <span class="attr">&quot;value&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#123;&#123;_ingest.timestamp&#125;&#125;&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;script&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;source&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ctx.cont_length = ctx.contents.length();&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="批量导入数据"><a href="#批量导入数据" class="headerlink" title="批量导入数据"></a>批量导入数据</h2><p>使用 Python ES Bulk API 批量导入数据，批量导入在数据量大的时候能有效提高导入性能。因为相比于一条请求携带一个文档，一条请求携带大量文档，大大提高了网络利用率。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">from</span> elasticsearch <span class="keyword">import</span> Elasticsearch</span><br><span class="line"><span class="keyword">from</span> elasticsearch <span class="keyword">import</span> helpers</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">read_and_write_index</span>():</span><br><span class="line">	<span class="comment"># define an empty list for the Elasticsearch docs</span></span><br><span class="line">	doc_list = []</span><br><span class="line">	es = Elasticsearch(hosts=<span class="string">&#x27;http://localhost&#x27;</span>,port=<span class="number">9200</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># use Python&#x27;s enumerate() function to iterate over list of doc strings</span></span><br><span class="line">	input_file = <span class="built_in">open</span>(<span class="string">&#x27;/Users/ligaofeng/Java/Resource/300/300.json&#x27;</span>,  encoding=<span class="string">&quot;utf8&quot;</span>, errors=<span class="string">&#x27;ignore&#x27;</span>)</span><br><span class="line">	json_array = json.load(input_file)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> item <span class="keyword">in</span> json_array:</span><br><span class="line">		<span class="keyword">try</span>:</span><br><span class="line">			<span class="comment"># convert the string to a dict object</span></span><br><span class="line">			<span class="comment"># add a new field to the Elasticsearch doc</span></span><br><span class="line">			dict_doc = &#123;&#125;</span><br><span class="line">			<span class="comment"># add a dict key called &quot;_id&quot; if you&#x27;d like to specify an ID for the doc</span></span><br><span class="line">			dict_doc[<span class="string">&quot;_id&quot;</span>] = item[<span class="string">&#x27;id&#x27;</span>]</span><br><span class="line">			dict_doc[<span class="string">&quot;contents&quot;</span>] = item[<span class="string">&#x27;contents&#x27;</span>]</span><br><span class="line">			dict_doc[<span class="string">&quot;type&quot;</span>] = item[<span class="string">&#x27;type&#x27;</span>]</span><br><span class="line">			dict_doc[<span class="string">&quot;author&quot;</span>] = item[<span class="string">&#x27;author&#x27;</span>]</span><br><span class="line">			dict_doc[<span class="string">&quot;title&quot;</span>] = item[<span class="string">&#x27;title&#x27;</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">			<span class="comment"># append the dict object to the list []</span></span><br><span class="line">			doc_list += [dict_doc]</span><br><span class="line"></span><br><span class="line">		<span class="keyword">except</span> json.decoder.JSONDecodeError <span class="keyword">as</span> err:</span><br><span class="line">			<span class="comment"># print the errors</span></span><br><span class="line">			<span class="built_in">print</span>(<span class="string">&quot;ERROR for num:&quot;</span>, item[<span class="string">&#x27;id&#x27;</span>], <span class="string">&quot;-- JSONDecodeError:&quot;</span>, err, <span class="string">&quot;for doc:&quot;</span>, dict_doc)</span><br><span class="line">			<span class="built_in">print</span>(<span class="string">&quot;Dict docs length:&quot;</span>, <span class="built_in">len</span>(doc_list))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">		<span class="built_in">print</span> (<span class="string">&quot;\nAttempting to index the list of docs using helpers.bulk()&quot;</span>)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># use the helpers library&#x27;s Bulk API to index list of Elasticsearch docs</span></span><br><span class="line">		resp = helpers.bulk(</span><br><span class="line">			es,</span><br><span class="line">			doc_list,</span><br><span class="line">			index = <span class="string">&quot;poem_index&quot;</span>,</span><br><span class="line">			doc_type = <span class="string">&quot;_doc&quot;</span></span><br><span class="line">		)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># print the response returned by Elasticsearch</span></span><br><span class="line">		<span class="built_in">print</span> (<span class="string">&quot;helpers.bulk() RESPONSE:&quot;</span>, resp)</span><br><span class="line">		<span class="built_in">print</span> (<span class="string">&quot;helpers.bulk() RESPONSE:&quot;</span>, json.dumps(resp, indent=<span class="number">4</span>))</span><br><span class="line">	<span class="keyword">except</span> Exception <span class="keyword">as</span> err:</span><br><span class="line">		<span class="comment"># print any errors returned w</span></span><br><span class="line">		<span class="comment">## Prerequisiteshile making the helpers.bulk() API call</span></span><br><span class="line">		<span class="built_in">print</span>(<span class="string">&quot;Elasticsearch helpers.bulk() ERROR:&quot;</span>, err)</span><br><span class="line">		quit()</span><br><span class="line"></span><br><span class="line">read_and_write_index()</span><br></pre></td></tr></table></figure>
+
+<h1 id="数据可视化"><a href="#数据可视化" class="headerlink" title="数据可视化"></a>数据可视化</h1><h2 id="谁的作品最多：TOP10"><a href="#谁的作品最多：TOP10" class="headerlink" title="谁的作品最多：TOP10"></a>谁的作品最多：TOP10</h2><p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/top10author.png"></p>
+<h2 id="五言绝句和七言律诗占比，以及对应作者占比统计"><a href="#五言绝句和七言律诗占比，以及对应作者占比统计" class="headerlink" title="五言绝句和七言律诗占比，以及对应作者占比统计"></a>五言绝句和七言律诗占比，以及对应作者占比统计</h2><p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/piechart.png"></p>
+<h2 id="同名诗排行统计"><a href="#同名诗排行统计" class="headerlink" title="同名诗排行统计"></a>同名诗排行统计</h2><p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/vertical.png"></p>
+<h2 id="三百首诗分词形成什么样的词云"><a href="#三百首诗分词形成什么样的词云" class="headerlink" title="三百首诗分词形成什么样的词云"></a>三百首诗分词形成什么样的词云</h2><p>由于我们使用 <code>ik_max_word</code>分词器，他会最大化分词，那么也就导致了词云都是单个字的现象。使用 <code>ik_smart</code>可以解决。</p>
+<p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/tagcloud.png"></p>
+<h2 id="全局视图"><a href="#全局视图" class="headerlink" title="全局视图"></a>全局视图</h2><p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/dashboard.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/09/09/Components/Elasticsearch/ES-Mappings/" rel="prev" title="ES-Mappings">
+                  <i class="fa fa-angle-left"></i> ES-Mappings
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/09/10/Tools/Charles/Charles%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" rel="next" title="Charles使用指南">
+                  Charles使用指南 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

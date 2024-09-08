@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在提起 Kafka 的时候，我们都会说 Kafka 很快，那快是一个抽象的形容词，对于快的定义是多方面的，吞吐量，延迟，抖动等等都是形容和描述快的指标。这也受限于，人们对于一个产品的使用期望。 Apache Kafka 以抖动和延迟为代价，针对吞吐量进行了优化。同时具备了耐用性，严格的记录顺序和最少一次的传递语义。 因此人们说 Kafka 很快，指的是 Kafka 在短时间内能安全地积累和分发大量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么Kafka这么快">
+<meta property="og:url" content="https://miszibu.github.io/2020/08/06/Components/Kafka/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="在提起 Kafka 的时候，我们都会说 Kafka 很快，那快是一个抽象的形容词，对于快的定义是多方面的，吞吐量，延迟，抖动等等都是形容和描述快的指标。这也受限于，人们对于一个产品的使用期望。 Apache Kafka 以抖动和延迟为代价，针对吞吐量进行了优化。同时具备了耐用性，严格的记录顺序和最少一次的传递语义。 因此人们说 Kafka 很快，指的是 Kafka 在短时间内能安全地积累和分发大量">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/traditionalio.gif">
+<meta property="og:image" content="https://miszibu.github.io/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/traditionalcopy.gif">
+<meta property="og:image" content="https://miszibu.github.io/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/zero-copy.gif">
+<meta property="og:image" content="https://miszibu.github.io/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/query-zero-copy.gif">
+<meta property="og:image" content="https://miszibu.github.io/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/latency-of-events.png">
+<meta property="article:published_time" content="2020-08-06T05:33:54.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.051Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Kafka">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/traditionalio.gif">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/08/06/Components/Kafka/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/08/06/Components/Kafka/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/","path":"2020/08/06/Components/Kafka/为什么Kafka这么快/","title":"为什么Kafka这么快"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>为什么Kafka这么快 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2%E7%9A%84%E6%80%BB%E7%BB%93"><span class="nav-number">1.</span> <span class="nav-text">写在前面的总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%A1%BA%E5%BA%8F%E5%86%99%E7%9A%84%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">基于顺序写的数据持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E6%96%87%E4%BB%B6%E7%9A%84%E8%AF%BB%E5%86%99%E6%98%AF%E9%A1%BA%E5%BA%8F%E7%9A%84%E5%90%97"><span class="nav-number">2.1.</span> <span class="nav-text">对文件的读写是顺序的吗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8FIO-VS-%E9%9A%8F%E6%9C%BA-IO"><span class="nav-number">2.2.</span> <span class="nav-text">顺序IO VS 随机 IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Page-Cache-%E9%A1%B5%E7%BC%93%E5%AD%98"><span class="nav-number">2.3.</span> <span class="nav-text">Page Cache 页缓存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zero-Copy"><span class="nav-number">3.</span> <span class="nav-text">Zero-Copy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E7%9A%84Copy-%E6%B5%81%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">普通的Copy 流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Zero-Copy-%E6%B5%81%E7%A8%8B"><span class="nav-number">3.2.</span> <span class="nav-text">Zero-Copy 流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95%E6%89%B9%E5%A4%84%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">记录批处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E5%8E%8B%E7%BC%A9"><span class="nav-number">5.</span> <span class="nav-text">批量压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unflushed-Buffer-Write"><span class="nav-number">6.</span> <span class="nav-text">Unflushed Buffer Write</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BC%98%E5%8C%96"><span class="nav-number">7.</span> <span class="nav-text">客户端优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">8.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/08/06/Components/Kafka/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="为什么Kafka这么快 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          为什么Kafka这么快
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-06 13:33:54" itemprop="dateCreated datePublished" datetime="2020-08-06T13:33:54+08:00">2020-08-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在提起 Kafka 的时候，我们都会说 Kafka 很快，那快是一个抽象的形容词，对于快的定义是多方面的，吞吐量，延迟，抖动等等都是形容和描述快的指标。这也受限于，人们对于一个产品的使用期望。</p>
+<p><strong>Apache Kafka 以抖动和延迟为代价，针对吞吐量进行了优化。</strong>同时具备了耐用性，严格的记录顺序和<strong>最少一次的</strong>传递语义。</p>
+<p>因此人们说 Kafka 很快，指的是 Kafka 在短时间内能安全地积累和分发大量消息的能力。</p>
+<blockquote>
+<p>从历史上说，Kafka 诞生之初是 LinkedInd的需求，即有效地传输大量消息地能力，每小时的数据总量达到数TB。单个消息传播延迟被认为是次要的。毕竟，LinkedIn不是从事高频交易的金融机构，也不是在确定的期限内运行的工业控制系统。 Kafka可用于实现近实时（也称为软实时）系统。</p>
+<p>Real-Time 实时系统是什么意思：每一个操作，每一个请求都能在指定的时间内完成并返回，也就是我们常说的 Deadline，那么这个系统就是实时系统。</p>
+<p>Near-Real-Time 近实时系统：系统能在一定范围地时间内给予返回，那就是NRT。举例而言，ES 就是 NRT 搜索系统，在默认配置下， 新插入的数据能在一秒钟后被搜索到。</p>
+<p>通常而言，NRT系统吞吐量远大于 RT 系统。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="写在前面的总结"><a href="#写在前面的总结" class="headerlink" title="写在前面的总结"></a>写在前面的总结</h2><ol>
+<li>从 CS 架构的角度而言，Kafka Client 提前做了很多工作，如数据压缩，寻找正确的 Broker 发送请求，减少了 Server 转发请求的压力。</li>
+<li>所有的消息都被<strong>压缩</strong>，极大的提高了网络的利用率，kafka broker 不解压数据，数据最终会被 Consumer 解压。</li>
+<li>Cilent 选择<strong>批量发送</strong>数据，从而摊薄请求头所占总网络带宽的比例，进一步提高了传输效率，但是也带来了一定量的延迟。</li>
+<li>在存储方面，Kafka 使用<strong>顺序写文件</strong>的方式持久化数据，顺序写效率是随机写效率的3-4倍。</li>
+<li><strong>PageCache</strong> 的引入，为数据的查询和插入提供了<strong>预读和后写</strong>的优化，给予了近乎内存操作的性能。</li>
+<li>在数据读取方面，kafka 引入了 <strong>Zero-Copy</strong>,极大的<strong>减少了上下文切换所带来的资源损耗。</strong></li>
+</ol>
+<h2 id="基于顺序写的数据持久化"><a href="#基于顺序写的数据持久化" class="headerlink" title="基于顺序写的数据持久化"></a>基于顺序写的数据持久化</h2><p>Kafka将 Partition 中的数据拆分为多个 <code>Segments</code> 进行<strong>分段存储</strong>，每个 Segment 就是一个文件。<strong>对文件的存储基本可以称之为顺序写</strong>。由于机械硬盘的物理构造，<strong>顺序写的效率数倍于随机写</strong>。</p>
+<h3 id="对文件的读写是顺序的吗"><a href="#对文件的读写是顺序的吗" class="headerlink" title="对文件的读写是顺序的吗"></a><strong>对文件的读写是顺序的吗</strong></h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">-bash-4.1$ filefrag -v websocket.log.4</span><br><span class="line"></span><br><span class="line">Filesystem type is: ef53</span><br><span class="line">File size of websocket.log.4 is 52105959 (12722 blocks, blocksize 4096)</span><br><span class="line"> ext logical physical expected length flags</span><br><span class="line">   0       0 15951872            4096</span><br><span class="line">   1    4096 64972800 15955968   2048</span><br><span class="line">   2    6144 65099776 64974848   2048</span><br><span class="line">   3    8192 65116160 65101824   2048</span><br><span class="line">   4   10240 65314816 65118208   2048</span><br><span class="line">   5   12288 65307136 65316864    434 eof</span><br></pre></td></tr></table></figure>
+
+<p>答案是肯定的，通过<code>filefrag</code>命令我们可以看出，一个文件是由许多ext组成，ext是<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Extent_(file_systems)">extent</a>的缩写，在操作系统中它表示一系列Block的合集，每个文件都是由extents组成。对 extent 的读写顺序的。</p>
+<p>那么基本可以说一个对一个大的文件进行读写基本是顺序的。</p>
+<h3 id="顺序IO-VS-随机-IO"><a href="#顺序IO-VS-随机-IO" class="headerlink" title="顺序IO VS 随机 IO"></a><strong>顺序IO VS 随机 IO</strong></h3><p>人们普遍认为磁盘速度很慢，但是其实这取决于<strong>对数据的访问模式</strong>。顺序 I&#x2F;O 省去了磁盘寻道的时间，极大的提高了效率。与随机I &#x2F; O相比，典型的7,200 RPM SATA磁盘上的顺序I &#x2F; O的性能要<strong>快三到四个数量级</strong></p>
+<h3 id="Page-Cache-页缓存"><a href="#Page-Cache-页缓存" class="headerlink" title="Page Cache 页缓存"></a><strong>Page Cache 页缓存</strong></h3><p>引入Cache层提高了Linux操作系统对磁盘访问的性能。Cache层在内存中<strong>缓存了磁盘上的部分数据</strong>。当数据的请求到达时，如果在Cache中存在该数据且是最新的，则直接将数据传递给用户程序，免除了对底层磁盘的操作，提高了性能。</p>
+<p>磁盘Cache有两大功能：<strong>预读和回写</strong>。</p>
+<p><strong>预读</strong>其实就是利用了<strong>局部性原理</strong>，具体过程是：对于每个文件的第一个读请求，系统读入所请求的页面并读入紧随其后的少数几个页面（通常是三个页面），这时的预读称为同步预读。对于第二次读请求，如果所读页面不在Cache中，即不在前次预读的页中，则表明文件访问不是顺序访问，系统继续采用同步预读；如果所读页面在Cache中，则表明前次预读命中，操作系统把预读页的大小扩大一倍，此时预读过程是异步的，应用程序可以不等预读完成即可返回，只要后台慢慢读页面即可，这时的预读称为异步预读。任何接下来的读请求都会处于两种情况之一：第一种情况是所请求的页面处于预读的页面中，这时继续进行异步预读；第二种情况是所请求的页面处于预读页面之外，这时系统就要进行同步预读。</p>
+<p><strong>回写</strong>是通过暂时将数据存在Cache里，然后<strong>统一异步写到磁盘中</strong>。通过这种异步的数据I&#x2F;O模式解决了程序中的计算速度和数据存储速度不匹配的鸿沟，减少了访问底层存储介质的次数，使存储系统的性能大大提高。Linux 2.6.32内核之前，采用pdflush机制来将脏页真正写到磁盘中，什么时候开始回写呢？下面两种情况下，脏页会被写回到磁盘：</p>
+<ol>
+<li>在空闲内存低于一个特定的阈值时，内核必须将脏页写回磁盘，以便释放内存。</li>
+<li>当脏页在内存中驻留超过一定的阈值时，内核必须将超时的脏页写会磁盘，以确保脏页不会无限期地驻留在内存中。</li>
+</ol>
+<p>回写开始后，pdflush会持续写数据，直到满足以下两个条件：</p>
+<ol>
+<li>已经有指定的最小数目的页被写回到磁盘。</li>
+<li>空闲内存页已经回升，超过了阈值。</li>
+</ol>
+<p>Linux 2.6.32内核之后，放弃了原有的pdflush机制，改成了bdi_writeback机制。bdi_writeback机制主要解决了原有fdflush机制存在的一个问题：在多磁盘的系统中，pdflush管理了所有磁盘的Cache，从而导致一定程度的I&#x2F;O瓶颈。bdi_writeback机制为每个磁盘都创建了一个线程，专门负责这个磁盘的Page Cache的刷新工作，从而实现了每个磁盘的数据刷新在线程级的分离，提高了I&#x2F;O性能。</p>
+<p><strong>回写机制存在的问题是回写不及时引发数据丢失（可由sync|fsync解决</strong>），回写期间读I&#x2F;O性能很差。</p>
+<h2 id="Zero-Copy"><a href="#Zero-Copy" class="headerlink" title="Zero-Copy"></a>Zero-Copy</h2><p>Kafka通过使用<strong>Java的NIO</strong>框架（特别是<code>java.nio.channels.FileChannel的transferTo()</code>方法）在Linux和UNIX系统上解决了此问题。 此方法允许将字节从源通道传输到目标通道，而无需将应用程序作为传输中介。 要了解NIO的不同，请先知道传统的数据拷贝过程，数据从源通道读取到字节缓冲区，然后作为两个单独的操作写入到接收器通道：</p>
+<h3 id="普通的Copy-流程"><a href="#普通的Copy-流程" class="headerlink" title="普通的Copy 流程"></a>普通的Copy 流程</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这两行代码，会从文件中读取数据到内存，然后再将数据发往 Socket</span></span><br><span class="line">File.read(fileDesc, buf, len);</span><br><span class="line">Socket.send(socket, buf, len);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/traditionalio.gif"></p>
+<p><img src="/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/traditionalcopy.gif"></p>
+<p>上图分别展示了代码背后实际的数据拷贝的过程和四次上下文切换的时间，从中我们可以看到，复制操作总共发生了四次数据拷贝，也产生了四次上下文切换（内核态和用户态之间的切换）。</p>
+<p>让我们具体来看下这四次上下文切换:</p>
+<ol>
+<li>read()操作需要从用户模式切换到内核模式来读取文件，然后将其内容通过DMA（直接内存访问）引擎复制到内核地址空间中的缓冲区中。 </li>
+<li>然后数据将从<strong>内核缓冲区</strong>复制到<strong>用户空间</strong>缓冲区中，read()操作返回。 此时，我们的应用程序可以读取文件的内容。</li>
+<li>随后的send()将切换回内核模式，将用户空间缓冲区复制到内核地址空间中与<strong>目标套接字关联的另一个缓冲区</strong>。 在幕后，DMA引擎接管了工作，将数据从内核缓冲区异步复制到协议堆栈。 </li>
+<li>send()调用返回，切换回用户空间</li>
+</ol>
+<p>正常来说这个流程是没有问题的，应用程序往往需要在用户态对数据进行修改。然而在 Kafka 中不涉及到数据改动，那么数据额外的拷贝就变成了冗余的操作。这里，我们就需要引入零拷贝来解决这个问题。 先前示例中的代码段可以重写为单行代码：</p>
+<h3 id="Zero-Copy-流程"><a href="#Zero-Copy-流程" class="headerlink" title="Zero-Copy 流程"></a>Zero-Copy 流程</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 从参数中可以看出，数据从磁盘直接到 socket</span></span><br><span class="line">fileDesc.transferTo(offset, len, socket);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/zero-copy.gif"></p>
+<p><strong>在此模型下，数据拷贝的次数从四减少到三，上下文切换的数量减少到两个。</strong></p>
+<p>具体而言，transferTo（）方法指示块设备通过DMA引擎将数据读取到读取缓冲区中。 然后，将该缓冲区复制到另一个内核缓冲区以暂存到套接字。 最后，套接字缓冲区通过DMA复制到NIC缓冲区。<br>这是一个很大的改进，但是还没有查询零副本。 后者可以在运行Linux内核2.4及更高版本以及支持收集操作的网络接口卡上作为进一步的优化来实现。 如下所示。</p>
+<p><img src="/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/query-zero-copy.gif"></p>
+<p>根据前面的示例，调用transferTo（）方法会使设备通过DMA引擎将数据读入内核读取缓冲区。 但是，使用聚集操作时，读取缓冲区和套接字缓冲区之间没有复制。 取而代之的是，<strong>给NIC一个指向读取缓冲区的指针以及偏移量和长度</strong>，该指针由DMA清除。 复制缓冲区决不涉及CPU。<br>对传统文件副本和零拷贝文件大小从几兆字节到千兆字节的比较，表明使用零拷贝的性能提高了2到3倍。 但是更令人印象深刻的是，Kafka使用了一个没有本地库或JNI代码的普通JVM来实现了这一目标。</p>
+<h2 id="记录批处理"><a href="#记录批处理" class="headerlink" title="记录批处理"></a>记录批处理</h2><p><img src="/%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E8%BF%99%E4%B9%88%E5%BF%AB/latency-of-events.png"></p>
+<p>在计算机中的众多 IO 中，网络 IO 其实是最慢的一部分。顺序 IO 的速度可以与网络I &#x2F; O的最高性能相比。</p>
+<p>实际应用中，kafka 的瓶颈往往不是磁盘而是网络。Kafka 通过<strong>客户端&#x2F;服务端批量发送记录</strong>的方式，使用较大的数据包提高了带宽效率，摊薄了网络往返的开销。</p>
+<p>网络请求由请求体和请求头组成，在网络 IO 达到峰值时，批处理减少了请求头，增加了请求体占总数据传输的比例，提高了网络 IO 的性能。</p>
+<h2 id="批量压缩"><a href="#批量压缩" class="headerlink" title="批量压缩"></a>批量压缩</h2><p>客户端将消息进行批量压缩，即利用了客户端的硬件资源，又对网络 IO 和服务端的磁盘 IO 产生了积极的影响。</p>
+<p>Kafka 会使用一种共享二进制格式来存储数据，Broker 并不会对数据进行解压而是由消费者来解压数据。因此数据块在不同组件中端对端的流通，并不会涉及消息内容的修改。</p>
+<h2 id="Unflushed-Buffer-Write"><a href="#Unflushed-Buffer-Write" class="headerlink" title="Unflushed Buffer Write"></a>Unflushed Buffer Write</h2><p>Kafka 在执行写入请求时并没有调用 <code>fsync</code>,<strong>ACK 的唯一要求就是数据写入I&#x2F;O Buffer.</strong> 这使得 Kafka 获得了近乎内存队列的速度，可以说 Kafka 是磁盘支持的内存队列。</p>
+<p>这在带来效率的同时也带来了数据可能丢失的问题，Kafka 是通过运行多个同步副本来解决这个问题，即便一台 Kafka宕机未落盘的数据丢失，kafka仍然能从其他副本中获取数据。</p>
+<p><strong>因此 Kafka 通过 Unflushed Buffer Write 和冗余的数据副本来达到可用性和持久性的一个结合。</strong></p>
+<h2 id="客户端优化"><a href="#客户端优化" class="headerlink" title="客户端优化"></a>客户端优化</h2><p>绝大多数的中间件产品都是简单的把客户端涉及成为一个简单的连接器，通过协议与服务器集群进行连接，作为业务代码和服务器之间的接口。<br>客户端会对记录上执行大量工作。包括对记录键进行哈希处理以得出正确的分区索引，对记录进行校验和以及对记录进行批量压缩。</p>
+<p>客户端也知道集群元数据，并定期刷新此元数据以了解对Brokers Servers List的任何更改。这使客户端可以做出转发决定；生产者客户端不是将记录盲目地发送到集群，而是依靠后者将其转发到适当的Broker节点，而是将写操作直接转发给分区主服务器。</p>
+<p>同样，消费者客户在采购记录时可以做出明智的决定，有可能使用在发出读取查询时在地理位置上更接近客户的副本。 （此功能是Kafka的更新功能，自2.4.0版开始可用。）</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://medium.com/swlh/why-kafka-is-so-fast-bde0d987cd03">Why Kafka Is so Fast</a></p>
+<p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2017/05/19/about-desk-io.html">磁盘I&#x2F;O那些事</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/03/Components/Zookeeper/ZK-Introduction/" rel="prev" title="ZK-Introduction">
+                  <i class="fa fa-angle-left"></i> ZK-Introduction
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/07/Components/Kafka/Kafka%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" rel="next" title="Kafka主从复制">
+                  Kafka主从复制 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

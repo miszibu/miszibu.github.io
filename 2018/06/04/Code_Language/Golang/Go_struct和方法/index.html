@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="结构体的三种声明方式，直接声明，new（Struct）,混合字面量 结构体的内存布局——Go的结构体数据以连续块的形式存放在内存中 递归结构体——可以引用自身来定义，方便树和链表的建立 结构体工厂 带标签的结构体 匿名字段 结构方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go-struct">
+<meta property="og:url" content="https://miszibu.github.io/2018/06/04/Code_Language/Golang/Go_struct%E5%92%8C%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="结构体的三种声明方式，直接声明，new（Struct）,混合字面量 结构体的内存布局——Go的结构体数据以连续块的形式存放在内存中 递归结构体——可以引用自身来定义，方便树和链表的建立 结构体工厂 带标签的结构体 匿名字段 结构方法">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-06-04T06:27:55.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.014Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/06/04/Code_Language/Golang/Go_struct%E5%92%8C%E6%96%B9%E6%B3%95/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/06/04/Code_Language/Golang/Go_struct%E5%92%8C%E6%96%B9%E6%B3%95/","path":"2018/06/04/Code_Language/Golang/Go_struct和方法/","title":"Go-struct"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go-struct | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E4%B8%89%E7%A7%8D%E5%A3%B0%E6%98%8E%E6%96%B9%E5%BC%8F%E2%80%94%E2%80%94%E7%9B%B4%E6%8E%A5%E5%A3%B0%E6%98%8E%EF%BC%8Cnew-%E6%B7%B7%E5%90%88%E5%AD%97%E9%9D%A2%E9%87%8F"><span class="nav-number">1.</span> <span class="nav-text">结构体三种声明方式——直接声明，new,混合字面量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="nav-number">2.</span> <span class="nav-text">结构体的内存布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">3.</span> <span class="nav-text">递归结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E5%B7%A5%E5%8E%82"><span class="nav-number">4.</span> <span class="nav-text">结构体工厂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A6%E6%A0%87%E7%AD%BE%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">5.</span> <span class="nav-text">带标签的结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%BF%E5%90%8D%E5%AD%97%E6%AE%B5"><span class="nav-number">6.</span> <span class="nav-text">匿名字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">7.</span> <span class="nav-text">方法</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/04/Code_Language/Golang/Go_struct%E5%92%8C%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go-struct | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go-struct
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-06-04 14:27:55" itemprop="dateCreated datePublished" datetime="2018-06-04T14:27:55+08:00">2018-06-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><ul>
+<li>结构体的三种声明方式，直接声明，new（Struct）,混合字面量</li>
+<li>结构体的内存布局——Go的结构体数据以连续块的形式存放在内存中</li>
+<li>递归结构体——可以引用自身来定义，方便树和链表的建立</li>
+<li>结构体工厂</li>
+<li>带标签的结构体</li>
+<li>匿名字段</li>
+<li>结构方法</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="结构体三种声明方式——直接声明，new-混合字面量"><a href="#结构体三种声明方式——直接声明，new-混合字面量" class="headerlink" title="结构体三种声明方式——直接声明，new,混合字面量"></a>结构体三种声明方式——直接声明，new,混合字面量</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">    firstName   <span class="type">string</span></span><br><span class="line">    lastName    <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">upPerson</span><span class="params">(p *Person)</span></span> &#123;<span class="comment">//接收一个person的引用类型</span></span><br><span class="line">    p.firstName = strings.ToUpper(p.firstName)</span><br><span class="line">    p.lastName = strings.ToUpper(p.lastName)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 1-struct as a value type:值类型 变量本身</span></span><br><span class="line">    <span class="keyword">var</span> pers1 Person </span><br><span class="line">    pers1.firstName = <span class="string">&quot;Chris&quot;</span></span><br><span class="line">    pers1.lastName = <span class="string">&quot;Woodward&quot;</span></span><br><span class="line">    upPerson(&amp;pers1)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;The name of the person is %s %s\n&quot;</span>, pers1.firstName, pers1.lastName)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2—struct as a pointer:使用new返回的是指向已分配内存的指针</span></span><br><span class="line">    pers2 := <span class="built_in">new</span>(Person)</span><br><span class="line">    pers2.firstName = <span class="string">&quot;Chris&quot;</span></span><br><span class="line">    pers2.lastName = <span class="string">&quot;Woodward&quot;</span></span><br><span class="line">    (*pers2).lastName = <span class="string">&quot;Woodward&quot;</span>  </span><br><span class="line">    pers2.lastName = <span class="string">&quot;Woodward&quot;</span>	    <span class="comment">//指针类型可以不解引用 直接访问子元素</span></span><br><span class="line">    upPerson(pers2)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;The name of the person is %s %s\n&quot;</span>, pers2.firstName, pers2.lastName)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3—struct as a literal:结构体字面量 混合字面量语法是一种简写，底层任然会调用new 因此返回的仍然是内存指针</span></span><br><span class="line">    pers3 := &amp;Person&#123;<span class="string">&quot;Chris&quot;</span>,<span class="string">&quot;Woodward&quot;</span>&#125;</span><br><span class="line">    upPerson(pers3)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;The name of the person is %s %s\n&quot;</span>, pers3.firstName, pers3.lastName)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">The name of the person is CHRIS WOODWARD</span><br><span class="line">The name of the person is CHRIS WOODWARD</span><br><span class="line">The name of the person is CHRIS WOODWARD</span><br></pre></td></tr></table></figure>
+
+<h3 id="结构体的内存布局"><a href="#结构体的内存布局" class="headerlink" title="结构体的内存布局"></a>结构体的内存布局</h3><p>Go语言中，结构体和它所包含的数据在内存中是以连续块的形式存在的，即便结构体中嵌套着其他的结构体，这在性能上带来了很大的优势。</p>
+<p>Java中的引用类型，一个对象和它里面包含的对象可能会在不同的内存空间中，与Go的指针类型类似。</p>
+<h3 id="递归结构体"><a href="#递归结构体" class="headerlink" title="递归结构体"></a>递归结构体</h3><p>结构体类型可以通过引用自身来定义。这就方便了链表和树的定义。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Node <span class="keyword">struct</span>&#123;<span class="comment">//链表定义</span></span><br><span class="line">    data <span class="type">int</span> </span><br><span class="line">    next *Node</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> treeNode <span class="keyword">struct</span>&#123;<span class="comment">//树节点定义</span></span><br><span class="line">    le *treeNode</span><br><span class="line">    ri *treeNode</span><br><span class="line">    data value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="结构体工厂"><a href="#结构体工厂" class="headerlink" title="结构体工厂"></a>结构体工厂</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> File <span class="keyword">struct</span>&#123;<span class="comment">//定义一个结构体file</span></span><br><span class="line">    fd <span class="type">int</span> </span><br><span class="line">    name <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewFile</span><span class="params">(fd <span class="type">int</span>, name <span class="type">string</span>)</span></span> *File&#123;<span class="comment">//结构体创建工厂方法</span></span><br><span class="line">    <span class="keyword">if</span> fd&lt;<span class="number">0</span>&#123;</span><br><span class="line">    	<span class="keyword">return</span> <span class="literal">nil</span>        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> &amp;File(fd, name)<span class="comment">//输入参数 返回一个指向结构体实例的指针</span></span><br><span class="line">&#125;</span><br><span class="line">f := NewFile(<span class="number">100</span>,<span class="string">&quot;./zibu.txt&quot;</span>) <span class="comment">//调用工厂方法</span></span><br><span class="line">size := unsafe.Sizeof(T&#123;&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="带标签的结构体"><a href="#带标签的结构体" class="headerlink" title="带标签的结构体"></a>带标签的结构体</h3><p>结构体中的字段除了有名字和类型外，还有一个可选的标签tag。标签无法通过.选择符直接访问，只能通过反射机制来获取。可以利用tag存储一些隐藏性描述数据，在代码中反射调用出来。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> TagType <span class="keyword">struct</span> &#123; <span class="comment">// tags</span></span><br><span class="line">    field1 <span class="type">bool</span>   <span class="string">&quot;An important answer&quot;</span></span><br><span class="line">    field2 <span class="type">string</span> <span class="string">&quot;The name of the thing&quot;</span></span><br><span class="line">    field3 <span class="type">int</span>    <span class="string">&quot;How much there are&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    tt := TagType&#123;<span class="literal">true</span>, <span class="string">&quot;Barak Obama&quot;</span>, <span class="number">1</span>&#125;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">3</span>; i++ &#123;</span><br><span class="line">        refTag(tt, i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">refTag</span><span class="params">(tt TagType, ix <span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    ttType := reflect.TypeOf(tt)</span><br><span class="line">    ixField := ttType.Field(ix)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%v\n&quot;</span>, ixField.Tag)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="匿名字段"><a href="#匿名字段" class="headerlink" title="匿名字段"></a>匿名字段</h3><p>每个结构体都可以拥有匿名字段，每个数据类型最多可以出现一次。当然结构体可以内嵌。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">type outerS struct &#123;</span><br><span class="line">    b    int</span><br><span class="line">    c    float32</span><br><span class="line">    int  // anonymous field</span><br><span class="line">    innerS //anonymous field</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当内嵌结构体时，可能会出现命名冲突需要注意。</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(structNew *StructNew)</span></span> method()&#123;</span><br><span class="line">    <span class="comment">// 方法名前的就是方法所属的类</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Go/" rel="tag"># Go</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/04/Code_Language/Golang/Go_defer%E5%92%8C%E8%BF%BD%E8%B8%AA/" rel="prev" title="Go-defer和追踪">
+                  <i class="fa fa-angle-left"></i> Go-defer和追踪
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/06/04/Code_Language/Golang/Go_Interface%E5%92%8C%E5%8F%8D%E5%B0%84/" rel="next" title="Go-Interface和反射">
+                  Go-Interface和反射 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

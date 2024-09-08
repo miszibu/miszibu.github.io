@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文将简要介绍常用Linux运维相关的命令如何使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux常用命令">
+<meta property="og:url" content="https://miszibu.github.io/2019/01/05/General/OS/Linux/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="本文将简要介绍常用Linux运维相关的命令如何使用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+<meta property="og:image" content="https://miszibu.github.io/%E9%A1%B5%E8%A1%A8.jpg">
+<meta property="article:published_time" content="2019-01-05T08:07:39.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.067Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2019/01/05/General/OS/Linux/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2019/01/05/General/OS/Linux/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/","path":"2019/01/05/General/OS/Linux/Linux常用命令/","title":"Linux常用命令"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux常用命令 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Free%E5%91%BD%E4%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">Free命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8A%9F%E8%83%BD"><span class="nav-number">1.1.</span> <span class="nav-text">命令功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">命令参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.4.</span> <span class="nav-text">输出介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#buff-cache"><span class="nav-number">1.5.</span> <span class="nav-text">buff&#x2F;cache</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.5.1.</span> <span class="nav-text">基本概念</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E9%A1%B5%E7%9A%84%E5%A4%A7%E5%B0%8F%E4%B8%BA4kB%E3%80%82%E9%A1%B5%E6%A1%86%E5%A4%A7%E5%B0%8F%E7%AD%89%E4%BA%8E%E9%A1%B5%E7%9A%84%E5%A4%A7%E5%B0%8F%E3%80%82"><span class="nav-number">1.6.</span> <span class="nav-text">一般页的大小为4kB。页框大小等于页的大小。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">1.6.1.</span> <span class="nav-text">地址结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B5%E8%A1%A8"><span class="nav-number">1.6.2.</span> <span class="nav-text">页表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TLB%E5%BF%AB%E8%A1%A8%EF%BC%88%E8%81%94%E6%83%B3%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%89"><span class="nav-number">1.6.3.</span> <span class="nav-text">TLB快表（联想寄存器）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">Top命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8A%9F%E8%83%BD-1"><span class="nav-number">2.1.</span> <span class="nav-text">命令功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0-1"><span class="nav-number">2.2.</span> <span class="nav-text">命令参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">2.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E4%BB%8B%E7%BB%8D-1"><span class="nav-number">2.4.</span> <span class="nav-text">输出介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">2.5.</span> <span class="nav-text">使用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9AU%E5%A4%9A%E6%A0%B8CPU%E7%9B%91%E6%8E%A7"><span class="nav-number">2.5.1.</span> <span class="nav-text">多U多核CPU监控</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E4%BA%AE%E6%98%BE%E7%A4%BA%E5%BD%93%E5%89%8D%E8%BF%90%E8%A1%8C%E8%BF%9B%E7%A8%8B"><span class="nav-number">2.6.</span> <span class="nav-text">高亮显示当前运行进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top%E4%BA%A4%E4%BA%92%E5%91%BD%E4%BB%A4"><span class="nav-number">2.7.</span> <span class="nav-text">top交互命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vmstat"><span class="nav-number">3.</span> <span class="nav-text">vmstat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mpstat"><span class="nav-number">4.</span> <span class="nav-text">mpstat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iostat"><span class="nav-number">5.</span> <span class="nav-text">iostat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2019/01/05/General/OS/Linux/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Linux常用命令 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux常用命令
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-05 16:07:39" itemprop="dateCreated datePublished" datetime="2019-01-05T16:07:39+08:00">2019-01-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>本文将简要介绍常用Linux运维相关的命令如何使用</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Free命令"><a href="#Free命令" class="headerlink" title="Free命令"></a>Free命令</h2><h3 id="命令功能"><a href="#命令功能" class="headerlink" title="命令功能"></a>命令功能</h3><p>free 命令显示系统使用和空闲的内存情况，包括物理内存、交互区内存(swap)和内核缓冲区内存。共享内存将被忽略</p>
+<h3 id="命令参数"><a href="#命令参数" class="headerlink" title="命令参数"></a>命令参数</h3><ul>
+<li>-b 　以Byte为单位显示内存使用情况。 </li>
+<li>-k 　以KB为单位显示内存使用情况。 </li>
+<li>-m 　以MB为单位显示内存使用情况。</li>
+<li>-g   以GB为单位显示内存使用情况。 </li>
+<li>-o 　不显示缓冲区调节列。 </li>
+<li>-s&lt;间隔秒数&gt; 　持续观察内存使用状况。 </li>
+<li>-t 　显示内存总和列。 </li>
+<li>-V 　显示版本信息。</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">free -m</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">docker的unbuntu容器</span></span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           1998         269         288           0        1441        1572</span><br><span class="line">Swap:          1023           0        1023</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="输出介绍"><a href="#输出介绍" class="headerlink" title="输出介绍"></a>输出介绍</h3><ul>
+<li><p><strong>Mem</strong>：内存</p>
+</li>
+<li><p><strong>Swap</strong>：磁盘交换空间（<strong>虚拟内存</strong>）</p>
+</li>
+<li><p><strong>total</strong>：总计物理内存&#x2F;交换空间的大小</p>
+</li>
+<li><p><strong>used</strong>：已使用的物理内存&#x2F;交换空间大小</p>
+</li>
+<li><p><strong>free</strong>：可用内存&#x2F;交换空间大小(<strong>对操作系统而言</strong>)</p>
+</li>
+<li><p><strong>shared</strong>：多个进程共享的内存大小（已被废弃）</p>
+</li>
+<li><p><strong>buff&#x2F;cache</strong>：磁盘缓存的大小</p>
+</li>
+<li><p><strong>available</strong>：可是用的内存&#x2F;交换空间大小（<strong>对应用程序而言</strong>）</p>
+</li>
+</ul>
+<h3 id="buff-cache"><a href="#buff-cache" class="headerlink" title="buff&#x2F;cache"></a>buff&#x2F;cache</h3><ul>
+<li><em>A buffer is something that has yet to be “written” to disk.</em> </li>
+<li><em>A cache is something that has been “read” from the disk and stored for later use.</em></li>
+</ul>
+<p>根据木桶短板理论，在目前的计算机系统中毫无疑问，磁盘IO是最慢的。因为传统的磁盘（见下图），需要访问某一扇区的数据，需要移动磁头到对应扇区，对应磁道，这些物理上的时间消耗在当今的计算机中实在是太慢了。因此需要提高计算机性能往往从更换外存设备为SSD入手。</p>
+<p><img src="/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png"></p>
+<h4 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h4><ul>
+<li><strong>Page 页：</strong>进程中的块称为页，每个进程的页码都是从0开始，并且在主存中维护一个页表。</li>
+<li><strong>Page Frame 页帧：</strong>内存中的块称为页框，把可用的内存按照页框的大小，从0开始编号。</li>
+<li><strong>Block 块：</strong>外存中也已同样单位划分称为块</li>
+</ul>
+<p>进程在执行时需要申请内存空间，就是要为每个页面分配主存中的可用页框，这就产生了<strong>页和页框的一一对应</strong>。</p>
+<blockquote>
+<p>Tips：区分页和页框是非常有必要的，页只是一个固定大小的数据块，可以存放在主存的页帧中也可以存放在外存的块中。</p>
+<h3 id="一般页的大小为4kB。页框大小等于页的大小。"><a href="#一般页的大小为4kB。页框大小等于页的大小。" class="headerlink" title="一般页的大小为4kB。页框大小等于页的大小。"></a>一般页的大小为4kB。页框大小等于页的大小。</h3></blockquote>
+<h4 id="地址结构"><a href="#地址结构" class="headerlink" title="地址结构"></a>地址结构</h4><p>对于一个32位的系统，且页大小4K时，其地址结构为如下所示</p>
+<table>
+<thead>
+<tr>
+<th align="center">31                                 …..                                 12</th>
+<th align="center">11                                       …                                         0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">页号P</td>
+<td align="center">页内偏移量</td>
+</tr>
+</tbody></table>
+<p>地址结构由<strong>页号</strong>和<strong>页内偏移量</strong>组成:</p>
+<p>页内偏移量为2的12次方 &#x3D;  4KB</p>
+<p>页号为2的20次方 &#x3D; 4MB</p>
+<p>页码*页内偏移量 &#x3D; 4GB, 也就是32位地址内存寻址的极限。</p>
+<h4 id="页表"><a href="#页表" class="headerlink" title="页表"></a>页表</h4><p>为了方便在内存中找到进程的每个页面所对应的物理页框，系统为每个进程建立了一张<strong>页表</strong>，记录页面在内存中对应的物理块号，一般<strong>存放在内存中</strong>。</p>
+<p>页表项的组成不同于地址结构，是由页号和块号组成的。</p>
+<p><img src="/%E9%A1%B5%E8%A1%A8.jpg"></p>
+<p>在配置页表后，进程执行时。通过查找页表，来获取每页在内存中的物理块号。页表的作用是实现从页号到物理块号的地址映射。</p>
+<h4 id="TLB快表（联想寄存器）"><a href="#TLB快表（联想寄存器）" class="headerlink" title="TLB快表（联想寄存器）"></a>TLB快表（联想寄存器）</h4><p>现在的访问流程是，获取数据页逻辑地址页码，去页表查询物理地址页码，根据物理地址页码查询内存或磁盘。</p>
+<p>这样若数据在内存中，实际上是访问了两次内存的，快表的出现就是为了加快数据访问的速度。</p>
+<p>通过在地址变换结构中增加一个具有并行查找能力的高速缓冲寄存器——<strong>快表，又称联想寄存器（TLB）</strong>，<strong>用于存放当前访问过的页表项</strong>。因此，内存中的数据也称为慢表。</p>
+<ol>
+<li>CPU给出逻辑地址后，由硬件进行地址转换并将页号送入高速缓冲寄存器TLB，比较快表中的页号。</li>
+<li>如果匹配成功，直接取出物理地址的页框号和页内偏移量组成新的物理地址。这样存取数据只经过一次内存。</li>
+<li>若失败，则访问内存中的页表，在读出页表项后，将其存入快表，以便于后续再次访问。若快表已满则按一定算法进行淘汰。</li>
+</ol>
+<blockquote>
+<p>Tips：有些处理机选择快表慢表同时查询，快表查询成功则结束慢表查询。</p>
+<p>一般快表的的命中率高于90%，这样分页带来的速度损失就极大的降低了。快表的设定原理基于著名的<strong>局部性原理</strong>。</p>
+<p>局部性原理：所访问数据往往集中在连续的一片区域中。</p>
+</blockquote>
+<hr>
+<h2 id="Top命令"><a href="#Top命令" class="headerlink" title="Top命令"></a>Top命令</h2><h3 id="命令功能-1"><a href="#命令功能-1" class="headerlink" title="命令功能"></a>命令功能</h3><p>显示当前系统正在执行的进程的相关信息，包括进程ID、内存占用率、CPU占用率等</p>
+<h3 id="命令参数-1"><a href="#命令参数-1" class="headerlink" title="命令参数"></a>命令参数</h3><ul>
+<li><p>-b 批处理</p>
+</li>
+<li><p>-c 显示完整的治命令</p>
+</li>
+<li><p>-I 忽略失效过程</p>
+</li>
+<li><p>-s 保密模式</p>
+</li>
+<li><p>-S 累积模式</p>
+</li>
+<li><p>-i&lt;时间&gt; 设置间隔时间</p>
+</li>
+<li><p>-u&lt;用户名&gt; 指定用户名</p>
+</li>
+<li><p>-p&lt;进程号&gt; 指定进程</p>
+</li>
+<li><p>-n&lt;次数&gt; 循环显示的次数</p>
+</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">top</span><br><span class="line"></span><br><span class="line">top - 15:29:54 up 1 day, 21:20,  0 users,  load average: 0.10, 0.03, 0.01</span><br><span class="line">Tasks:   2 total,   1 running,   1 sleeping,   0 stopped,   0 zombie</span><br><span class="line"><span class="meta prompt_">%</span><span class="language-bash">Cpu(s):  0.1 us,  0.9 sy,  0.0 ni, 99.0 <span class="built_in">id</span>,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st</span></span><br><span class="line">KiB Mem :  2046748 total,   307648 free,   258716 used,  1480384 buff/cache</span><br><span class="line">KiB Swap:  1048572 total,  1048572 free,        0 used.  1627892 avail Mem</span><br><span class="line"></span><br><span class="line">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND</span><br><span class="line">    1 root      20   0   18504   3480   3064 S   0.0  0.2   0:00.07 bash</span><br><span class="line">   17 root      20   0   36628   3184   2720 R   0.0  0.2   0:00.01 top</span><br></pre></td></tr></table></figure>
+
+<h3 id="输出介绍-1"><a href="#输出介绍-1" class="headerlink" title="输出介绍"></a>输出介绍</h3><ul>
+<li><p>第一行： <strong>任务队列信息</strong>，同 uptime 命令的执行结果，具体参数说明情况如下：</p>
+<ul>
+<li><p>15：29：54 当前系统时间</p>
+</li>
+<li><p>up 1 day, 21:20：系统连续运行时间</p>
+</li>
+<li><p>0 users：当前登录系统用户数</p>
+</li>
+<li><p><strong>load average</strong>: 0.10, 0.03, 0.01 — load average后面的三个数分别是<strong>1分钟、5分钟、15分钟的负载情况。</strong></p>
+<p>load average数据是每隔5秒钟检查一次活跃的进程数，然后按特定算法计算出的数值。<strong>如果这个数除以逻辑CPU的数量，结果高于5的时候就表明系统在超负荷运转了</strong>。</p>
+</li>
+</ul>
+</li>
+<li><p>第二行：<strong>Tasks — 任务（进程）</strong>，具体信息说明如下：</p>
+<p>系统现在共有2个进程，其中处于运行中的有1个，1个在休眠（sleep），stoped状态的有0个，zombie状态（僵尸）的有0个。</p>
+</li>
+<li><p>第三行：<strong>cpu状态信息</strong>，具体属性说明如下：</p>
+<ul>
+<li><p>0.1%us — 用户空间占用CPU的百分比。  <strong>User</strong></p>
+</li>
+<li><p>0.9% sy — 内核空间占用CPU的百分比。 <strong>System</strong></p>
+</li>
+<li><p>0.0% ni — 改变过优先级的进程占用CPU的百分比 </p>
+</li>
+<li><p>99.0% id — 空闲CPU百分比</p>
+</li>
+<li><p>0.0% wa — IO等待占用CPU的百分比      <strong>Wait</strong></p>
+</li>
+<li><p>0.0% hi — 硬中断（Hardware IRQ）占用CPU的百分比</p>
+</li>
+<li><p>0.0% si — 软中断（Software Interrupts）占用CPU的百分比</p>
+</li>
+</ul>
+</li>
+<li><p>第四行：<strong>内存</strong>（详情见Free命令解析）</p>
+<p>对于内存监控，在top里我们要时刻监控第五行swap交换分区的used，如果这个数值在不断的变化，说明内核在不断进行内存和swap的数据交换，这是真正的内存不够用了。</p>
+</li>
+<li><p>第五行：<strong>进程</strong></p>
+<ul>
+<li><p>PID — 进程id</p>
+</li>
+<li><p>USER — 进程所有者</p>
+</li>
+<li><p>PR — 进程优先级</p>
+</li>
+<li><p>NI — nice值。负值表示高优先级，正值表示低优先级</p>
+</li>
+<li><p>VIRT — 进程使用的虚拟内存总量，单位kb。VIRT&#x3D;SWAP+RES</p>
+</li>
+<li><p>RES — 进程使用的、未被换出的物理内存大小，单位kb。RES&#x3D;CODE+DATA</p>
+</li>
+<li><p>SHR — 共享内存大小，单位kb</p>
+</li>
+<li><p>S — 进程状态。D&#x3D;不可中断的睡眠状态 R&#x3D;运行 S&#x3D;睡眠 T&#x3D;跟踪&#x2F;停止 Z&#x3D;僵尸进程</p>
+</li>
+<li><p>%CPU — 上次更新到现在的CPU时间占用百分比</p>
+</li>
+<li><p>%MEM — 进程使用的物理内存百分比</p>
+</li>
+<li><p>TIME+ — 进程使用的CPU时间总计，单位1&#x2F;100秒</p>
+</li>
+<li><p>COMMAND — 进程名称（命令名&#x2F;命令行）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h3><h4 id="多U多核CPU监控"><a href="#多U多核CPU监控" class="headerlink" title="多U多核CPU监控"></a>多U多核CPU监控</h4><p>在top界面按下1开关，多核CPU数据显示。</p>
+<h3 id="高亮显示当前运行进程"><a href="#高亮显示当前运行进程" class="headerlink" title="高亮显示当前运行进程"></a>高亮显示当前运行进程</h3><p>敲击键盘“b”（打开&#x2F;关闭加亮效果）</p>
+<h3 id="top交互命令"><a href="#top交互命令" class="headerlink" title="top交互命令"></a>top交互命令</h3><p>h 显示帮助画面，给出一些简短的命令总结说明</p>
+<p>k 终止一个进程。</p>
+<p>i 忽略闲置和僵死进程。这是一个开关式命令。</p>
+<p>q 退出程序</p>
+<p>r 重新安排一个进程的优先级别</p>
+<p>S 切换到累计模式</p>
+<p>s 改变两次刷新之间的延迟时间（单位为s），如果有小数，就换算成m s。输入0值则系统将不断刷新，默认值是5 s</p>
+<p>f或者F 从当前显示中添加或者删除项目</p>
+<p>o或者O 改变显示项目的顺序</p>
+<p>l 切换显示平均负载和启动时间信息</p>
+<p>m 切换显示内存信息</p>
+<p>t 切换显示进程和CPU状态信息</p>
+<p>c 切换显示命令名称和完整命令行</p>
+<p>M 根据驻留内存大小进行排序</p>
+<p>P 根据CPU使用百分比大小进行排序</p>
+<p>T 根据时间&#x2F;累计时间进行排序</p>
+<p>W 将当前设置写入~&#x2F;.toprc文件中</p>
+<hr>
+<h2 id="vmstat"><a href="#vmstat" class="headerlink" title="vmstat"></a>vmstat</h2><p>待完善</p>
+<hr>
+<h2 id="mpstat"><a href="#mpstat" class="headerlink" title="mpstat"></a>mpstat</h2><p>待完善</p>
+<hr>
+<h2 id="iostat"><a href="#iostat" class="headerlink" title="iostat"></a>iostat</h2><p>待完善</p>
+<hr>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p>《操作系统概念》</p>
+<p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/peida/archive/2012/12/24/2831353.html">竹子-博客 每天一个Linux命令系列</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/12/28/Framework/Spring/Spring-mvc/" rel="prev" title="Spring_mvc">
+                  <i class="fa fa-angle-left"></i> Spring_mvc
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/01/06/Framework/Spring/SpringBoot%E5%90%AF%E5%8A%A8%E7%B1%BB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="next" title="SpringBoot启动类源码分析">
+                  SpringBoot启动类源码分析 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

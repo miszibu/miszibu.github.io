@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="如何安装 redis, 启动 Redis 和 redis 集群设置。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis-Ligecycle">
+<meta property="og:url" content="https://miszibu.github.io/2020/05/26/Components/Redis/Redis-Lifecylce/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="如何安装 redis, 启动 Redis 和 redis 集群设置。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-26T15:59:25.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.054Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/05/26/Components/Redis/Redis-Lifecylce/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/05/26/Components/Redis/Redis-Lifecylce/","path":"2020/05/26/Components/Redis/Redis-Lifecylce/","title":"Redis-Ligecycle"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Redis-Ligecycle | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Installation"><span class="nav-number">1.</span> <span class="nav-text">Installation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Prerequisite-to-be-installed"><span class="nav-number">1.1.</span> <span class="nav-text">Prerequisite to be installed</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Download-build-and-install-Redis-server"><span class="nav-number">1.2.</span> <span class="nav-text">Download, build, and install Redis server</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Start-redis-instance"><span class="nav-number">2.</span> <span class="nav-text">Start redis instance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-redis-cluster"><span class="nav-number">3.</span> <span class="nav-text">Create redis cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Add-redis-slave-instance-into-redis-cluster"><span class="nav-number">4.</span> <span class="nav-text">Add redis slave instance into redis cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Add-redis-master-instance-into-redis-cluster"><span class="nav-number">5.</span> <span class="nav-text">Add redis master instance into redis cluster</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/05/26/Components/Redis/Redis-Lifecylce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Redis-Ligecycle | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis-Ligecycle
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-05-26 23:59:25" itemprop="dateCreated datePublished" datetime="2020-05-26T23:59:25+08:00">2020-05-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>如何安装 redis, 启动 Redis 和 redis 集群设置。</p>
+<span id="more"></span>
+
+<h2 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h2><p>There are many ways to install redis on different version system. Using package managment tool like brew, apt-get, yum ans so on is more convenient than other ways. But in this case we would install redis by tarball. </p>
+<h3 id="Prerequisite-to-be-installed"><a href="#Prerequisite-to-be-installed" class="headerlink" title="Prerequisite to be installed"></a>Prerequisite to be installed</h3><ul>
+<li>Install necessary package</li>
+</ul>
+<p>yum -y install gcc-c++</p>
+<blockquote>
+<p>-y: always yes</p>
+</blockquote>
+<ul>
+<li>Install ruby</li>
+</ul>
+<ol>
+<li>Download ruby tarball</li>
+<li>Unarchive ruby package</li>
+<li>Set access authority(Optional): chmod -R 700 ruby-2.6.3</li>
+<li>cd redis_install_path&#x2F;ruby-2.6.3&#x2F;</li>
+<li>Set ruby install path: .&#x2F;configure –prefix&#x3D;redis_install_path&#x2F;ruby</li>
+<li>Compile code: make</li>
+<li>Compile and install: make install</li>
+<li>Add ruby command folder to system path: export PATH&#x3D;redis_install_path&#x2F;ruby&#x2F;bin:$PATH</li>
+</ol>
+<blockquote>
+<p>Tips: If there are two executable files with same name in different folder and their path are both in PATH. The previous ones in PATH will be executed, and the latter will be ignored.</p>
+</blockquote>
+<ul>
+<li>Install rubygem(gem is a package management tool in ruby)</li>
+</ul>
+<ol>
+<li>Download rubygems tarball </li>
+<li>Unarchive rubygems packages: unzip rubygems-3.0.4.zip</li>
+<li>Set access authority(Optional): chmod -R 700 rubygems-3.0.4</li>
+<li>cd rubygems-3.0.4</li>
+<li>Install ruby-gems: ruby setup.rb</li>
+</ol>
+<ul>
+<li>Install redis-gem(Install the redis-gem package using gem)</li>
+</ul>
+<ol>
+<li>Download redis-gems tarball</li>
+<li>Install: gem install -l redis-4.1.2.gem</li>
+</ol>
+<h3 id="Download-build-and-install-Redis-server"><a href="#Download-build-and-install-Redis-server" class="headerlink" title="Download, build, and install Redis server"></a>Download, build, and install Redis server</h3><ul>
+<li>Install redis</li>
+</ul>
+<ol>
+<li>Download redis installation package</li>
+<li>Unarchive package: tar -xvzf redis-stable.tar.gz</li>
+<li>cd redis-stable</li>
+<li>Compile: make</li>
+<li>Install: make install</li>
+</ol>
+<hr>
+<h2 id="Start-redis-instance"><a href="#Start-redis-instance" class="headerlink" title="Start redis instance"></a>Start redis instance</h2><ol>
+<li><p>Update redis configuratio file(Refer to redis_config.conf.j2 file)</p>
+</li>
+<li><p>Create the pid, log, configuration folder</p>
+</li>
+<li><p>Start redis by configuration file: </p>
+<blockquote>
+<p>redis-server &#x2F;.conf</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># The following configuration is important</span></span><br><span class="line"><span class="string">port</span> <span class="string">&lt;REDIS</span> <span class="string">PORT&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Specify the log file name</span></span><br><span class="line"><span class="string">logfile</span> <span class="string">&quot;redisLog.log&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set pid file path where port is the port where it is running</span></span><br><span class="line"><span class="string">pidfile</span> <span class="string">/var/run/redis_&lt;port&gt;</span></span><br><span class="line"><span class="comment"># Data/Working Directory where the DB will be written inside this directory, with the filename # specified using the &#x27;dbfilename&#x27; configuration directive</span></span><br><span class="line"><span class="string">dir</span> <span class="string">/&lt;REDIS</span> <span class="string">DATA</span> <span class="string">PARTITION&gt;/&lt;REDIS</span> <span class="string">PORT&gt;/data</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Initially if we don’t have list of server ips for trusted access for cluster node.</span></span><br><span class="line"><span class="string">bind</span> <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span></span><br><span class="line"><span class="comment"># bind server1_ip server2_ip ... servern_ip</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># By default Redis does not run as a daemon. Use &#x27;yes&#x27; as we need it.</span></span><br><span class="line"><span class="string">daemonize</span> <span class="literal">yes</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set log level to moderate</span></span><br><span class="line"><span class="string">loglevel</span> <span class="string">notice</span></span><br><span class="line"></span><br><span class="line"><span class="string">cluster-enabled</span> <span class="literal">yes</span></span><br><span class="line"></span><br><span class="line"><span class="string">cluster-config-file</span> <span class="string">nodes.conf</span></span><br><span class="line"></span><br><span class="line"><span class="string">cluster-node-timeout</span> <span class="number">5000</span></span><br><span class="line"></span><br><span class="line"><span class="string">appendonly</span> <span class="literal">yes</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Create-redis-cluster"><a href="#Create-redis-cluster" class="headerlink" title="Create redis cluster"></a>Create redis cluster</h2><ol>
+<li>Cd redis installation path</li>
+<li>Create redis cluster</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli –cluster create itsrhv22205.it.statestr.com:6380 itsrhv17064.it.statestr.com:6379 itsrhv17065.it.statestr.com:6379</p>
+</blockquote>
+<ol start="3">
+<li>View the topology of redis cluster</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli -c -h  -p  -a  cluster nodes</p>
+</blockquote>
+<hr>
+<h2 id="Add-redis-slave-instance-into-redis-cluster"><a href="#Add-redis-slave-instance-into-redis-cluster" class="headerlink" title="Add redis slave instance into redis cluster"></a>Add redis slave instance into redis cluster</h2><ol>
+<li>Cd redis installation path</li>
+<li>Add redis slave instance into redis cluster</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli –cluster add-node : : –cluster-slave –cluster-master-id  -a </p>
+</blockquote>
+<ol start="3">
+<li>View the topology of redis cluster</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli -c -h  -p  -a  cluster nodes</p>
+</blockquote>
+<hr>
+<h2 id="Add-redis-master-instance-into-redis-cluster"><a href="#Add-redis-master-instance-into-redis-cluster" class="headerlink" title="Add redis master instance into redis cluster"></a>Add redis master instance into redis cluster</h2><ol>
+<li>Cd redis installation path</li>
+<li>Add redis master instance into redis cluster</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli –cluster add-node : : -a </p>
+</blockquote>
+<ol start="3">
+<li>Reshard slots from existed master nodes to newly added master node</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli –cluster reshard : –cluster-from all –cluster-to  –cluster-slots  –cluster-yes -a </p>
+</blockquote>
+<ol start="3">
+<li>View the topology of redis cluster</li>
+</ol>
+<blockquote>
+<p>.&#x2F;redis-cli -c -h  -p  -a  cluster nodes</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/05/26/Components/Redis/Redis-Reshard/" rel="prev" title="Redis-Reshard">
+                  <i class="fa fa-angle-left"></i> Redis-Reshard
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/05/27/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="next" title="Java-多线程同步工具类">
+                  Java-多线程同步工具类 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

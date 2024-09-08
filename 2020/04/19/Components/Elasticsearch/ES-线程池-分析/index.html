@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文将介绍 ES 的线程池和请求等待队列等知识。 施工中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES_线程池_分析">
+<meta property="og:url" content="https://miszibu.github.io/2020/04/19/Components/Elasticsearch/ES-%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="本文将介绍 ES 的线程池和请求等待队列等知识。 施工中">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-19T06:37:14.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.038Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/04/19/Components/Elasticsearch/ES-%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E5%88%86%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/04/19/Components/Elasticsearch/ES-%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E5%88%86%E6%9E%90/","path":"2020/04/19/Components/Elasticsearch/ES-线程池-分析/","title":"ES_线程池_分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ES_线程池_分析 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E5%8F%82%E6%95%B0%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">线程池 参数介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E7%BA%BF%E7%A8%8B%E6%B1%A0%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">获取线程池配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">线程池类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%8F%82%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">线程池的参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%99%A8%E6%A0%B8%E6%95%B0%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.4.</span> <span class="nav-text">处理器核数设置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E5%8F%98%E6%9B%B4%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">2.</span> <span class="nav-text">是否需要变更线程池的大小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9-Therad-Pool-Queue-Size"><span class="nav-number">3.</span> <span class="nav-text">修改 Therad Pool Queue Size</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%9C%BA%E6%99%AF"><span class="nav-number">3.1.</span> <span class="nav-text">示例场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/04/19/Components/Elasticsearch/ES-%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ES_线程池_分析 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES_线程池_分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-19 14:37:14" itemprop="dateCreated datePublished" datetime="2020-04-19T14:37:14+08:00">2020-04-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文将介绍 ES 的线程池和请求等待队列等知识。</p>
+<p>施工中</p>
+<span id="more"></span>
+
+<h2 id="线程池-参数介绍"><a href="#线程池-参数介绍" class="headerlink" title="线程池 参数介绍"></a>线程池 参数介绍</h2><p><code>_cat/thread_pool</code>API 返回了线程池的相关信息，其中 <code>active</code> 表示活跃的线程数量，<code>queue</code> 表示正在等待中的任务数量，<code>queue_size</code>则表示当前 queue 的 size了。当队列中等待的任务超过了 <code>queue_size</code>时，请求将会被拒绝。</p>
+<h3 id="获取线程池配置"><a href="#获取线程池配置" class="headerlink" title="获取线程池配置"></a>获取线程池配置</h3><figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 两种 API 都可以查询线程池的状态</span><br><span class="line">GET /_cat/thread_pool?v&amp;h=id,core,name,type,active,queue,queue_size,rejected,largest,min,max</span><br><span class="line">GET /_nodes/thread_pool</span><br><span class="line"></span><br><span class="line">id                     name                type                  active queue queue_size rejected largest min max</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A analyze             fixed                      0     0         16        0       0   1   1</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A ccr                 fixed                      0     0        100        0       0  32  32</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A fetch_shard_started scaling                    0     0         -1        0       0   1  16</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A fetch_shard_store   scaling                    0     0         -1        0       0   1  16</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A flush               scaling                    0     0         -1        0       4   1   4</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A force_merge         fixed                      0     0         -1        0       0   1   1</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A generic             scaling                    0     0         -1        0       5   4 128</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A get                 fixed                      0     0       1000        0       8   8   8</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A index               fixed                      0     0        200        0       8   8   8</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A listener            fixed                      0     0         -1        0       4   4   4</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A management          scaling                    1     0         -1        0       4   1   5</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A refresh             scaling                    0     0         -1        0       2   1   4</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A rollup_indexing     fixed                      0     0          4        0       0   4   4</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A search              fixed_auto_queue_size      0     0       1000        0      13  13  13</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A search_throttled    fixed_auto_queue_size      0     0        100        0       0   1   1</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A security-token-key  fixed                      0     0       1000        0       0   1   1</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A snapshot            scaling                    0     0         -1        0       0   1   4</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A warmer              scaling                    0     0         -1        0       0   1   4</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A watcher             fixed                      0     0       1000        0       0  40  40</span><br><span class="line">K65T0Ik-TW-KCAHLzq4f_A write               fixed                      0     0        200        0       8   8   8</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>Field Name</th>
+<th>Alias</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>type</code></td>
+<td><code>t</code></td>
+<td>The current (*) type of thread pool (<code>fixed</code> or <code>scaling</code>)</td>
+</tr>
+<tr>
+<td><strong><code>active</code></strong></td>
+<td><code>a</code></td>
+<td>The number of active threads in the current thread pool</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td><code>s</code></td>
+<td>The number of threads in the current thread pool</td>
+</tr>
+<tr>
+<td><strong><code>queue</code></strong></td>
+<td><code>q</code></td>
+<td>The number of tasks in the queue for the current thread pool</td>
+</tr>
+<tr>
+<td><strong><code>queue_size</code></strong></td>
+<td><code>qs</code></td>
+<td>The maximum number of tasks permitted in the queue for the current thread pool</td>
+</tr>
+<tr>
+<td><strong><code>rejected</code></strong></td>
+<td><code>r</code></td>
+<td>The number of tasks rejected by the thread pool executor</td>
+</tr>
+<tr>
+<td><code>largest</code></td>
+<td><code>l</code></td>
+<td>The highest number of active threads in the current thread pool</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td><code>c</code></td>
+<td>The number of tasks completed by the thread pool executor</td>
+</tr>
+<tr>
+<td><code>min</code></td>
+<td><code>mi</code></td>
+<td>The configured minimum number of active threads allowed in the current thread pool</td>
+</tr>
+<tr>
+<td><code>max</code></td>
+<td><code>ma</code></td>
+<td>The configured maximum number of active threads allowed in the current thread pool</td>
+</tr>
+<tr>
+<td><code>keep_alive</code></td>
+<td><code>k</code></td>
+<td>The configured keep alive time for threads</td>
+</tr>
+</tbody></table>
+<h3 id="线程池类型"><a href="#线程池类型" class="headerlink" title="线程池类型"></a><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html#modules-threadpool">线程池类型</a></h3><p>对于不同的功能，节点内部有不同的线程池来处理，区分线程池可以使节点更好的管理线程内存的消费。</p>
+<p>许多线程池都由对应的队列，用于存储 Pending 请求而不是丢弃。</p>
+<p>以下是各个请求的功能，按需查看。</p>
+<ul>
+<li><p><strong><code>generic</code></strong></p>
+<p>For generic operations (for example, background node discovery). Thread pool type is <code>scaling</code>.</p>
+</li>
+<li><p><strong><code>search</code></strong></p>
+<p>For count&#x2F;search&#x2F;suggest operations. Thread pool type is <code>fixed_auto_queue_size</code> with a size of <code>int((# of available_processors * 3) / 2) + 1</code>, and initial queue_size of <code>1000</code>.</p>
+</li>
+<li><p><strong><code>search_throttled</code></strong></p>
+<p>For count&#x2F;search&#x2F;suggest&#x2F;get operations on <code>search_throttled indices</code>. Thread pool type is <code>fixed_auto_queue_size</code> with a size of <code>1</code>, and initial queue_size of <code>100</code>.</p>
+</li>
+<li><p><strong><code>get</code></strong></p>
+<p>For get operations. Thread pool type is <code>fixed</code> with a size of <code># of available processors</code>, queue_size of <code>1000</code>.</p>
+</li>
+<li><p><strong><code>analyze</code></strong></p>
+<p>For analyze requests. Thread pool type is <code>fixed</code> with a size of <code>1</code>, queue size of <code>16</code>.</p>
+</li>
+<li><p><strong><code>write</code></strong></p>
+<p>For single-document index&#x2F;delete&#x2F;update and bulk requests. Thread pool type is <code>fixed</code> with a size of <code># of available processors</code>, queue_size of <code>200</code>. The maximum size for this pool is <code>1 + # of available processors</code>.</p>
+</li>
+<li><p><strong><code>snapshot</code></strong></p>
+<p>For snapshot&#x2F;restore operations. Thread pool type is <code>scaling</code> with a keep-alive of <code>5m</code> and a max of <code>min(5, (# of available processors)/2)</code>.</p>
+</li>
+<li><p><strong><code>warmer</code></strong></p>
+<p>For segment warm-up operations. Thread pool type is <code>scaling</code> with a keep-alive of <code>5m</code> and a max of <code>min(5, (# of available processors)/2)</code>.</p>
+</li>
+<li><p><strong><code>refresh</code></strong></p>
+<p>For refresh operations. Thread pool type is <code>scaling</code> with a keep-alive of <code>5m</code> and a max of <code>min(10, (# of available processors)/2)</code>.</p>
+</li>
+<li><p><strong><code>listener</code></strong></p>
+<p>Mainly for java client executing of action when listener threaded is set to <code>true</code>. Thread pool type is <code>scaling</code> with a default max of <code>min(10, (# of available processors)/2)</code>.</p>
+</li>
+<li><p><strong><code>fetch_shard_started</code></strong></p>
+<p>For listing shard states. Thread pool type is <code>scaling</code> with keep-alive of <code>5m</code> and a default maximum size of <code>2 * # of available processors</code>.</p>
+</li>
+<li><p><strong><code>fetch_shard_store</code></strong></p>
+<p>For listing shard stores. Thread pool type is <code>scaling</code> with keep-alive of <code>5m</code> and a default maximum size of <code>2 * # of available processors</code>.</p>
+</li>
+<li><p><strong><code>flush</code></strong></p>
+<p>For <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-flush.html">flush</a>, <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-synced-flush-api.html">synced flush</a>, and <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-translog.html">translog</a> <code>fsync</code> operations. Thread pool type is <code>scaling</code> with a keep-alive of <code>5m</code> and a default maximum size of <code>min(5, (# of available processors)/2)</code>.</p>
+</li>
+<li><p><strong><code>force_merge</code></strong></p>
+<p>For <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html">force merge</a> operations. Thread pool type is <code>fixed</code> with a size of 1 and an unbounded queue size.</p>
+</li>
+<li><p><strong><code>management</code></strong></p>
+<p>For cluster management. Thread pool type is <code>scaling</code> with a keep-alive of <code>5m</code> and a default maximum size of <code>5</code>.</p>
+</li>
+</ul>
+<h3 id="线程池的参数"><a href="#线程池的参数" class="headerlink" title="线程池的参数"></a>线程池的参数</h3><p>线程池有三种不同的模式，分别为 <code>fixed</code>, <code>scaling</code>, <code>fixed-auto-queue-size</code>，对于不同的类型的线程池，配置参数也不相同。</p>
+<p><strong>fixed</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">thread_pool:</span></span><br><span class="line">    <span class="attr">write:</span></span><br><span class="line">        <span class="attr">size:</span> <span class="number">30</span></span><br><span class="line">        <span class="attr">queue_size:</span> <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>scaling</strong></p>
+<p><code>scaling</code>类型的线程池持有动态数量的线程。线程数量随集群负载 和 <code>core &amp; max</code>的值成比例变化。</p>
+<p><code>keep_alive</code>参数决定一个线程空闲多久会被移除。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">thread_pool:</span></span><br><span class="line">    <span class="attr">warmer:</span></span><br><span class="line">        <span class="attr">core:</span> <span class="number">1</span></span><br><span class="line">        <span class="attr">max:</span> <span class="number">8</span></span><br><span class="line">        <span class="attr">keep_alive:</span> <span class="string">2m</span></span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html#fixed-auto-queue-size"><strong>fixed-auto-queue-size</strong></a></p>
+<p>实验性功能，请根据具体版本，查看对应官方文档。</p>
+<h3 id="处理器核数设置"><a href="#处理器核数设置" class="headerlink" title="处理器核数设置"></a>处理器核数设置</h3><p>处理器核数是自动感知的，线程池设置也是基于此自动设置的，可以通过以下的配置来修改该值，如果你确定你的场景需要修改这个值。 </p>
+<blockquote>
+<p> NOTE: 这是个专家级的配置，会牵涉到许多不同的配置，比如说改变 GC 线程的数量，pinning processes to cores等等。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">processors:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>此处介绍几个需要覆盖<code>processors</code>值的场景：</p>
+<ol>
+<li>当我们需要 ES只使用一部分处理器性能时，比如一台机器上运行了2个 ES 实例，我们会希望每个实例只使用一半的 CPU 资源，就可以手动修改处理器核数。</li>
+<li>当ES 错误的检测了节点的 CPU 核数时，这个值可以通过 GET &#x2F;_nodes，查看 OS 对象的值来获取。</li>
+</ol>
+<h2 id="是否需要变更线程池的大小"><a href="#是否需要变更线程池的大小" class="headerlink" title="是否需要变更线程池的大小"></a>是否需要变更线程池的大小</h2><p>Elasticsearch 默认的线程设置已经是很合理。</p>
+<p>对于所有的线程池（除了 <code>search</code> ），<strong>线程个数是根据 CPU 核心数设置的</strong>。 如果你有 8 个核，你可以同时运行的只有 8 个线程，只分配 8 个线程给任何特定的线程池是有道理的。</p>
+<p><code>Search</code>线程池设置的大一点，配置为 <code>int（（ 核心数 ＊ 3 ）／ 2 ）＋ 1</code> 。</p>
+<p>你可能会认为某些线程可能会阻塞（如磁盘上的 I／O 操作），所以你才想加大线程的。对于 Elasticsearch 来说这并不是一个问题：因为大多数 I／O 的操作是由 Lucene 线程管理的，而不是 Elasticsearch。</p>
+<p>此外，线程池通过传递彼此之间的工作配合。你不必再因为它正在等待磁盘写操作而担心网络线程阻塞， 因为网络线程早已把这个工作交给另外的线程池，并且网络进行了响应。</p>
+<p>最后，你的处理器的计算能力是有限的，拥有<strong>更多的线程会导致你的处理器频繁切换线程上下文</strong>。 一个处理器同时只能运行一个线程。所以当它需要切换到其它不同的线程的时候，它会存储当前的状态（寄存器等等），然后加载另外一个线程。 如果幸运的话，这个切换发生在同一个核心，如果不幸的话，这个切换可能发生在不同的核心，这就需要在内核间总线上进行传输。</p>
+<p>这个上下文的切换，会给 CPU 时钟周期带来管理调度的开销；在现代的 CPUs 上，开销估计高达 30 μs。也就是说线程会被堵塞超过 30 μs，如果这个时间用于线程的运行，极有可能早就结束了。</p>
+<p><strong>所以，下次请不要调整线程池的线程数。如果你真 <em>想调整</em> ， 一定要关注你的 CPU 核心数，最多设置成核心数的两倍，再多了都是浪费。</strong></p>
+<h2 id="修改-Therad-Pool-Queue-Size"><a href="#修改-Therad-Pool-Queue-Size" class="headerlink" title="修改 Therad Pool Queue Size"></a>修改 Therad Pool Queue Size</h2><p>当同时接收过多请求，队列等待请求数量大于 <code>queue_size</code> 时，额外的请求就会被拒绝。</p>
+<p>单纯的增加线程数量，对于提高系统的性能，作用有限，参考<a href="#%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E5%8F%98%E6%9B%B4%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%A4%A7%E5%B0%8F">是否需要变更线程池的大小</a></p>
+<p>直接增加等待队列的大小是相对可取的方案。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">thread_pool.search.queue_size:</span> <span class="number">500</span></span><br><span class="line"><span class="comment">#queue_size允许控制没有线程执行它们的挂起请求队列的初始大小。</span></span><br><span class="line"></span><br><span class="line"><span class="attr">thread_pool.search.size:</span> <span class="number">200</span></span><br><span class="line"><span class="comment">#size参数控制线程数，默认为核心数乘以5。</span></span><br><span class="line"></span><br><span class="line"><span class="string">thread_pool.search.min_queue_size:10</span></span><br><span class="line"><span class="comment">#min_queue_size设置控制queue_size可以调整到的最小量。</span></span><br><span class="line"></span><br><span class="line"><span class="attr">thread_pool.search.max_queue_size:</span> <span class="number">1000</span></span><br><span class="line"><span class="comment">#max_queue_size设置控制queue_size可以调整到的最大量。</span></span><br><span class="line"></span><br><span class="line"><span class="attr">thread_pool.search.auto_queue_frame_size:</span> <span class="number">2000</span></span><br><span class="line"><span class="comment">#auto_queue_frame_size设置控制在调整队列之前进行测量的操作数。它应该足够大，以便单个操作不会过度偏向计算。</span></span><br><span class="line"></span><br><span class="line"><span class="attr">thread_pool.search.target_response_time:</span> <span class="string">6s</span></span><br><span class="line"><span class="comment">#target_response_time是时间值设置，指示线程池队列中任务的目标平均响应时间。如果任务通常超过此时间，则将调低线程池队列以拒绝任务。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="示例场景"><a href="#示例场景" class="headerlink" title="示例场景"></a>示例场景</h3><p>通过代码生成大量写请求，来测试请求过载的场景。</p>
+<p>目前设置 write 线程数量为1，发送1W 个请求，还是没有监测到 queue队列的拥堵现象。</p>
+<p>考虑多线程发送请求，提高压力。</p>
+<p>&#x2F;&#x2F;todo</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/cat-thread-pool.html">ESV6.7 _cat&#x2F;therad_pool api introductin</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/dont-touch-these-settings.html">ES Don’t touch these setting</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html#modules-threadpool">ES7.6 Thread Pool Type</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/04/16/Components/Elasticsearch/Snapshot-To-Local/" rel="prev" title="ElasticSearch Snapshot">
+                  <i class="fa fa-angle-left"></i> ElasticSearch Snapshot
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/04/19/Tools/maven/maven-tutorial/" rel="next" title="maven_tutorial">
+                  maven_tutorial <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

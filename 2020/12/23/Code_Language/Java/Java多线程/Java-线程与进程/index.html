@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="OS_单核至多核的进程调度 关于操作系统的方面的进程线程关系，请先阅读上述博文。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java-线程与进程">
+<meta property="og:url" content="https://miszibu.github.io/2020/12/23/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="OS_单核至多核的进程调度 关于操作系统的方面的进程线程关系，请先阅读上述博文。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/os_thread_status.png">
+<meta property="og:image" content="https://miszibu.github.io/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/JavaThreadStatus.png">
+<meta property="og:image" content="https://miszibu.github.io/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/java_thread_lifecycle.jpg">
+<meta property="article:published_time" content="2020-12-23T09:21:44.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.020Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="多线程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/os_thread_status.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/12/23/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/12/23/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/","path":"2020/12/23/Code_Language/Java/Java多线程/Java-线程与进程/","title":"Java-线程与进程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java-线程与进程 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81"><span class="nav-number">1.</span> <span class="nav-text">操作系统线程的状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81-Thread-State"><span class="nav-number">2.</span> <span class="nav-text">Java线程的状态: Thread.State</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Java%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81-%E4%B8%8E-OS%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E7%9A%84%E6%98%A0%E5%B0%84"><span class="nav-number">3.</span> <span class="nav-text">Java线程状态 与 OS线程状态的映射</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#New"><span class="nav-number">3.1.</span> <span class="nav-text">New</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Runnable%EF%BC%9A%E6%AD%A3%E5%9C%A8-JVM%E4%B8%AD%E8%BF%90%E8%A1%8C"><span class="nav-number">3.2.</span> <span class="nav-text">Runnable：正在 JVM中运行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-Runnable-%E7%8A%B6%E6%80%81%E8%A6%81%E4%B8%8D%E5%8C%BA%E5%88%86-Ready-%E5%92%8C-Running"><span class="nav-number">3.2.1.</span> <span class="nav-text">为什么 Runnable 状态要不区分 Ready 和 Running?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E7%94%9FI-O%E9%98%BB%E5%A1%9E%EF%BC%8C%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%A6%82%E4%BD%95%E5%88%87%E6%8D%A2%EF%BC%9F"><span class="nav-number">3.2.2.</span> <span class="nav-text">发生I&#x2F;O阻塞，线程状态如何切换？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%B1%82%E9%9D%A2"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">操作系统层面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JVM-%E5%B1%82%E9%9D%A2"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">JVM 层面</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Waiting%EF%BC%9A%E6%97%A0%E9%99%90%E6%9C%9F%E7%AD%89%E5%BE%85%E5%85%B6%E4%BB%96%E7%BA%BF%E7%A8%8B"><span class="nav-number">3.3.</span> <span class="nav-text">Waiting：无限期等待其他线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Timed-waiting%EF%BC%9A%E6%9C%89%E9%99%90%E6%9C%9F%E7%AD%89%E5%BE%85%E5%85%B6%E4%BB%96%E7%BA%BF%E7%A8%8B"><span class="nav-number">3.4.</span> <span class="nav-text">Timed_waiting：有限期等待其他线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block%EF%BC%9A%E7%AD%89%E5%BE%85%E7%9B%91%E8%A7%86%E5%99%A8%E9%94%81"><span class="nav-number">3.5.</span> <span class="nav-text">Block：等待监视器锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Terminated"><span class="nav-number">3.6.</span> <span class="nav-text">Terminated</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/12/23/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java-线程与进程 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java-线程与进程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-23 17:21:44" itemprop="dateCreated datePublished" datetime="2020-12-23T17:21:44+08:00">2020-12-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a href="https://miszibu.github.io/2016/11/13/General/OS/BaseKnowledge/OS_%E5%8D%95%E6%A0%B8%E8%87%B3%E5%A4%9A%E6%A0%B8%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6/">OS_单核至多核的进程调度</a></p>
+<p>关于操作系统的方面的进程线程关系，请先阅读上述博文。</p>
+<span id="more"></span>
+
+<h1 id="操作系统线程的状态"><a href="#操作系统线程的状态" class="headerlink" title="操作系统线程的状态"></a>操作系统线程的状态</h1><p><img src="/./Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/os_thread_status.png"></p>
+<h1 id="Java线程的状态-Thread-State"><a href="#Java线程的状态-Thread-State" class="headerlink" title="Java线程的状态: Thread.State"></a>Java线程的状态: Thread.State</h1><p><img src="/./Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/JavaThreadStatus.png"></p>
+<ul>
+<li><code>NEW</code> (<strong>新建</strong>)<br>一个尚未启动的线程处于这一状态。(A thread that has not yet started is in this state.)</li>
+<li><code>RUNNABLE</code> (<strong>可运行</strong>)<br>一个正在 Java 虚拟机中执行的线程处于这一状态。(A thread executing in the Java virtual machine is in this state.)</li>
+<li><code>BLOCKED</code> (<strong>阻塞</strong>)<br>一个正在阻塞等待一个监视器锁的线程处于这一状态。(A thread that is blocked waiting for a monitor lock is in this state.)</li>
+<li><code>WAITING</code> (<strong>等待</strong>)<br>一个正在无限期等待另一个线程执行一个特别的动作的线程处于这一状态。(A thread that is waiting indefinitely for another thread to perform a particular action is in this state.)</li>
+<li><code>TIMED_WAITING</code> (<strong>计时等待</strong>)<br>一个正在限时等待另一个线程执行一个动作的线程处于这一状态。(A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.)</li>
+<li><code>TERMINATED</code> (<strong>终止</strong>)<br>一个已经退出的线程处于这一状态。(A thread that has exited is in this state.)</li>
+</ul>
+<p><img src="/./Java-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B/java_thread_lifecycle.jpg"></p>
+<h1 id="Java线程状态-与-OS线程状态的映射"><a href="#Java线程状态-与-OS线程状态的映射" class="headerlink" title="Java线程状态 与 OS线程状态的映射"></a>Java线程状态 与 OS线程状态的映射</h1><p>前两个标题中，我们分别介绍了OS线程的5种状态和 Java线程状态的定义，<strong>JVM将 Java线程一一映射到操作系统底层的线程上，由CPU调度管理线程的生命周期</strong>。不同的操作系统有不同的线程状态的定义，而我们开发 Java 程序时，不需要关注到系统的线程定义，而是关注由 JVM 统一的线程状态。</p>
+<blockquote>
+<p>These states are <strong>virtual machine states</strong> which <strong>do not reflect</strong> any operating system thread states。<br>这些状态是<strong>虚拟机状态</strong>，它<strong>不反映</strong>任何操作系统的线程状态。</p>
+</blockquote>
+<p>比如操作系统中的 <code>ready</code>,<code> running</code>被统一成了 java 线程中的<code>runnable</code>.</p>
+<p>比如操作系统中的<code>waiting</code>状态则被更细分为了<code>block</code>,<code>waiting</code>,<code>timed_waiting</code>.</p>
+<h2 id="New"><a href="#New" class="headerlink" title="New"></a>New</h2><p>当使用new Thread()创建一个新的线程，又还没有开始执行，就处于NEW状态。</p>
+<p>当使用 start()方法后，线程进入 Runnable 状态。</p>
+<blockquote>
+<p>这里所谓“开始执行”具体指调用线程类中的start方法，start方法会开启新的执行线程，run 方法还在原线程上执行。</p>
+</blockquote>
+<h2 id="Runnable：正在-JVM中运行"><a href="#Runnable：正在-JVM中运行" class="headerlink" title="Runnable：正在 JVM中运行"></a>Runnable：正在 JVM中运行</h2><p><strong>Runnable 状态: 既包含了 Ready , Running 也包含了部分的因为 IO操作所导致的 Waiting 状态。</strong></p>
+<p>实际上，Java 的线程状态都是与自身显式引入的机制有关，Blocked(锁机制)，waiting, timed_waiting(线程间交互)</p>
+<blockquote>
+<p>处于 runnable 状态下的线程正在 Java 虚拟机中执行，但它<strong>可能正在等待</strong>来自于操作系统的其它资源，比如处理器。</p>
+<p>A thread in the runnable state is executing in the Java virtual machine but <strong>it may be waiting for</strong> other resources from the operating system such as processor.</p>
+</blockquote>
+<h3 id="为什么-Runnable-状态要不区分-Ready-和-Running"><a href="#为什么-Runnable-状态要不区分-Ready-和-Running" class="headerlink" title="为什么 Runnable 状态要不区分 Ready 和 Running?"></a>为什么 Runnable 状态要不区分 Ready 和 Running?</h3><p>现在的<strong>时分多任务</strong>操作系统架构通常都是使用的“<strong>时间分片</strong>”方式进行<strong>抢占式</strong>轮转调度（round-robin）。</p>
+<p>每个线程只能使用10ms-20ms的时间片，随后CPU会记录当前线程的执行状态并将其放回线程就绪队列，并唤醒等待的下一个线程，这就是 CPU上下文切换。实际上由于线程自身的 IO 操作，每次线程往往没用满时间片，就切换了。因此线程状态在running和ready间不断切换。</p>
+<p>通常，Java的线程状态是服务于监控的，如果线程切换得是如此之快，那么区分 ready 与 running 就没什么太大意义了。</p>
+<blockquote>
+<p>当你看到监控上显示是 running 时，对应的线程可能早就被切换下去了，甚至又再次地切换了上来，也许你只能看到 ready 与 running 两个状态在快速地闪烁。</p>
+<p>当然，对于精确的性能评估而言，获得准确的 running 时间是有必要的。</p>
+</blockquote>
+<h3 id="发生I-O阻塞，线程状态如何切换？"><a href="#发生I-O阻塞，线程状态如何切换？" class="headerlink" title="发生I&#x2F;O阻塞，线程状态如何切换？"></a>发生I&#x2F;O阻塞，线程状态如何切换？</h3><h4 id="操作系统层面"><a href="#操作系统层面" class="headerlink" title="操作系统层面"></a>操作系统层面</h4><p>在操作系统层面，当线程发生IO操作时，就会将线程切换到Waiting 状态，等待其 IO 操作完成，则使用<code>中断</code>(interrupt)机制来通知 CPU.</p>
+<blockquote>
+<p>IO操作时间长，为了让 CPU资源利用最大化，则使用阻塞式 IO, CPU不会等待线程，而是调用下一个线程。</p>
+<p>“<strong>中断驱动</strong>（interrupt-driven）”，现代操作系统基本都采用这一机制。</p>
+<p>某种意义上，这也是<strong>控制反转</strong>（IoC）机制的一种体现，cpu不用反复去询问硬盘，而是由硬盘主动发出中断信号，CPU 不断去检查中断信号。包括时间片轮转机制，本质上也是一个定时的中断信号，用于切换线程。</p>
+</blockquote>
+<p>举例说，CPU收到一个来自硬盘的中断信号，就进入中断处理例程，将当前线程放入就绪队列，先前因 I&#x2F;O 而waiting 的线程随着 I&#x2F;O 的完成也再次回到 ready 队列，这时 cpu 可能会选择它来执行。</p>
+<h4 id="JVM-层面"><a href="#JVM-层面" class="headerlink" title="JVM 层面"></a>JVM 层面</h4><p>了解了操作系统层面后，那么在 Java中线程遇到 IO 操作后，会切换到什么状态呢？Blocked 还是 Waiting 呢?</p>
+<p><strong>答案是：仍然为 Runnable.</strong></p>
+<p>我们先来看下 runnable 状态的定义，处于 runnable 状态下的线程正在 Java 虚拟机中执行，但它<strong>可能正在等待</strong>来自于操作系统的其它资源，比如处理器。对于 JVM而言，它并不关心底层的实现细节，只要线程正在运行中，正在由某个硬件资源为其服务，那么它就是 Runnable 状态。</p>
+<p>因此 IO 阻塞时，网卡，硬盘等IO设备仍然在为线程工作，那么该线程就应该是 Runnable 状态。</p>
+<p>操作系统的线程状态是围绕 CPU 为核心去叙事的，而JVM 则是抹去了底层的细节，关注于线程本身的锁和交互状态。</p>
+<p>因此细分出了 Blocked(锁阻塞)，Waiting, Timed_Waiting(线程交互)等状态。</p>
+<blockquote>
+<p>“Java 线程状态的改变通常只与自身显式引入的机制有关”，现在应该对这句话更有了解了。</p>
+</blockquote>
+<h2 id="Waiting：无限期等待其他线程"><a href="#Waiting：无限期等待其他线程" class="headerlink" title="Waiting：无限期等待其他线程"></a>Waiting：无限期等待其他线程</h2><p>这里所谓的动作通常即是指“notify或是notifyAll”。</p>
+<h2 id="Timed-waiting：有限期等待其他线程"><a href="#Timed-waiting：有限期等待其他线程" class="headerlink" title="Timed_waiting：有限期等待其他线程"></a>Timed_waiting：有限期等待其他线程</h2><p>如果没有等到如“notify”之类的动作，时间到了也会自动退出这一状态。</p>
+<h2 id="Block：等待监视器锁"><a href="#Block：等待监视器锁" class="headerlink" title="Block：等待监视器锁"></a>Block：等待监视器锁</h2><p>这是一种特殊的waiting，实际上就是被synchronized方法或者块阻塞。</p>
+<p>monitor有些书上通常叫”<strong>管程</strong>“，我也不太确定要怎么叫它。这里叫成”监视器“也是取字面的意思。</p>
+<h2 id="Terminated"><a href="#Terminated" class="headerlink" title="Terminated"></a>Terminated</h2><p>终止状态，在线程执行完毕后或退出时，线程则标志为终止。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/56494969/answer/154053599">java线程运行怎么有第六种状态？</a></p>
+<p><a target="_blank" rel="noopener" href="https://my.oschina.net/goldenshaw/blog/705397">Java 线程状态之 RUNNABLE</a></p>
+<p><a target="_blank" rel="noopener" href="https://my.oschina.net/goldenshaw/blog/386788">关于Java的线程状态</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/10/07/Components/Elasticsearch/ES-IngestPipeline/" rel="prev" title="ES-IngestPipeline">
+                  <i class="fa fa-angle-left"></i> ES-IngestPipeline
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/03/Components/Elasticsearch/ElasticSearch-%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95/" rel="next" title="ElasticSearch_倒排索引">
+                  ElasticSearch_倒排索引 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

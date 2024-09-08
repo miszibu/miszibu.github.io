@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="涉及知识点：  Template Mapping所支持Type 对于不同的查询需求，设置什么 Type">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-Mappings">
+<meta property="og:url" content="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-Mappings/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="涉及知识点：  Template Mapping所支持Type 对于不同的查询需求，设置什么 Type">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-09-09T15:06:01.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.035Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-Mappings/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-Mappings/","path":"2020/09/09/Components/Elasticsearch/ES-Mappings/","title":"ES-Mappings"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ES-Mappings | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dynamic-Mapping"><span class="nav-number">1.</span> <span class="nav-text">Dynamic Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E5%88%9B%E5%BB%BAMapping"><span class="nav-number">2.</span> <span class="nav-text">手动创建Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">字段类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">字符串类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#text"><span class="nav-number">3.1.1.</span> <span class="nav-text">text</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Keyword"><span class="nav-number">3.1.2.</span> <span class="nav-text">Keyword</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Keyword-Field"><span class="nav-number">3.1.3.</span> <span class="nav-text">Keyword + Field</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">数字类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E6%9C%9F%E7%B1%BB%E5%9E%8B-date"><span class="nav-number">3.3.</span> <span class="nav-text">日期类型 date</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B-boolean"><span class="nav-number">3.4.</span> <span class="nav-text">布尔类型 boolean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%B1%BB%E5%9E%8B-binary"><span class="nav-number">3.5.</span> <span class="nav-text">二进制类型 binary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8C%83%E5%9B%B4%E7%B1%BB%E5%9E%8B-Range"><span class="nav-number">3.6.</span> <span class="nav-text">范围类型 Range</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E7%B1%BB%E5%9E%8B-Arrays"><span class="nav-number">3.7.</span> <span class="nav-text">数组类型 Arrays</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-%E6%95%B0%E7%BB%84-Nested"><span class="nav-number">3.8.</span> <span class="nav-text">Object 数组 Nested</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/09/Components/Elasticsearch/ES-Mappings/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ES-Mappings | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES-Mappings
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-09-09 23:06:01" itemprop="dateCreated datePublished" datetime="2020-09-09T23:06:01+08:00">2020-09-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>涉及知识点：</p>
+<ul>
+<li>Template Mapping所支持Type</li>
+<li>对于不同的查询需求，设置什么 Type</li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p><strong>Mapping的优先级</strong>：在创建索引时，会按照 template 的优先级，由低到高覆盖性的合成的 Mapping。</p>
+</blockquote>
+<h2 id="Dynamic-Mapping"><a href="#Dynamic-Mapping" class="headerlink" title="Dynamic Mapping"></a>Dynamic Mapping</h2><p>，会自动应用所有匹配的template,按照template的优先级，由低到高进行覆盖式的合成，最后应用到索引上。<br>但当没有匹配到任何templates时，索引会自动生成对应mapping,这就Dynamic Mapping。</p>
+<p>动态Mapping存在着不足，比如当一个字段被映射为Integer类型后，相同字段值为String类型的文档将无法插入索引。</p>
+<h2 id="手动创建Mapping"><a href="#手动创建Mapping" class="headerlink" title="手动创建Mapping"></a>手动创建Mapping</h2><p>由于Dynamic Mapping的不可控，我们往往需要手动根据字段的类型和需求来创建Mapping。</p>
+<blockquote>
+<p>Tips: 当字段类型较多时，可以先动态生成，再删除数据后，更新mapping后再重新导入数据。</p>
+</blockquote>
+<h2 id="字段类型"><a href="#字段类型" class="headerlink" title="字段类型"></a>字段类型</h2><h3 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h3><ul>
+<li><strong>text:</strong> 支持分词，用于全文搜索</li>
+<li><strong>keyword:</strong> 不支持分词，用于聚合和排序</li>
+</ul>
+<p>如果安装了分词器，我们可以为text类型指定IK分词器。 </p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"># 模糊搜索+精确匹配</span><br><span class="line"><span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">		<span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">			<span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">		<span class="punctuation">&#125;</span></span><br><span class="line">	<span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;fielddata&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"># 模糊搜索</span><br><span class="line"><span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"># 精确匹配</span><br><span class="line"><span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"># 不需要索引</span><br><span class="line"><span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">	<span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="text"><a href="#text" class="headerlink" title="text"></a>text</h4><p><strong>工作机制：</strong> <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/text.html">text</a>类型用于索引 <code>full-text</code>字段，比如诗歌，产品描述,邮件正文等。该类型字符串会被<code>analyzer</code>分词为多个terms,然后建立反向索引。<br>text类型字段允许在全文中，进行分词查询。但不用于排序，基本也不用于聚合（Aggregation）.<br><strong>适用场景：</strong> 希望对内容进行分词查询，全文搜索的场景。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># fielddata<span class="punctuation">:</span> <span class="literal">true</span>. 该参数默认为<span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span>当设置为<span class="literal"><span class="keyword">true</span></span>时，将在内存中使用fieldata结构，用于支持对`text`类型的排序，聚合或scripting。</span><br><span class="line"># 激活fielddata， 会消耗大量内存，请根据情况使用。</span><br><span class="line">PUT my_index</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_doc&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;full_name&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span>  <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">		  <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">		  <span class="string">&quot;fielddata&quot;</span>： <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Keyword"><a href="#Keyword" class="headerlink" title="Keyword"></a>Keyword</h4><p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/keyword.html">Keyword</a> 类型用于索引结构化的数据，比如邮件地址，主机名，状态 和标签等。<br>这些类型的数据往往用于过滤（过滤所有状态为不可用的记录）,用于排序 或者 用于聚合。<strong>Keyword类型只有与查询值完全一致时，才会被匹配。</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_doc&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;tags&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span>  <span class="string">&quot;keyword&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+<h4 id="Keyword-Field"><a href="#Keyword-Field" class="headerlink" title="Keyword + Field"></a>Keyword + Field</h4><p>很多情况下，我们需要一个字段同时支持全文查找和聚合排序等功能，就需要设置该字段类型为 <code>text</code> 和 <code>Keyword</code>。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">PUT my_index</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_doc&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;city&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> </span><br><span class="line">              <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span>  <span class="string">&quot;keyword&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="数字类型"><a href="#数字类型" class="headerlink" title="数字类型"></a>数字类型</h3><ul>
+<li><strong>long</strong>: 带符号的64位整数</li>
+<li><strong>integer</strong>: 带符号的32位整数</li>
+<li><strong>short</strong>: 带符号的16位整数 [-32768，32767]</li>
+<li><strong>byte</strong>: 带符号的8位整数， [-128，127]</li>
+<li><strong>double</strong>: 双精度64位浮点数</li>
+<li><strong>float</strong>: 单精度32位浮点数</li>
+<li><strong>half_float</strong>: 半精度16位浮点数</li>
+<li><strong>scaled_float</strong>: 缩放类型的浮点数，需配合缩放因子（scaling_factor）一起使用</li>
+</ul>
+<p>对于整数类型而言（long, integer, short， byte），从搜索查询的角度而言，尽可能选择小的能提高查询效率。<br>对于浮点数而言（double, float, half_float, scaled_float），<code>-0.0</code>和<code>+0.0</code>是两个不同的数值，这点需要注意，在范围查询时选择两者中范围更大的作为边界。<br>其中scaled_float，比如价格只需要精确到分，那么缩放因子的值就是100, **在选择浮点数时，如果小数位明确，则优先使用<code>scaled_float</code>**。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	   <span class="attr">&quot;status&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;byte&quot;</span></span><br><span class="line">	   <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">	   <span class="attr">&quot;year&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;short&quot;</span></span><br><span class="line">	   <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">	   <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;long&quot;</span></span><br><span class="line">	   <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">	   <span class="attr">&quot;price&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;scaled_float&quot;</span><span class="punctuation">,</span></span><br><span class="line">		  <span class="attr">&quot;scaling_factor&quot;</span><span class="punctuation">:</span> <span class="number">100</span></span><br><span class="line">	   <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="日期类型-date"><a href="#日期类型-date" class="headerlink" title="日期类型 date"></a>日期类型 date</h3><p>ES支持以下三种日期格式：</p>
+<ul>
+<li>格式化的日期字符串</li>
+<li>一个13位long类型表示的毫秒时间戳</li>
+<li>一个integer类型表示的10位普通时间戳</li>
+</ul>
+<p>在ES内部，日期类型会被转化为UTC时间（如果指定了时区）并存储为long类型表示的毫秒时间戳。<br>值得注意的是在Kibana上的Discovery，它会根据用户所处的时区，来进行转换，查询。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	   <span class="attr">&quot;postdate&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">	      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;date&quot;</span></span><br><span class="line">	   <span class="punctuation">&#125;</span></span><br><span class="line">	<span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="布尔类型-boolean"><a href="#布尔类型-boolean" class="headerlink" title="布尔类型 boolean"></a>布尔类型 boolean</h3><h3 id="二进制类型-binary"><a href="#二进制类型-binary" class="headerlink" title="二进制类型 binary"></a>二进制类型 binary</h3><h3 id="范围类型-Range"><a href="#范围类型-Range" class="headerlink" title="范围类型 Range"></a>范围类型 Range</h3><h3 id="数组类型-Arrays"><a href="#数组类型-Arrays" class="headerlink" title="数组类型 Arrays"></a>数组类型 Arrays</h3><p>在 ES 中,没有单独 <code>array</code>的数据类型。任何 field 类型都支持[0, N]个数据，但是这些数据的类型应该相同</p>
+<blockquote>
+<p>Tips: 除了 Object 类型，Object 数组也可以被插入，但是无法对单个元素匹配查询。</p>
+</blockquote>
+<ul>
+<li>an array of strings: [ <code>&quot;one&quot;</code>, <code>&quot;two&quot;</code> ]</li>
+<li>an array of integers: [ <code>1</code>, <code>2</code> ]</li>
+<li>an array of arrays: [ <code>1</code>, [ <code>2</code>, <code>3</code> ]] which is the equivalent of [ <code>1</code>, <code>2</code>, <code>3</code> ]</li>
+<li>an array of objects: [ <code>&#123; &quot;name&quot;: &quot;Mary&quot;, &quot;age&quot;: 12 &#125;</code>, <code>&#123; &quot;name&quot;: &quot;John&quot;, &quot;age&quot;: 10 &#125;</code>]</li>
+</ul>
+<h3 id="Object-数组-Nested"><a href="#Object-数组-Nested" class="headerlink" title="Object 数组 Nested"></a>Object 数组 Nested</h3><p>默认的数组不支持 Object 元素，需要 <code>Nested</code> 来存储 Object 数组，这样数组中每一个 Object 都可以单独匹配查询。</p>
+<blockquote>
+<p>对于 Object 元素，使用 <code>Flattened</code>是一种更为开销更低的方式。具体内容略</p>
+</blockquote>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000017215813?utm_source=sf-related">https://segmentfault.com/a/1190000017215813?utm_source=sf-related</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/09/09/Components/Elasticsearch/ES-%E5%88%86%E8%AF%8D%E5%99%A8/" rel="prev" title="ES-分词器">
+                  <i class="fa fa-angle-left"></i> ES-分词器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/" rel="next" title="ES-项目实战1-唐诗300首">
+                  ES-项目实战1-唐诗300首 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

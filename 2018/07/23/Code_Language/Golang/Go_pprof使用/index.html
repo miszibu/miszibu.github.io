@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Java已经有了非常成熟性能监控工具，然而Go在这一方面还很欠缺，pprof(Program Profile)是Golang自带的性能分析工具。本文记录了这两天使用pprof包遇到的一些问题和经验。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go-pprof使用">
+<meta property="og:url" content="https://miszibu.github.io/2018/07/23/Code_Language/Golang/Go_pprof%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Java已经有了非常成熟性能监控工具，然而Go在这一方面还很欠缺，pprof(Program Profile)是Golang自带的性能分析工具。本文记录了这两天使用pprof包遇到的一些问题和经验。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-07-23T06:04:55.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.014Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/07/23/Code_Language/Golang/Go_pprof%E4%BD%BF%E7%94%A8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/07/23/Code_Language/Golang/Go_pprof%E4%BD%BF%E7%94%A8/","path":"2018/07/23/Code_Language/Golang/Go_pprof使用/","title":"Go-pprof使用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go-pprof使用 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#pprof%E5%8C%85"><span class="nav-number">1.</span> <span class="nav-text">pprof包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#runtime-pprof"><span class="nav-number">1.1.</span> <span class="nav-text">runtime&#x2F;pprof</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pprof%E5%8A%9F%E8%83%BD%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">pprof功能具体实现方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CPU%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">CPU性能分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">2.2.</span> <span class="nav-text">内存性能分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">2.3.</span> <span class="nav-text">阻塞性能分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pprof%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">pprof文件分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grapgviz-%E5%92%8C-go-torch%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">4.</span> <span class="nav-text">grapgviz 和 go-torch的安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#grapgviz"><span class="nav-number">4.1.</span> <span class="nav-text">grapgviz</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#go-torch-https-github-com-uber-go-torch"><span class="nav-number">4.2.</span> <span class="nav-text">go-torch https:&#x2F;&#x2F;github.com&#x2F;uber&#x2F;go-torch</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#go-trace"><span class="nav-number">5.</span> <span class="nav-text">go trace</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/07/23/Code_Language/Golang/Go_pprof%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go-pprof使用 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go-pprof使用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-07-23 14:04:55" itemprop="dateCreated datePublished" datetime="2018-07-23T14:04:55+08:00">2018-07-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Java已经有了非常成熟性能监控工具，然而Go在这一方面还很欠缺，pprof(Program Profile)是Golang自带的性能分析工具。本文记录了这两天使用pprof包遇到的一些问题和经验。</p>
+<span id="more"></span>
+
+<h3 id="pprof包"><a href="#pprof包" class="headerlink" title="pprof包"></a>pprof包</h3><p>golang目前没有成熟的性能分析工具，在社区和配套工具上，golang与Java还是有着不小的差距的。但是golang原生就自带了pprof包，可以对程序进行Cpu，内存，堆栈等信息进行记录分析。</p>
+<h4 id="runtime-pprof"><a href="#runtime-pprof" class="headerlink" title="runtime&#x2F;pprof"></a><strong>runtime&#x2F;pprof</strong></h4><p><strong>runtime&#x2F;pprof</strong> 与 net&#x2F;http&#x2F;pprof 包相比 ，runtime包集成了功能，方便在程序中调用其方法，<strong>功能更为强大</strong>。</p>
+<p>而<strong>http&#x2F;pprof</strong>包则提供了<strong>动态预览</strong>的功能， 能够动态直接查看程序的运行状态。</p>
+<p>下面是使用pprof文件记录CPU和Memory信息的代码实现。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">需要在运行项目时，在参数中声明 -cpuprofile cpu.prof -memprofile mem.prof</span><br><span class="line"><span class="comment">//获取命令行入参</span></span><br><span class="line"><span class="keyword">var</span> cpuprofile = flag.String(<span class="string">&quot;cpuprofile&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;write cpu profile `file`&quot;</span>)</span><br><span class="line"><span class="keyword">var</span> memprofile = flag.String(<span class="string">&quot;memprofile&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;write memory profile to `file`&quot;</span>)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">go</span> cpuProfile()</span><br><span class="line">	<span class="comment">//程序的退出函数</span></span><br><span class="line">    quit()    </span><br><span class="line">&#125;</span><br><span class="line">---------------------------------------------------------------------	</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">quit</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//结束CPU记时</span></span><br><span class="line">	log.Info(<span class="string">&quot;停止CPU运行记录&quot;</span>)</span><br><span class="line">	pprof.StopCPUProfile()</span><br><span class="line">	<span class="comment">//记录当前内存状况 以主协程运行 开子协程若主协程执行完 将无法记录下内存状态</span></span><br><span class="line">	memProfile()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">cpuProfile</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> *cpuprofile != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		f, err := os.Create(*cpuprofile)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error(<span class="string">&quot;创建CPU运行记录文件失败: &quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> err := pprof.StartCPUProfile(f); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error(<span class="string">&quot;创建CPU运行状态记录失败: &quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">memProfile</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> *memprofile != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		f, err := os.Create(*memprofile)</span><br><span class="line">		<span class="keyword">defer</span> f.Close()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error(<span class="string">&quot;创建内存使用情况记录文件失败: &quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//runtime.GC() // 调用GC清理内存 可以查看GC后的内存使用情况</span></span><br><span class="line">		<span class="keyword">if</span> err := pprof.WriteHeapProfile(f); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error(<span class="string">&quot;获取内存使用情况失败: &quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>net&#x2F;http&#x2F;pprof</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// net/http/pprof 已经在 init()函数中通过 import 副作用完成默认 Handler 的注册</span></span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">    log.Println(http.ListenAndServe(<span class="string">&quot;localhost:6060&quot;</span>, <span class="literal">nil</span>))</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 访问 <a target="_blank" rel="noopener" href="http://localhost:6060/debug/pprof">http://localhost:6060/debug/pprof</a> 即可获取数据</p>
+</blockquote>
+<h3 id="pprof功能具体实现方法"><a href="#pprof功能具体实现方法" class="headerlink" title="pprof功能具体实现方法"></a>pprof功能具体实现方法</h3><h4 id="CPU性能分析"><a href="#CPU性能分析" class="headerlink" title="CPU性能分析"></a><strong>CPU性能分析</strong></h4><p>当 CPU 性能分析启用后，Go runtime 会每 <code>10ms</code> 就暂停以下，记录当前运行的 Goroutine 的调用堆栈及相关数据。</p>
+<h4 id="内存性能分析"><a href="#内存性能分析" class="headerlink" title="内存性能分析"></a>内存性能分析</h4><p>内存性能分析则是在<strong>堆(Heap)分配</strong>的时候，记录一下调用堆栈。默认情况下，是每 <code>1000</code> 次分配，取样一次，这个数值可以改变。</p>
+<p><strong>栈(Stack)分配</strong> 由于会随时释放，因此<strong>不会</strong>被内存分析所记录。</p>
+<p>由于内存分析是<strong>取样</strong>方式，并且也因为其记录的<strong>是分配内存，而不是使用内存</strong>。因此使用内存性能分析工具来准确判断程序具体的内存使用是比较困难的。</p>
+<h4 id="阻塞性能分析"><a href="#阻塞性能分析" class="headerlink" title="阻塞性能分析"></a>阻塞性能分析</h4><p>阻塞分析是一个很独特的分析。它有点儿类似于 CPU 性能分析，但是它所记录的是 goroutine 等待资源所花的时间。</p>
+<p>阻塞分析对分析程序<strong>并发瓶颈</strong>非常有帮助。阻塞性能分析可以显示出什么时候出现了大批的 goroutine 被阻塞了。阻塞包括：</p>
+<ul>
+<li>发送、接受无缓冲的 channel；</li>
+<li>发送给一个满缓冲的 channel，或者从一个空缓冲的 channel 接收；</li>
+<li>试图获取已被另一个 go routine 锁定的 <code>sync.Mutex</code> 的锁；</li>
+</ul>
+<p>阻塞性能分析是特殊的分析工具，在排除 CPU 和内存瓶颈前，不应该用它来分析。</p>
+<h3 id="pprof文件分析"><a href="#pprof文件分析" class="headerlink" title="pprof文件分析"></a>pprof文件分析</h3><p>在runtime&#x2F;pprof生成对应的方法后，在命令行中使用go tool pprof工具可以对profile文件进行性能分析。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">go tool pprof XXX.prof #即可分析对应prof文件</span><br><span class="line"></span><br><span class="line">go tool pprof localhost:[port]/debug/pprof/profile #cpu性能分析</span><br><span class="line">go tool pprof localhost:[port]/debug/pprof/heap	   #内存性能分析数据</span><br><span class="line">go tool pprof localhost:[port]/debug/pprof/block   #阻塞性能分析</span><br><span class="line"></span><br><span class="line">进入命令行后</span><br><span class="line">top [number] #输出对应前N位的数据信息</span><br><span class="line">web #使用grapgviz生成对应svg图 </span><br><span class="line">web &gt; [name].svg #生成svg图后修改名字 存放到同级目录下</span><br><span class="line">list func #显示耗时几个函数</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">使用go-torch进行性能分析 svg更好的表现了其中的关系但若想要直观看到所使用资源的占比 falmeGraph会更为直观</span></span><br><span class="line">go-torch xxx.prof #生成对应火焰图 X轴显示占用资源量 Y轴显示调用栈深度</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="grapgviz-和-go-torch的安装"><a href="#grapgviz-和-go-torch的安装" class="headerlink" title="grapgviz 和 go-torch的安装"></a><strong>grapgviz 和 go-torch的安装</strong></h3><h4 id="grapgviz"><a href="#grapgviz" class="headerlink" title="grapgviz"></a>grapgviz</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">windows 从http://www.graphviz.org/download/ 下载对应文件 然后将其bin目录放入系统环境变量</span><br><span class="line">mac brew install grapgviz</span><br></pre></td></tr></table></figure>
+
+<h4 id="go-torch-https-github-com-uber-go-torch"><a href="#go-torch-https-github-com-uber-go-torch" class="headerlink" title="go-torch https://github.com/uber/go-torch"></a>go-torch <a target="_blank" rel="noopener" href="https://github.com/uber/go-torch">https://github.com/uber/go-torch</a></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Mac </span><br><span class="line">go get github.com/uber/go-torch #下载go-torch</span><br><span class="line">cd $GOPATH/src/github.com/uber/go-torch  #进入go-torch 文件夹</span><br><span class="line">git clone https://github.com/brendangregg/FlameGraph.git #下载其依赖的FlameGrapg.git</span><br><span class="line">Win </span><br><span class="line">执行与MAC相同命令后</span><br><span class="line">go build #在go-torch文件下build exe文件</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">将FlameGraph目录加入 系统变量</span></span><br><span class="line">./go-torch.exe cpu.prof</span><br><span class="line"> Failed: could not generate flame graph: fork/exec ./FlameGraph/flamegraph.pl: %1 is not a valid Win32 application.</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">相关报错 尚未解决</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="go-trace"><a href="#go-trace" class="headerlink" title="go trace"></a>go trace</h3><p>go trace 是go1.5以后提供的新的性能分析工具，可以提供更为详细的性能分析数据。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Go/" rel="tag"># Go</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/07/23/BlockChain/%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF_%E5%8A%A0%E5%AF%86%E8%B4%A7%E5%B8%81%E4%B8%89%E8%A7%92%E5%AE%9A%E5%BE%8B/" rel="prev" title="区块链技术-加密货币三角定律">
+                  <i class="fa fa-angle-left"></i> 区块链技术-加密货币三角定律
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/07/23/General/Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C_TCP/" rel="next" title="计算机网络-TCP协议">
+                  计算机网络-TCP协议 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

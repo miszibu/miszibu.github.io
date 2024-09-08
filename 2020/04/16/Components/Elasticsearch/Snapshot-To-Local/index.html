@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Snapshot And RestoreSnapshot(快照)是正在运行的 ES Cluster 的一个备份。你可以选择部分 index，也可以选择整个集群来打 Snapshot，并将其存储在共享文件系统中，ES 支持例如S3,HDFS,Azure, Google Cloud Storage等等的远程仓库，只需要安装对应的 Plugin 就可以轻松集成。 Snapshot 是增量备份的，当我们为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch Snapshot">
+<meta property="og:url" content="https://miszibu.github.io/2020/04/16/Components/Elasticsearch/Snapshot-To-Local/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Snapshot And RestoreSnapshot(快照)是正在运行的 ES Cluster 的一个备份。你可以选择部分 index，也可以选择整个集群来打 Snapshot，并将其存储在共享文件系统中，ES 支持例如S3,HDFS,Azure, Google Cloud Storage等等的远程仓库，只需要安装对应的 Plugin 就可以轻松集成。 Snapshot 是增量备份的，当我们为">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-16T08:43:42.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.045Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/04/16/Components/Elasticsearch/Snapshot-To-Local/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/04/16/Components/Elasticsearch/Snapshot-To-Local/","path":"2020/04/16/Components/Elasticsearch/Snapshot-To-Local/","title":"ElasticSearch Snapshot"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ElasticSearch Snapshot | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Snapshot-And-Restore"><span class="nav-number">1.</span> <span class="nav-text">Snapshot And Restore</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Version-compatibility"><span class="nav-number">1.1.</span> <span class="nav-text">Version compatibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Repositories"><span class="nav-number">1.2.</span> <span class="nav-text">Repositories</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Snapshot"><span class="nav-number">1.3.</span> <span class="nav-text">Snapshot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Restore"><span class="nav-number">1.4.</span> <span class="nav-text">Restore</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Partial-restore"><span class="nav-number">1.4.1.</span> <span class="nav-text">Partial restore</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Changing-index-settings-during-restore"><span class="nav-number">1.4.2.</span> <span class="nav-text">Changing index settings during restore</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Restoring-to-a-different-cluster"><span class="nav-number">1.4.3.</span> <span class="nav-text">Restoring to a different cluster</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Snapshot-status"><span class="nav-number">1.5.</span> <span class="nav-text">Snapshot status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Monitoring-snapshot-restore-progress"><span class="nav-number">1.6.</span> <span class="nav-text">Monitoring snapshot&#x2F;restore progress</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stopping-currently-running-snapshot-and-restore-operations"><span class="nav-number">1.7.</span> <span class="nav-text">Stopping currently running snapshot and restore operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Effect-of-cluster-blocks-on-snapshot-and-restore-operations"><span class="nav-number">1.8.</span> <span class="nav-text">Effect of cluster blocks on snapshot and restore operations</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number"></span> <span class="nav-text">Reference</span></a></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/04/16/Components/Elasticsearch/Snapshot-To-Local/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ElasticSearch Snapshot | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ElasticSearch Snapshot
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-16 16:43:42" itemprop="dateCreated datePublished" datetime="2020-04-16T16:43:42+08:00">2020-04-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Snapshot-And-Restore"><a href="#Snapshot-And-Restore" class="headerlink" title="Snapshot And Restore"></a>Snapshot And Restore</h2><p>Snapshot(快照)是正在运行的 ES Cluster 的一个备份。你可以选择部分 index，也可以选择整个集群来打 Snapshot，并将其存储在共享文件系统中，ES 支持例如S3,HDFS,Azure, Google Cloud Storage等等的远程仓库，只需要安装对应的 Plugin 就可以轻松集成。</p>
+<p>Snapshot 是<strong>增量备份的</strong>，当我们为一个已经在仓库中存储过的 index做备份时，数据会在原有的基础上递增，因此我们可以为我们的集群频繁备份，不会产生冗余数据。</p>
+<p>我们可以通过 <strong>restore API</strong> 来恢复Snapshot，当恢复 indices时，我们可以修改 index的名字和配置，十分灵活。</p>
+<p>不建议通过直接拷贝 Data 文件夹的方式来拷贝数据，由于 ES Data 目录，是不断变更的，直接恢复可能会丢失数据或者恢复失败等等。<strong>唯一可靠的备份数据的方式就是 Snaphot and Restore functionality</strong></p>
+<span id="more"></span>
+
+<h3 id="Version-compatibility"><a href="#Version-compatibility" class="headerlink" title="Version compatibility"></a>Version compatibility</h3><p>Snapshot 的版本兼容性的问题，实际上是 <strong>Lucene Index 版本兼容性</strong>的问题。<strong>Snapshot 实际上存储了 index 在磁盘上的数据结构。</strong>不同版本的 ES，在大版本之间都伴随着 Lucene 版本的升级，旧的 Lucene Index 是无法在新的 Lucene 上被读取的。</p>
+<ul>
+<li>A snapshot of an index created in 5.x can be restored to 6.x.</li>
+<li>A snapshot of an index created in 2.x can be restored to 5.x.</li>
+<li>A snapshot of an index created in 1.x can be restored to 2.x.</li>
+</ul>
+<p>比如说，1.x版本的 Snapshot 自然是无法在5.x以后的 ES 中恢复的，两者内核 Lucene 的版本相差过大了。</p>
+<p>Snapshot 可以存储不同版本的 Lucene Index，当我们全量恢复一个 Snapshot到目标集群时，如果其中部分 indices 创建于不兼容的版本时，我们就无法恢复 snapshot。因此在我们升级 ES Cluster之前，要确保 snapshot 不会存在不兼容的 indices 来影响集群的恢复。</p>
+<p>当我们面临一个场景，需要从 snapshot中恢复不兼容的 indices ，怎么办呢？我们可以在一个支持恢复这个 Indices 的集群上先恢复 indices，然后再通过 reindex-from-remote 在远端 ES Cluster 上重建这个 index到当前版本。远程获取并恢复 indices 的操作相对耗时，当数据量较大时，可以先恢复部分数据，在充分考虑到时间影响后，再全部恢复。</p>
+<h3 id="Repositories"><a href="#Repositories" class="headerlink" title="Repositories"></a>Repositories</h3><p>在打 Snapshot 和 Restore 操作之前，我们需要实现注册一个 Snapshot Repository。我们<strong>建议为每个 ES 大版本创建的对应的 Snapshot repository.</strong></p>
+<p>Repository 存在不同的 Type. 比如当多个集群共享一个 Snapshot Repository 时，我们只会让一个集群具备 <code>Write</code> 权限，其他的集群只有 <code>readonly</code> 权限</p>
+<p>Snapshot 的格式在不同的版本之间有所差别，因此当多个 ES Cluster 共享一个 Snapshot Repository时，可能会出现数据不可见，repository 崩溃等问题。</p>
+<p>下面的例子就是来创建一个名为 my_backup 的 Repository。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /_snapshot/my_backup</span><br><span class="line">&#123;</span><br><span class="line">  &quot;type&quot;: &quot;fs&quot;,</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;location&quot;: &quot;my_backup_location&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 Get 请求来获取到已注册的 Snapshot Repository 信息</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup</span><br><span class="line"><span class="comment">// 返回信息</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;my_backup&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;fs&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;location&quot;</span><span class="punctuation">:</span> <span class="string">&quot;my_backup_location&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// 使用通配符和,来批量获取 Repository 的信息</span></span><br><span class="line">GET /_snapshot/repo*<span class="punctuation">,</span>*backup*</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取全部 snapshot repository 的信息，默认不声明时，就表示_all</span></span><br><span class="line">GET /_snapshot</span><br><span class="line">GET /_snapshot/_all</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>Note: Snapshot Repository 的配置是非常重要的，我们需要配置Repo 的连接方式，如 URL, Directory Path, 外部组件的信息，还需要配置数据的存储方式，是否压缩，是否分块。还需要配置Type。文章不在这方面详细介绍，如果有实际应用，需要仔细了解下 Repository 配置。</p>
+</blockquote>
+<h3 id="Snapshot"><a href="#Snapshot" class="headerlink" title="Snapshot"></a>Snapshot</h3><p>一个 Repository 可以存储多个 Snapshots。Snapshot之间以名字作为区分。</p>
+<p>以下的命令将在 my_backup 这个Repository 中，创建名为 snapshot_1的 snapshot。</p>
+<p><code>wait_for_completion</code>参数表示，当 snapshot 初始化完成后，请求是否立即返回，默认情况是 false,请求会立即返回。设置为 True 后，请求将在 SnapShot 创建完成后才会返回。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PUT /_snapshot/my_backup/snapshot_1?wait_for_completion=true</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，snapshot会对所有 Open and Started 的 indices 生效，我们也可以配置其对指定 indices 生效。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT /_snapshot/my_backup/snapshot_2?wait_for_completion=true</span><br><span class="line">&#123;</span><br><span class="line">  &quot;indices&quot;: &quot;index_1,index_2&quot;,</span><br><span class="line">  &quot;ignore_unavailable&quot;: true,</span><br><span class="line">  &quot;include_global_state&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ignore_unavailable</code>为 True 表示，当指定的 indices不存在时，跳过这 indices，默认情况下当indices 不存在时，请求将失败。</p>
+<p>The list of indices that should be included into the snapshot can be specified using the <code>indices</code> parameter that supports <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/multi-index.html">multi index syntax</a>. The snapshot request also supports the <code>ignore_unavailable</code> option. Setting it to <code>true</code> will cause indices that do not exist to be ignored during snapshot creation. By default, when <code>ignore_unavailable</code> option is not set and an index is missing the snapshot request will fail. By setting <code>include_global_state</code> to false it’s possible to prevent the cluster global state to be stored as part of the snapshot. By default, the entire snapshot will fail if one or more indices participating in the snapshot don’t have all primary shards available. This behaviour can be changed by setting <code>partial</code> to <code>true</code>.</p>
+<p>Snapshot names can be automatically derived using <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/date-math-index-names.html">date math expressions</a>, similarly as when creating new indices. Note that special characters need to be URI encoded.</p>
+<p>使用以下命令创建一个以当前日期为结尾的 snapshot，如 <code>snapshot-2018.05.11</code></p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">PUT /_snapshot/my_backup/&lt;snapshot-&#123;now/d&#125;&gt;</span></span><br><span class="line">PUT /_snapshot/my_backup/%3Csnapshot-%7Bnow%2Fd%7D%3E</span><br></pre></td></tr></table></figure>
+
+<p>The index snapshot process is incremental. In the process of making the index snapshot Elasticsearch analyses the list of the index files that are already stored in the repository and copies only files that were created or changed since the last snapshot. That allows multiple snapshots to be preserved in the repository in a compact form. Snapshotting process is executed in non-blocking fashion. All indexing and searching operation can continue to be executed against the index that is being snapshotted. However, a snapshot represents the point-in-time view of the index at the moment when snapshot was created, so no records that were added to the index after the snapshot process was started will be present in the snapshot. The snapshot process starts immediately for the primary shards that has been started and are not relocating at the moment. Before version 1.2.0, the snapshot operation fails if the cluster has any relocating or initializing primaries of indices participating in the snapshot. Starting with version 1.2.0, Elasticsearch waits for relocation or initialization of shards to complete before snapshotting them.</p>
+<p>Besides creating a copy of each index the snapshot process can also store global cluster metadata, which includes persistent cluster settings and templates. The transient settings and registered snapshot repositories are not stored as part of the snapshot.</p>
+<p>Only one snapshot process can be executed in the cluster at any time. While snapshot of a particular shard is being created this shard cannot be moved to another node, which can interfere with rebalancing process and allocation filtering. Elasticsearch will only be able to move a shard to another node (according to the current allocation filtering settings and rebalancing algorithm) once the snapshot is finished.</p>
+<p>获取指定 snapshot 的信息：</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/snapshot_1</span><br></pre></td></tr></table></figure>
+
+<p>This command returns basic information about the snapshot including start and end time, version of Elasticsearch that created the snapshot, the list of included indices, the current state of the snapshot and the list of failures that occurred during the snapshot. The snapshot <code>state</code> can be</p>
+<table>
+<thead>
+<tr>
+<th><code>IN_PROGRESS</code></th>
+<th>The snapshot is currently running.</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SUCCESS</code></td>
+<td>The snapshot finished and all shards were stored successfully.</td>
+</tr>
+<tr>
+<td><code>FAILED</code></td>
+<td>The snapshot finished with an error and failed to store any data.</td>
+</tr>
+<tr>
+<td><code>PARTIAL</code></td>
+<td>The global cluster state was stored, but data of at least one shard wasn’t stored successfully. The <code>failure</code> section in this case should contain more detailed information about shards that were not processed correctly.</td>
+</tr>
+<tr>
+<td><code>INCOMPATIBLE</code></td>
+<td>The snapshot was created with an old version of Elasticsearch and therefore is incompatible with the current version of the cluster.</td>
+</tr>
+</tbody></table>
+<p>使用通配符来获取多个 Snapshot 的信息</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/snapshot_*,some_other_snapshot</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>_all</code>来获取一个 Repository 下的所有 snapshot 的信息。</p>
+<p>All snapshots currently stored in the repository can be listed using the following command:</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/_all</span><br></pre></td></tr></table></figure>
+
+<p>获取当前正在运行的 Snapshot 的信息</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/_current</span><br></pre></td></tr></table></figure>
+
+<p>删除一个 Snapshot</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DELETE /_snapshot/my_backup/snapshot_2</span><br></pre></td></tr></table></figure>
+
+<p>Snapshot 被删除时，其所关联的文件也会被删除。当 Snapshot 正在创建时，Delete Snapshot 操作会打断它，当我们错误的创建了一个 Snapshot 时，直接删除即可。</p>
+<p>注销 Repository，当一个 Repository 被注销时，ES 仅仅移除了这个 Repository 的引用，而 Repositroy 中包含的 Snapshot 仍然存在在文件系统中。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DELETE /_snapshot/my_backup</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Restore"><a href="#Restore" class="headerlink" title="Restore"></a>Restore</h3><figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /_snapshot/my_backup/snapshot_1/_restore</span><br></pre></td></tr></table></figure>
+
+<p>默认情况，snapshot 中的所有 indices 都会被恢复，而集群状态不会被恢复。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST /_snapshot/my_backup/snapshot_1/_restore</span><br><span class="line">&#123;</span><br><span class="line">  &quot;indices&quot;: &quot;index_1,index_2&quot;,</span><br><span class="line">  &quot;ignore_unavailable&quot;: true,</span><br><span class="line">  &quot;include_global_state&quot;: true,</span><br><span class="line">  &quot;rename_pattern&quot;: &quot;index_(.+)&quot;,</span><br><span class="line">  &quot;rename_replacement&quot;: &quot;restored_index_$1&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>indices</code> 参数指定想要恢复的 indices，可以使用通配符</p>
+<p><code>include_global_state</code> 参数决定是否恢复 Cluster State, 默认false,不恢复</p>
+<p><code>rename_pattern</code> and <code>rename_replacement</code> 则决定是否要重命名 indices和如何重命名，以上述为例，符合 <code>rename_pattern</code>正则表达式的 indices 将会被重命名为 <code>rename_replacement</code>，$1指代的是原名。</p>
+<p><code>include_aliases</code>参数决定是否在恢复 indices 的同时，恢复其所关联的别名。</p>
+<p>Restore 操作只能在正常运行的 ES Cluster 上执行。</p>
+<ol>
+<li><strong>对应Index已经存在时，</strong> 只能在 close 状态和当其与 snapshot 中的备份拥有相同 shards 数量的时候才能恢复。Restore 操作会将其打开。</li>
+<li>不存在的 Index，数据创建新的 index来恢复数据。</li>
+<li>当<code>include_global_state</code>被激活时，默认为 false，那么对应的 templates 如果不存在则创建，如果存在则替换。恢复的 Persistent Setting 会被直接添加。</li>
+</ol>
+<h4 id="Partial-restore"><a href="#Partial-restore" class="headerlink" title="Partial restore"></a>Partial restore</h4><p>在默认情况下，在 snapshot 恢复操作时，如果部分 indices 的 shard不可用，那么恢复操作将失败。</p>
+<p>通过设置<code>partial</code>为 true，当存在不可用的 shards 时，将创建对应 empty shards，而不是失败。其他正常的 shards 仍会正常创建。</p>
+<h4 id="Changing-index-settings-during-restore"><a href="#Changing-index-settings-during-restore" class="headerlink" title="Changing index settings during restore"></a>Changing index settings during restore</h4><p>绝大多数的 Index Setting 可以在恢复的时候被修改，比如说，下面的例子中，index 会被恢复且不生成任何的 replicate shards且设置refersh_interval 值为默认。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POST /_snapshot/my_backup/snapshot_1/_restore</span><br><span class="line">&#123;</span><br><span class="line">  &quot;indices&quot;: &quot;index_1&quot;,</span><br><span class="line">  &quot;index_settings&quot;: &#123;</span><br><span class="line">    &quot;index.number_of_replicas&quot;: 0</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;ignore_index_settings&quot;: [</span><br><span class="line">    &quot;index.refresh_interval&quot;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Note: <code>index.number_of_shards</code>, primary shards number 是不可以改的</p>
+</blockquote>
+<h4 id="Restoring-to-a-different-cluster"><a href="#Restoring-to-a-different-cluster" class="headerlink" title="Restoring to a different cluster"></a>Restoring to a different cluster</h4><p>Snapshot 并不跟集群紧密相关，因此一个集群创建的 snapshot 是可以给其他集群使用的，这里需要考虑的是版本兼容的问题。根据具体情况来说，自己把握。</p>
+<p>在恢复的时候，还需要考虑到新集群的容量，架构等是否满足 indices 的要求，如果不满足我们可以在恢复Indices 时，修改 Replicate Number 操作，让 indices 恢复到一个相对较小的集群中去。</p>
+<p>还要考虑的一点就是 Shard allocation filtering 了，我们会指定 shards 分配到有具体标签的节点中去，如果存在这个配置，我们就要修改他或者确保新集群能够满足这个配置，否则 indices 也会恢复失败的。</p>
+<p>最后一点，在恢复 snapshot 时，默认也是会恢复 cluster status，这包括 templates, persistent setting 等等，在恢复时也会校验setting 能否应用新集群。比如当<code>discovery.zen.minimum_master_nodes</code>配置，就会影响新集群的 zen discovery。其实我个人建议直接不要恢复cluster status 就好了。</p>
+<h3 id="Snapshot-status"><a href="#Snapshot-status" class="headerlink" title="Snapshot status"></a>Snapshot status</h3><figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 获取当前正在运行的 snapshot 的详细信息。</span><br><span class="line">GET /_snapshot/_status</span><br><span class="line">// 获取指定 Repository 下的 snapshot 信息</span><br><span class="line">GET /_snapshot/my_backup/_status</span><br><span class="line">// 获取指定 Repository 指定 snapshot 的信息</span><br><span class="line">GET /_snapshot/my_backup/snapshot_1/_status</span><br></pre></td></tr></table></figure>
+
+<p>返回json 示例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;snapshots&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;snapshot&quot;</span>: <span class="string">&quot;snapshot_1&quot;</span>,</span><br><span class="line">      <span class="string">&quot;repository&quot;</span>: <span class="string">&quot;my_backup&quot;</span>,</span><br><span class="line">      <span class="string">&quot;uuid&quot;</span>: <span class="string">&quot;XuBo4l4ISYiVg0nYUen9zg&quot;</span>,</span><br><span class="line">      <span class="string">&quot;state&quot;</span>: <span class="string">&quot;SUCCESS&quot;</span>,</span><br><span class="line">      <span class="string">&quot;include_global_state&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="string">&quot;shards_stats&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;initializing&quot;</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="string">&quot;started&quot;</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="string">&quot;finalizing&quot;</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="string">&quot;done&quot;</span>: <span class="number">5</span>,</span><br><span class="line">        <span class="string">&quot;failed&quot;</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="string">&quot;total&quot;</span>: <span class="number">5</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="string">&quot;stats&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;incremental&quot;</span>: &#123;</span><br><span class="line">          <span class="string">&quot;file_count&quot;</span>: <span class="number">8</span>,</span><br><span class="line">          <span class="string">&quot;size_in_bytes&quot;</span>: <span class="number">4704</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;processed&quot;</span>: &#123;</span><br><span class="line">          <span class="string">&quot;file_count&quot;</span>: <span class="number">7</span>,</span><br><span class="line">          <span class="string">&quot;size_in_bytes&quot;</span>: <span class="number">4254</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;total&quot;</span>: &#123;</span><br><span class="line">          <span class="string">&quot;file_count&quot;</span>: <span class="number">8</span>,</span><br><span class="line">          <span class="string">&quot;size_in_bytes&quot;</span>: <span class="number">4704</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;start_time_in_millis&quot;</span>: <span class="number">1526280280355</span>,</span><br><span class="line">        <span class="string">&quot;time_in_millis&quot;</span>: <span class="number">358</span>,</span><br><span class="line"></span><br><span class="line">        <span class="string">&quot;number_of_files&quot;</span>: <span class="number">8</span>,</span><br><span class="line">        <span class="string">&quot;processed_files&quot;</span>: <span class="number">8</span>,</span><br><span class="line">        <span class="string">&quot;total_size_in_bytes&quot;</span>: <span class="number">4704</span>,</span><br><span class="line">        <span class="string">&quot;processed_size_in_bytes&quot;</span>: <span class="number">4704</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The output is composed of different sections. The <code>stats</code> sub-object provides details on the number and size of files that were snapshotted. As snapshots are incremental, copying only the Lucene segments that are not already in the repository, the <code>stats</code> object contains a <code>total</code> section for all the files that are referenced by the snapshot, as well as an <code>incremental</code> section for those files that actually needed to be copied over as part of the incremental snapshotting. In case of a snapshot that’s still in progress, there’s also a <code>processed</code> section that contains information about the files that are in the process of being copied.</p>
+<p><em>Note</em>: Properties <code>number_of_files</code>, <code>processed_files</code>, <code>total_size_in_bytes</code> and <code>processed_size_in_bytes</code> are used for backward compatibility reasons with older 5.x and 6.x versions. These fields will be removed in Elasticsearch v7.0.0.</p>
+<p>同时返回多个 snapshot 信息</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/snapshot_1,snapshot_2/_status</span><br></pre></td></tr></table></figure>
+
+<h3 id="Monitoring-snapshot-restore-progress"><a href="#Monitoring-snapshot-restore-progress" class="headerlink" title="Monitoring snapshot&#x2F;restore progress"></a>Monitoring snapshot&#x2F;restore progress</h3><p>There are several ways to monitor the progress of the snapshot and restores processes while they are running. Both operations support <code>wait_for_completion</code> parameter that would block client until the operation is completed. This is the simplest method that can be used to get notified about operation completion.</p>
+<p>The snapshot operation can be also monitored by periodic calls to the snapshot info:</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/snapshot_1</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Please note that snapshot info operation uses the same resources and thread pool as the snapshot operation. So, executing a snapshot info operation while large shards are being snapshotted can cause the snapshot info operation to wait for available resources before returning the result. On very large shards the wait time can be significant.</p>
+<p>To get more immediate and complete information about snapshots the snapshot status command can be used instead:</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_snapshot/my_backup/snapshot_1/_status</span><br></pre></td></tr></table></figure>
+
+
+
+<p>While snapshot info method returns only basic information about the snapshot in progress, the snapshot status returns complete breakdown of the current state for each shard participating in the snapshot.</p>
+<p>The restore process piggybacks on the standard recovery mechanism of the Elasticsearch. As a result, standard recovery monitoring services can be used to monitor the state of restore. When restore operation is executed the cluster typically goes into <code>red</code> state. It happens because the restore operation starts with “recovering” primary shards of the restored indices. During this operation the primary shards become unavailable which manifests itself in the <code>red</code> cluster state. Once recovery of primary shards is completed Elasticsearch is switching to standard replication process that creates the required number of replicas at this moment cluster switches to the <code>yellow</code> state. Once all required replicas are created, the cluster switches to the <code>green</code> states.</p>
+<p>The cluster health operation provides only a high level status of the restore process. It’s possible to get more detailed insight into the current state of the recovery process by using <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-recovery.html">indices recovery</a> and <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/cat-recovery.html">cat recovery</a> APIs.</p>
+<h3 id="Stopping-currently-running-snapshot-and-restore-operations"><a href="#Stopping-currently-running-snapshot-and-restore-operations" class="headerlink" title="Stopping currently running snapshot and restore operations"></a>Stopping currently running snapshot and restore operations</h3><p>Snapshot and restore 框架 同时只支持一个 snapshot 和 restore 操作，若当前正在运行的 snapshot 有误或运行时间过长，我们可以通过 snapshot delete 操作来终止。</p>
+<p>Sanpshot delete 操作会先检查 snapshot 是否运行结束，然后先停止正在运行的 snapshot，再从仓库中删除 snapshot 数据。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DELETE /_snapshot/my_backup/snapshot_1</span><br></pre></td></tr></table></figure>
+
+<p>restore 操作使用标准的分片恢复机制，因此，任何对于当前正在恢复的索引删除操作，都会直接终止 restore 操作。</p>
+<h3 id="Effect-of-cluster-blocks-on-snapshot-and-restore-operations"><a href="#Effect-of-cluster-blocks-on-snapshot-and-restore-operations" class="headerlink" title="Effect of cluster blocks on snapshot and restore operations"></a>Effect of cluster blocks on snapshot and restore operations</h3><p>Many snapshot and restore operations are affected by cluster and index blocks. For example, registering and unregistering repositories require write global metadata access. The snapshot operation requires that all indices and their metadata as well as the global metadata were readable. The restore operation requires the global metadata to be writable, however the index level blocks are ignored during restore because indices are essentially recreated during restore. Please note that a repository content is not part of the cluster and therefore cluster blocks don’t affect internal repository operations such as listing or deleting snapshots from an already registered repository.</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.8/modules-snapshots.html">ESV6.7 snapshot</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/04/13/Components/Elasticsearch/CCR-Cross-Cluster-Replicaiton/" rel="prev" title="CCR-Cross_Cluster_Replicaiton">
+                  <i class="fa fa-angle-left"></i> CCR-Cross_Cluster_Replicaiton
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/04/19/Components/Elasticsearch/ES-%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E5%88%86%E6%9E%90/" rel="next" title="ES_线程池_分析">
+                  ES_线程池_分析 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

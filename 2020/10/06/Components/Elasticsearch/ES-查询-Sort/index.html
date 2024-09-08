@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="对查询过滤后的结果集进行排序，可以对基于 **字段，数组，Nested(JsonArr)**类型进行排序。 当存在多条排序语句时，后续排序只对排序结果相同的文档进行重新排序，而非对全部结果姐  字段类型： 直接排序 数值数组： 选择排序模式，计算排序值，基于排序值排序 nested: 原理同数值数组类型，可以添加filter查询，来针对匹配过滤查询的Json文档才执行排序计算 geo distan">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-查询-Sort">
+<meta property="og:url" content="https://miszibu.github.io/2020/10/06/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-Sort/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="对查询过滤后的结果集进行排序，可以对基于 **字段，数组，Nested(JsonArr)**类型进行排序。 当存在多条排序语句时，后续排序只对排序结果相同的文档进行重新排序，而非对全部结果姐  字段类型： 直接排序 数值数组： 选择排序模式，计算排序值，基于排序值排序 nested: 原理同数值数组类型，可以添加filter查询，来针对匹配过滤查询的Json文档才执行排序计算 geo distan">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-06T06:22:31.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.037Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/10/06/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-Sort/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/10/06/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-Sort/","path":"2020/10/06/Components/Elasticsearch/ES-查询-Sort/","title":"ES-查询-Sort"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ES-查询-Sort | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E6%8E%92%E5%BA%8F-Sort-mode"><span class="nav-number">1.</span> <span class="nav-text">数组排序: Sort mode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nested"><span class="nav-number">2.</span> <span class="nav-text">nested</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Missing-value"><span class="nav-number">3.</span> <span class="nav-text">Missing value</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/10/06/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-Sort/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ES-查询-Sort | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES-查询-Sort
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-06 14:22:31" itemprop="dateCreated datePublished" datetime="2020-10-06T14:22:31+08:00">2020-10-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>对查询过滤后的结果集进行排序，可以对基于 **字段，数组，Nested(JsonArr)**类型进行排序。</p>
+<p>当存在多条排序语句时，后续排序只对排序结果相同的文档进行重新排序，而非对全部结果姐</p>
+<ul>
+<li><strong>字段类型</strong>： 直接排序</li>
+<li><strong>数值数组</strong>： 选择排序模式，计算排序值，基于排序值排序</li>
+<li><strong>nested</strong>: 原理同数值数组类型，可以添加filter查询，来针对匹配过滤查询的Json文档才执行排序计算</li>
+<li>geo distance sorting: todo</li>
+</ul>
+<span id="more"></span>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 先根据第一个排序规则进行排序，若存在文档拥有相同的值，再对它们使用下一条排序规则继续排序。</span></span><br><span class="line">GET /my_index/_search</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;sort&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;price&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;order&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;asc&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;mode&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;avg&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;user&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;name&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;desc&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;age&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;desc&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;_score&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;user&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;kimchy&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>排序规则</strong></p>
+<ul>
+<li><strong>asc:</strong> 升序，除_score外其他类型默认升序</li>
+<li><strong>desc:</strong> 降序，对于_score默认为降序</li>
+</ul>
+<h2 id="数组排序-Sort-mode"><a href="#数组排序-Sort-mode" class="headerlink" title="数组排序: Sort mode"></a><strong>数组排序: Sort mode</strong></h2><p>当某字段为数值数组类型时，可以使用以下不同的Sort mode来计算出该数组的一个统计值，对于该值再进行排序。</p>
+<ul>
+<li>min</li>
+<li>max</li>
+<li>sum</li>
+<li>avg</li>
+<li>median: 选择中间的数据</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// price为数值数组</span></span><br><span class="line">PUT /my_index/_doc/<span class="number">1</span>?refresh</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">   <span class="attr">&quot;product&quot;</span><span class="punctuation">:</span> <span class="string">&quot;chocolate&quot;</span><span class="punctuation">,</span></span><br><span class="line">   <span class="attr">&quot;price&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="number">20</span><span class="punctuation">,</span> <span class="number">4</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">POST /_search</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">   <span class="attr">&quot;query&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;term&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;product&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;chocolate&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line">   <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">   <span class="attr">&quot;sort&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">	  <span class="comment">// avg值为（20+4）/2,使用该值进行升序排序</span></span><br><span class="line">      <span class="punctuation">&#123;</span><span class="attr">&quot;price&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;order&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;asc&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;mode&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;avg&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">   <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="nested"><a href="#nested" class="headerlink" title="nested"></a><strong>nested</strong></h2><p>原理同数值数组类型，可以添加filter查询，来针对匹配过滤查询的Json文档才执行排序计算</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">POST /_search</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">   <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;match_all&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">   <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">   <span class="attr">&quot;sort&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">&#123;</span></span><br><span class="line">		      <span class="comment">// 取parent.child.age的最小值为统计值升序排序</span></span><br><span class="line">         <span class="attr">&quot;parent.child.age&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;mode&quot;</span> <span class="punctuation">:</span>  <span class="string">&quot;min&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;order&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;asc&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;nested&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">               <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;parent&quot;</span><span class="punctuation">,</span></span><br><span class="line">               <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="comment">// 过滤掉部分Json Docs</span></span><br><span class="line">                  <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;parent.age&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span> <span class="number">21</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">               <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">               <span class="attr">&quot;nested&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                  <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;parent.child&quot;</span><span class="punctuation">,</span></span><br><span class="line">                  <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="comment">// 双重过滤</span></span><br><span class="line">                     <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;parent.child.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;matt&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">                  <span class="punctuation">&#125;</span></span><br><span class="line">               <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">         <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">   <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Missing-value"><a href="#Missing-value" class="headerlink" title="Missing value"></a><strong>Missing value</strong></h2><p>对于没有被排序字段排序的文档，默认会被放到最后，也可以设置为<code>_first</code>放置最前。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">GET /_search</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;sort&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;price&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;missing&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;_last&quot;</span><span class="punctuation">&#125;</span> <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;product&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;chocolate&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/10/05/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-FullTextQueries/" rel="prev" title="ES-查询-FullTextQueries">
+                  <i class="fa fa-angle-left"></i> ES-查询-FullTextQueries
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/10/06/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-Highlight/" rel="next" title="ES-查询-Highlight">
+                  ES-查询-Highlight <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="使用过Docker，也了解了Kubernetes，容器技术在集群服务器上应用如火如荼。 本文将深入揭露容器技术的发展和其应用。是之后的一系列容器技术应用的前置文章。 本文主要来自 Demystifying containers 101: a deep dive into container technology for beginners">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟机到容器的发展">
+<meta property="og:url" content="https://miszibu.github.io/2018/12/10/Components/Container/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="使用过Docker，也了解了Kubernetes，容器技术在集群服务器上应用如火如荼。 本文将深入揭露容器技术的发展和其应用。是之后的一系列容器技术应用的前置文章。 本文主要来自 Demystifying containers 101: a deep dive into container technology for beginners">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/de7a410468a1663a9ca2383ad996a829.png">
+<meta property="og:image" content="https://miszibu.github.io/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/1_zUYwSHCA2wFF8BW8E7D92w.png">
+<meta property="og:image" content="https://miszibu.github.io/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/1_sm1PmoLGTMlwRJiPlABYog.png">
+<meta property="og:image" content="https://miszibu.github.io/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/cdb109ad34fc36bf6de5e762eed821cd.png">
+<meta property="og:image" content="https://miszibu.github.io/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/1_BO8iqCKHjeB6Fw9irS4oBw.png">
+<meta property="article:published_time" content="2018-12-10T07:00:31.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.032Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="容器">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/de7a410468a1663a9ca2383ad996a829.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/12/10/Components/Container/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/12/10/Components/Container/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/","path":"2018/12/10/Components/Container/虚拟机到容器的发展/","title":"虚拟机到容器的发展"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>虚拟机到容器的发展 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%92%8C%E5%86%85%E6%A0%B8"><span class="nav-number">1.</span> <span class="nav-text">操作系统和内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA-VM"><span class="nav-number">2.</span> <span class="nav-text">虚拟机 VM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cgroups"><span class="nav-number">3.</span> <span class="nav-text">cgroups</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E5%AE%B9%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">Linux容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker"><span class="nav-number">4.1.</span> <span class="nav-text">Docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E5%AE%B9%E5%99%A8"><span class="nav-number">5.</span> <span class="nav-text">为什么使用容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E6%8E%92"><span class="nav-number">6.</span> <span class="nav-text">编排</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">7.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/12/10/Components/Container/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="虚拟机到容器的发展 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          虚拟机到容器的发展
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-10 15:00:31" itemprop="dateCreated datePublished" datetime="2018-12-10T15:00:31+08:00">2018-12-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>使用过Docker，也了解了Kubernetes，容器技术在集群服务器上应用如火如荼。</p>
+<p>本文将深入揭露容器技术的发展和其应用。是之后的一系列容器技术应用的前置文章。</p>
+<p>本文主要来自 <a target="_blank" rel="noopener" href="https://medium.freecodecamp.org/demystifying-containers-101-a-deep-dive-into-container-technology-for-beginners-d7b60d8511c1">Demystifying containers 101: a deep dive into container technology for beginners</a></p>
+</blockquote>
+<span id="more"></span>
+
+<hr>
+<h2 id="操作系统和内核"><a href="#操作系统和内核" class="headerlink" title="操作系统和内核"></a>操作系统和内核</h2><p>现在的电脑是由一系列的硬件所组成的，如CPU，持久化的存储介质(硬盘，SSD),内存，网卡等等所组成</p>
+<p>为了与硬件交换，操作系统中的一部分称作<code>内核kernel</code>的软件，充当了硬件和系统的其他部分沟通的桥梁。内核负责调度运行进程（程序），管理设备（从磁盘和内存中读写地址内信息）和其他操作。</p>
+<p>操作系统的其他部分，负责引导和管理用户程序使用的用户空间并且不断与内核进行交互。</p>
+<p><img src="/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/de7a410468a1663a9ca2383ad996a829.png"></p>
+<blockquote>
+<p>Tips:要区分Kernel Space和Kernel。Kernel 是OS的一部分，OS整个位于KernelSpace中。</p>
+</blockquote>
+<hr>
+<h2 id="虚拟机-VM"><a href="#虚拟机-VM" class="headerlink" title="虚拟机 VM"></a>虚拟机 VM</h2><p>假设MacOS需要运行一个只有在Ubuntu下才能运行的软件。我们普遍的解决方案是跑了一个Ubuntu的虚拟机，然后运行该程序。</p>
+<p>虚拟机是由客户操作系统(案例中的Macos)的一系列硬件和内核虚拟化技术组成的。通过一种称为<code>hypervisor</code>的软件技术创建虚拟硬件，包括虚拟磁盘，虚拟网卡接口，虚拟CPU等硬件。虚拟机也包含一个内核来于虚拟硬件交流。</p>
+<ul>
+<li>The hypervisor can be hosted（管理程序可以被托管），这意味着它是一些运行在宿主OS（上例中的Macos）的软件。</li>
+<li>Hypervisor同样可以裸机运行，直接运行在机器硬件上（替代宿主OS）。</li>
+</ul>
+<p>无论是那种方式，Hypervisor方法都是被认为是一种重量级的实现，需要虚拟化部分硬件或者全部硬件和内核。</p>
+<p>如果在一个机器上需要运行多个独立组时，使用VM独立运行每个组是一种笨重且浪费资源的方式。</p>
+<p><img src="/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/1_zUYwSHCA2wFF8BW8E7D92w.png"></p>
+<p>虚拟机需要硬件虚拟化来实现机器层面的隔离，然而，容器可以在同一个操作系统中独立操作。随着独立空间数量的增加，容器和虚拟机之间的消耗资源差距会特别明显。一个普通的笔记本可以运行数十个容器却难以运行一个虚拟机。</p>
+<hr>
+<h2 id="cgroups"><a href="#cgroups" class="headerlink" title="cgroups"></a>cgroups</h2><p>2006，谷歌的工程师发明了Linux“控制组<code>(Control Group)</code>”，缩写为CGROUP。这是Linux内核的一个特性，用于隔离和控制用户进程的资源使用。</p>
+<p>这些进程可以放入命名空间<code>namespaces</code>，命名空间本质上是共享相同有限资源的进程的集合。计算机可以有多个命名空间，每个命名空间都有内核所分配的资源。</p>
+<p>可以管理每个命名空间的资源分配，用于限制一组进程可以使用的总CPU、RAM等资源。例如，可以限制后台日志收集进程所分配的资源，从而避免该进程占据过多资源，影响服务器其他程序运行。</p>
+<p>虽然不是原始的特性，但是Linux中的cgroups最终被重新设计以包括名为命名空间隔离的特性。命名空间隔离的思想本身并不新鲜，Linux已经有很多种名称空间隔离。一个常见的例子是进程隔离，它隔壁每个单独的进程，并防止诸如共享内存之类的事情。</p>
+<p>Cgroup隔离是一种更高级别的隔离，它确保cgroup命名空间中的进程独立于其他命名空间中的进程。下面列出了一些重要的命名空间隔离特性，为我们理想中容器特性奠定基础。</p>
+<ul>
+<li>PID(Process Identifier) Namespaces：这确保了一个命名空间内的进程不知道其他命名空间中的进程。</li>
+<li>Network NameSpace: 隔离网络接口控制器、IP表、路由表和其他底层网络工具。</li>
+<li>Mount NameSpace:挂载文件系统，因此名称空间的文件系统范围仅限于挂载的目录。</li>
+<li>User NameSpace:将名称空间内的用户限制为仅该名称空间，并避免跨越名称空间的用户ID冲突。</li>
+</ul>
+<p>简单地说，每个命名空间内的进程都把命名空间当做一个实际运行的计算机。</p>
+<h2 id="Linux容器"><a href="#Linux容器" class="headerlink" title="Linux容器"></a>Linux容器</h2><p>Linux cgroup为Linux容器（LXC）的技术铺平了道路。LXC确实是我们今天所知的第一个容器的主要实现，它利用cgroup和命名空间隔离来创建具有独立进程和网络空间的虚拟环境。</p>
+<p>在某种意义上，这允许独立和隔离的用户空间。容器的概念直接来自LXC。事实上，早期版本的DOCKER直接构建在LXC的顶部。</p>
+<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p>Docker是使用最广泛的容器技术，也是大多数人在提到容器时所指的技术。虽然还有其他开源容器技术（如CoreOS的rkt）和大型公司构建自己的容器引擎（如Google的lmctfy），但是Docker已经成为容器化的行业标准。它仍然基于Linux内核以及最近Windows所提供的cgroup和Namespace。</p>
+<p><img src="/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/1_sm1PmoLGTMlwRJiPlABYog.png"></p>
+<p>Docker容器由许多层image组成，二进制文件打包成单个包。基本映像中包含容器的OS，它可以不同于主机的操作系统。</p>
+<p>容器的操作系统是image形式。这不是主机上的完整操作系统，不同之处在于image只是操作系统的文件系统和二进制文件，而完整操作系统包括文件系统、二进制文件和内核。</p>
+<p>在基础镜像的顶部是多个镜像，每个镜像构建容器的一部分。 例如，在基本镜像的顶部可以是包含<code>apt-get</code>依赖性的镜像。 最重要的可能是包含应用程序二进制文件的镜像，依此类推。</p>
+<p>很酷的部分是如果有两个带有镜像层<code>a，b，c</code>和<code>a，b，d</code>的容器，那么你只需要在本地和存储库中存储每个镜像层<code>a，b，c，d</code>的一个副本。 这是Docker的<em>联合文件系统</em>。</p>
+<p><img src="/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/cdb109ad34fc36bf6de5e762eed821cd.png"></p>
+<p>由散列标识的每个image只是构成容器的许多可能镜像层之一。但是，容器仅由其top image标识，该镜像具有对父镜像的引用。此处显示的两个顶级镜像（镜像1和镜像2）共享前三个图层。镜像2具有两个附加的配置相关层，但与镜像1共享相同的父镜像。</p>
+<p>引导容器时，将从repo下载镜像及其父镜像，创建cgroup和命名空间，并使用该镜像创建虚拟环境。在容器内，镜像中指定的文件和二进制文件似乎是整个计算机中的唯一文件。然后启动容器的主进程，并将容器视为活动状态。</p>
+<p>Docker还有其他一些非常酷的功能，例如写入时复制，卷（容器之间的共享文件系统），docker守护程序（管理机器上的容器），版本控制的存储库（如容器的Github）等等。要了解有关它们的更多信息并查看有关如何使用Docker的一些实际示例，这篇Medium上的<a target="_blank" rel="noopener" href="https://medium.freecodecamp.org/a-beginner-friendly-introduction-to-containers-vms-and-docker-79a9e3e119b">文章</a>非常有用。</p>
+<p><img src="/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%88%B0%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8F%91%E5%B1%95/1_BO8iqCKHjeB6Fw9irS4oBw.png"></p>
+<p><a href="%E6%B6%88%E8%80%97%E4%B8%8D%E6%88%90%E6%AF%94%E4%BE%8B">^</a>: <em>命令行客户端（1）告诉计算机上的名为进docker daemo的进程（2）该做什么。 守护程序从注册表&#x2F;仓库中提取image（3）。 这些image在本地计算机上缓存（4），并且可以由守护程序启动以运行容器（5）。 图片来源：Docker。</em></p>
+<hr>
+<h2 id="为什么使用容器"><a href="#为什么使用容器" class="headerlink" title="为什么使用容器"></a>为什么使用容器</h2><p>容器可作为一个独立的单元，可以在任何支持它的地方运行。在每个实例中，容器本身都是完全相同的。如果主机操作系统是CentOS，Ubuntu，MacOS，甚至是像Windows这样的非UNIX系统都无关紧要——从容器内部看操作系统将是容器指定的任何操作系统。因此，你可以确定你在笔记本电脑上构建的容器也将在公司的服务器上运行。</p>
+<p>容器还充当标准化的工作或计算单元。一个常见的范例是每个容器运行单个Web服务器，数据库的单个分片或单个Spark工作程序等。然后，为了扩展应用程序，你只需要扩展容器的数量。</p>
+<p>在这个范例中，每个容器都有一个固定的资源配置（CPU，RAM，线程数等），并且扩展应用程序需要只扩展容器的数量而不是单个资源原语。当应用程序需要按比例放大或缩小时，这为工程师提供了更容易的抽象。</p>
+<p>容器也是实现微服务架构的一个很好的工具，每个微服务只是一组协作容器。例如，可以使用单个主容器和多个从容器来实现Redis微服务。</p>
+<p>这种（微）服务导向架构具有一些非常重要的属性，使工程团队可以轻松创建和部署应用程序（有关更多详细信息，请参阅我之前的<a target="_blank" rel="noopener" href="https://hackernoon.com/how-microservices-saved-the-internet-30cd4b9c6230?gi=d7bc571ea278">文章</a>）。</p>
+<h2 id="编排"><a href="#编排" class="headerlink" title="编排"></a>编排</h2><p>自从Linux容器出现以来，用户一直试图在许多虚拟机上部署大型应用程序，其中每个进程都在自己的容器中运行。这样做需要能够在数百个虚拟机中有效地部署数十到数千个容器，并管理他们的网络，文件系统，资源等。今天Docker使它更容易，因为它公开了抽象来定义容器网络，文件卷系统，资源配置等</p>
+<p>但是仍然需要一个工具来：</p>
+<ul>
+<li>真实地采取规范并将容器分配给机器（调度）</li>
+<li>真实地通过Docker在机器上启动指定的容器</li>
+<li>处理升级&#x2F;回滚&#x2F;系统不断变化的性质</li>
+<li>应对容器崩溃等故障</li>
+<li>创建集群资源，如服务发现，VM间网络，集群入口&#x2F;出口等。</li>
+</ul>
+<p>这组问题涉及在一组（可能是瞬态的或不断变化的）容器之上构建的分布式系统的编排，人们已经建立了一些非常奇妙的系统来解决这个问题。</p>
+<p>详情请见下文，理解kubernetes核心概念。</p>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p><a target="_blank" rel="noopener" href="https://medium.freecodecamp.org/demystifying-containers-101-a-deep-dive-into-container-technology-for-beginners-d7b60d8511c1">Demystifying containers 101: a deep dive into container technology for beginners</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AE%B9%E5%99%A8/" rel="tag"># 容器</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/12/08/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_%E5%8F%8D%E5%B0%84_invoke/" rel="prev" title="Java_反射_invoke深入解析">
+                  <i class="fa fa-angle-left"></i> Java_反射_invoke深入解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/12/11/Components/Container/%E7%90%86%E8%A7%A3Kubernetes%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/" rel="next" title="理解Kubernetes核心概念">
+                  理解Kubernetes核心概念 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

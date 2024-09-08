@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="AI&#x2F;DL&#x2F;ML三者的概念人工智能是一个宽泛的概念，目的是让计算机能够像人一样思考。 人工智能现阶段分为弱人工智能和强人工智能。当下的AI本质上都是弱人工智能。而DL是实现AI的一种方法,而在深度学习出现之前，一般是以机器学习的神经网络学习算法存在的，随着计算机资源和大数据的兴起，神经网络变成了如今的DL。 三者的关系，是互相包含。AI概念最广，DL和ML之间关系，不确定，根据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="人工智能和深度学习概念入门">
+<meta property="og:url" content="https://miszibu.github.io/2018/03/23/%E6%9D%82%E8%B0%88/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="AI&#x2F;DL&#x2F;ML三者的概念人工智能是一个宽泛的概念，目的是让计算机能够像人一样思考。 人工智能现阶段分为弱人工智能和强人工智能。当下的AI本质上都是弱人工智能。而DL是实现AI的一种方法,而在深度学习出现之前，一般是以机器学习的神经网络学习算法存在的，随着计算机资源和大数据的兴起，神经网络变成了如今的DL。 三者的关系，是互相包含。AI概念最广，DL和ML之间关系，不确定，根据">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/AIDIML%E5%85%B3%E7%B3%BB.jpg">
+<meta property="article:published_time" content="2018-03-23T12:50:33.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.072Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="人工智能">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/AIDIML%E5%85%B3%E7%B3%BB.jpg">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/03/23/%E6%9D%82%E8%B0%88/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/03/23/%E6%9D%82%E8%B0%88/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/","path":"2018/03/23/杂谈/人工智能和深度学习概念入门/","title":"人工智能和深度学习概念入门"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>人工智能和深度学习概念入门 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AI-DL-ML%E4%B8%89%E8%80%85%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">AI&#x2F;DL&#x2F;ML三者的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0ML"><span class="nav-number">2.</span> <span class="nav-text">机器学习ML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BDAI"><span class="nav-number">3.</span> <span class="nav-text">人工智能AI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0DL"><span class="nav-number">4.</span> <span class="nav-text">深度学习DL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/03/23/%E6%9D%82%E8%B0%88/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="人工智能和深度学习概念入门 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          人工智能和深度学习概念入门
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-03-23 20:50:33" itemprop="dateCreated datePublished" datetime="2018-03-23T20:50:33+08:00">2018-03-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="AI-DL-ML三者的概念"><a href="#AI-DL-ML三者的概念" class="headerlink" title="AI&#x2F;DL&#x2F;ML三者的概念"></a>AI&#x2F;DL&#x2F;ML三者的概念</h2><p>人工智能是一个宽泛的概念，目的是让计算机能够像人一样思考。</p>
+<p>人工智能现阶段分为弱人工智能和强人工智能。当下的AI本质上都是弱人工智能。而DL是实现AI的一种方法,而在深度学习出现之前，一般是以机器学习的神经网络学习算法存在的，随着计算机资源和大数据的兴起，神经网络变成了如今的DL。</p>
+<p>三者的关系，是互相包含。AI概念最广，DL和ML之间关系，不确定，根据划分方法的不同而不同。</p>
+<p><img src="/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E5%BF%B5%E5%85%A5%E9%97%A8/AIDIML%E5%85%B3%E7%B3%BB.jpg" alt="AI/DI/ML关系"></p>
+<span id="more"></span>
+
+<h2 id="机器学习ML"><a href="#机器学习ML" class="headerlink" title="机器学习ML"></a>机器学习ML</h2><p><strong>训练</strong> <strong>推理</strong>（评估）是机器学习的两个过程，判别模型，模型可以直接用来判别事物，典型的就是做分类。判别模型是对条件概率进行的建模，也就是p(Y|X)。常用于处理分类问题(垃圾邮件判断)，图像识别等。 </p>
+<p>机器学习分成下面几种类别：</p>
+<ul>
+<li><strong>监督学习</strong>：从给定的训练<strong>数据集</strong>中学习出一个函数，当新的数据到来时，可以根据这个函数预测结果。监督学习的训练集要求是包括输入和输出，也可以说是特征和目标。训练数据中的目标是由人标注的。常见的监督学习算法包括<strong>回归分析</strong>和<strong>统计分类</strong>。</li>
+<li><strong>无监督学习</strong>:相比监督学习，训练集<strong>没有人为标注的结果</strong>。常见的无监督学习算法有<strong>聚类</strong>。</li>
+<li><strong>半监督学习</strong>：介于监督学习与无监督学习之间。它主要考虑如何利用<strong>少量的标注样本</strong>和<strong>大量的未标注样本</strong>进行训练和分类的问题。。</li>
+<li><strong>增强学习</strong>：通过<strong>观察</strong>来学习做成如何的动作。每个动作都会对环境有所影响，学习对象根据观察到的周围环境的反馈来做出判断。</li>
+</ul>
+<p>传统的机器学习领域中，监督学习最大的问题在于训练数据标注成本高而无监督学习的应用场景有限，因此<strong>半监督学习</strong>一直是业内研究的<strong>重点</strong>方向。</p>
+<h2 id="人工智能AI"><a href="#人工智能AI" class="headerlink" title="人工智能AI"></a>人工智能AI</h2><p><strong>应用方向</strong></p>
+<ul>
+<li>语音识别：如Siri等，将语音识别跟搜索引擎结合在一起，使得能不断采集数据，提高系统精度。</li>
+<li>自然语言理解：搜索引擎，机器翻译等等。</li>
+<li>数据挖掘：在大数据的基础上，进行数据挖掘，结合已有的信息推导出新的的数据，来服务用户。 </li>
+<li>计算机视觉：自动驾驶。在这方面的发展趋势有两种<ul>
+<li>1）通过多个角度来分析问题，集成更多模块，来解决同一个问题。</li>
+<li>2）使用新的信息来解决一个原来很难的问题，如引入红外投影仪。</li>
+</ul>
+</li>
+</ul>
+<p><strong>理论基础</strong></p>
+<ul>
+<li><p>计算复杂度：能保证完美解的算法大多是NP-hand,从时间复杂度来讲过于复杂，因此在硬件有限的条件下，如何降低其时间复杂度，需要很多细节上的努力。</p>
+<p>多项式级复杂度与非多项式级复杂度</p>
+<blockquote>
+<p>一种是O(1),O(log(n)),O(n^a)等，我们把它叫做多项式级的复杂度，因为它的规模n出现在底数的位置。另一种是O(a^n)和O(n!)型复杂度，它是非多项式级的，其复杂度计算机往往不能承受。</p>
+</blockquote>
+</li>
+<li><p>模型假设：所有的模型都需要一个假设，比如说SIri做语音识别时需要假设存在环境噪音，无人驾驶时需要假设周围的汽车有个加速度上限。只有在假设的基础上，才能进行建模。</p>
+</li>
+<li><p>数据基础：人工智能的实现，离不开机器学习，机器学习需要大量的数据进行模拟学习。因此，类似于google等公司在人工智能方面有着得天独厚的优势。</p>
+</li>
+</ul>
+<h2 id="深度学习DL"><a href="#深度学习DL" class="headerlink" title="深度学习DL"></a>深度学习DL</h2><h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/30545893">深度学习和人工智能之间是什么样的关系</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/20102212">人工智能现在的发展前景如何？</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" rel="tag"># 人工智能</a>
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/03/23/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_%E5%A4%9A%E6%80%81/" rel="prev" title="Java_多态">
+                  <i class="fa fa-angle-left"></i> Java_多态
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/03/29/Code_Language/Java/JVM/Java_GC/" rel="next" title="Java_GC">
+                  Java_GC <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

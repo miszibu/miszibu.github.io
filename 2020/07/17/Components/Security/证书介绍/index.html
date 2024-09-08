@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="TLS和HTTPS协议为我们实现了节点之间的加密通信，这是通过证书Certification 实现的。 本文针对证书中出现的常见概念，进行解释。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="证书介绍">
+<meta property="og:url" content="https://miszibu.github.io/2020/07/17/Components/Security/%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="TLS和HTTPS协议为我们实现了节点之间的加密通信，这是通过证书Certification 实现的。 本文针对证书中出现的常见概念，进行解释。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/osi.png">
+<meta property="article:published_time" content="2020-07-16T16:08:31.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.056Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Security">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/osi.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/07/17/Components/Security/%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/07/17/Components/Security/%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/","path":"2020/07/17/Components/Security/证书介绍/","title":"证书介绍"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>证书介绍 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TSL-HTTPS"><span class="nav-number">1.</span> <span class="nav-text">TSL&#x2F;HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TLS-SSL"><span class="nav-number">1.1.</span> <span class="nav-text">TLS(SSL)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPS"><span class="nav-number">1.2.</span> <span class="nav-text">HTTPS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%81%E4%B9%A6-Certification"><span class="nav-number">2.</span> <span class="nav-text">证书 Certification</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="nav-number">3.</span> <span class="nav-text">工作机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%81%E4%B9%A6%E5%B8%B8%E8%A7%81%E7%BC%96%E7%A0%81%E6%A0%BC%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%90%8E%E7%BC%80%E5%90%8D"><span class="nav-number">4.</span> <span class="nav-text">证书常见编码格式及其后缀名</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AF%86%E5%88%AB%E7%BC%96%E7%A0%81%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.0.1.</span> <span class="nav-text">如何识别编码格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E6%83%85%E4%B8%8E%E5%91%BD%E4%BB%A4"><span class="nav-number">4.0.2.</span> <span class="nav-text">详情与命令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%81%E4%B9%A6%E7%BC%96%E7%A0%81%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">5.</span> <span class="nav-text">证书编码的转换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6"><span class="nav-number">6.</span> <span class="nav-text">生成证书</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%91%E6%9D%83%E5%A8%81%E8%AF%81%E4%B9%A6%E9%A2%81%E5%8F%91%E6%9C%BA%E6%9E%84%E7%94%B3%E8%AF%B7%E8%AF%81%E4%B9%A6"><span class="nav-number">6.0.1.</span> <span class="nav-text">向权威证书颁发机构申请证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E7%AD%BE%E5%90%8D%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6"><span class="nav-number">6.0.2.</span> <span class="nav-text">自签名生成证书</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/17/Components/Security/%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="证书介绍 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          证书介绍
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-17 00:08:31" itemprop="dateCreated datePublished" datetime="2020-07-17T00:08:31+08:00">2020-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>TLS和HTTPS协议为我们实现了节点之间的加密通信，这是通过证书Certification 实现的。</p>
+<p>本文针对证书中出现的常见概念，进行解释。</p>
+<span id="more"></span>
+
+<h1 id="TSL-HTTPS"><a href="#TSL-HTTPS" class="headerlink" title="TSL&#x2F;HTTPS"></a>TSL&#x2F;HTTPS</h1><p><img src="/./%E8%AF%81%E4%B9%A6%E4%BB%8B%E7%BB%8D/osi.png"></p>
+<h2 id="TLS-SSL"><a href="#TLS-SSL" class="headerlink" title="TLS(SSL)"></a>TLS(SSL)</h2><p><strong>TCP: Transport Layer Security</strong></p>
+<p>SSL: Secure Sockets Layer</p>
+<p><strong>TLS协议直接在TCP协议的基础上运行</strong>，提供支持证书加密验证等功能。SSL则是TLS的前身，SSL在3.0版本后直接更名为TLS。目前SSL协议已经不被广泛支持，普遍使用TLS协议。</p>
+<h2 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a><strong>HTTPS</strong></h2><p>全称: Hyper-text transport protocal secure</p>
+<p>HTTP协议负责处理数据报文，数据则由TLS协议进行加解密处理，加密后的数据则由TCP协议负责传输。这就是计算机网络分层的优点，下层的细节对上层屏蔽，因此HTTPS加密传输时，对于应用程序而言相比于HTTP协议，应用程序感受不到区别。</p>
+<h1 id="证书-Certification"><a href="#证书-Certification" class="headerlink" title="证书 Certification"></a>证书 Certification</h1><p><strong>证书标准 X.509</strong>:  密码学中公钥证书的格式标准, TLS使用的就是这种证书标准, 详情可以参考RFC5280和<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/X.509">wikipedia</a>.</p>
+<p><strong>定义</strong>：由CA中心或其子机构签发的，存储相关信息，如有效期，有效域名，签发机构等重要信息的，可以通过RSA和Hash算法确认合法性的一种数据结构。具体可看<a target="_blank" rel="noopener" href="https://gitprod.statestr.com/E662491/blog/blob/master/Technology_Stack/https/Https%E5%8E%9F%E7%90%86.md#ca-%E9%AA%8C%E8%AF%81%E5%8E%9F%E7%90%86">CA 验证原理</a></p>
+<h1 id="工作机制"><a href="#工作机制" class="headerlink" title="工作机制"></a>工作机制</h1><p>TLS 和 HTTPS 本质相同，下文就以HTTPS为例，解释其工作原理。</p>
+<p><a target="_blank" rel="noopener" href="https://gitprod.statestr.com/E662491/blog/blob/master/Technology_Stack/https/Https%E5%8E%9F%E7%90%86.md#https-%E5%8E%9F%E7%90%86">Https 原理</a></p>
+<hr>
+<h1 id="证书常见编码格式及其后缀名"><a href="#证书常见编码格式及其后缀名" class="headerlink" title="证书常见编码格式及其后缀名"></a>证书常见编码格式及其后缀名</h1><p>证书有<strong>PEM, DER两种格式</strong>和由<strong>JDK生成的JKS格式</strong>，由于证书文件后缀名可任意修改，无法单纯的从后缀名得出证书编码格式。</p>
+<h3 id="如何识别编码格式"><a href="#如何识别编码格式" class="headerlink" title="如何识别编码格式"></a>如何识别编码格式</h3><ol>
+<li><p>直接查看证书，来判断是否为PEM格式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">st=&gt;;start: Start</span><br><span class="line">op0=&gt;;operation: 查看你的证书(cat xxx)</span><br><span class="line">cond0=&gt;;condition: 是否能直接查看证书</span><br><span class="line">cond1=&gt;;condition: 是否由.jks .keystore .truststore 结尾</span><br><span class="line"></span><br><span class="line">e1=&gt;;end: PEM格式</span><br><span class="line">e2=&gt;;end: DER(P12)格式</span><br><span class="line">e3=&gt;;end: JKS格式</span><br><span class="line"></span><br><span class="line">st-&gt;;op0-&gt;;cond0(yes)</span><br><span class="line">cond0(yes)-&gt;;e1</span><br><span class="line">cond0(no)-&gt;;cond1</span><br><span class="line">cond1(yes)-&gt;;e3</span><br><span class="line">cond1(no)-&gt;;e2</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="详情与命令"><a href="#详情与命令" class="headerlink" title="详情与命令"></a>详情与命令</h3><ul>
+<li><p><strong>PEM</strong>：通常由<strong>openssl</strong>生成，常见于<em><strong>nix</strong>系统，</em>*后缀名任意**。通常命名为.cer, .key, .csr等来区分内容。</p>
+<ul>
+<li><p><strong>特点</strong>：直接查看证书，并符合以下格式，内容为BASE64编码则为PEM格式证书。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-----BEGIN CERTIFICATE-----</span><br><span class="line">***********************</span><br><span class="line">-----END CERTIFICATE-----</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>命令</strong>：</p>
+<ul>
+<li>查看KEY信息:  openssl rsa -noout -text -in myserver.key </li>
+<li>查看CSR信息:  openssl req -noout -text -in myserver.csr </li>
+<li>查看证书信息: openssl x509 -noout -text -in ca.crt</li>
+<li>由根证书验证证书: openssl verify -CAfile ca.crt myserver.crt </li>
+<li>去除证书密码: openssl rsa -in myserver.key -out server.key.insecure</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>DER</strong>: 该编码常出现于<strong>Winodws和Macos</strong>系统中, 但通常不以DER作为后缀名。</p>
+<ul>
+<li><strong>特点</strong>：无法直接查看读取，</li>
+<li><strong>命令:</strong><ul>
+<li>查看证书：openssl x509 -in certificate.der -inform der -text -noout</li>
+<li>查看Key: openssl rsa -in mykey.key -text -noout -inform der</li>
+<li>查看Csr: openssl req -noout -text -in my.csr -inform der</li>
+</ul>
+</li>
+<li><strong>PKCS#12(.pfx .p12) <strong>: 常见于</strong>Mac OS</strong>系统，P12证书同时存放了证书和对应的私钥。P12证书实际是DER编码格式。</li>
+</ul>
+</li>
+<li><p><strong>JKS</strong>: <strong>JAVA keytool</strong>工具生成的证书文件格式，通常命名为***.truststore.jks|<em>.keystore.jks</em>*</p>
+<ul>
+<li><strong>特点</strong>: 后缀名普遍带有.truststore.jks|*.keystore.jks</li>
+<li>命令：<a target="_blank" rel="noopener" href="https://gitprod.statestr.com/E662491/blog/blob/master/Technology_Stack/https/JKS.md">JKS相关命令</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="证书编码的转换"><a href="#证书编码的转换" class="headerlink" title="证书编码的转换"></a>证书编码的转换</h1><p>证书 从PEM转为DER <strong>openssl x509 -in cert.crt -outform der -out cert.der</strong></p>
+<p>证书 从DER转为PEM <strong>openssl x509 -in cert.crt -inform der -outform pem -out cert.pem</strong></p>
+<p>(提示:要转换KEY文件也类似,只不过把x509换成rsa,要转CSR的话,把x509换成req)</p>
+<hr>
+<h1 id="生成证书"><a href="#生成证书" class="headerlink" title="生成证书"></a>生成证书</h1><h3 id="向权威证书颁发机构申请证书"><a href="#向权威证书颁发机构申请证书" class="headerlink" title="向权威证书颁发机构申请证书"></a><strong>向权威证书颁发机构申请证书</strong></h3><p>生成CSR，将CSR交给证书生成机构</p>
+<p>&gt; <strong>openssl req -newkey rsa:2048 -new -nodes -keyout my.key -out my.csr</strong></p>
+<h3 id="自签名生成证书"><a href="#自签名生成证书" class="headerlink" title="自签名生成证书"></a>自签名生成证书</h3><p>&gt; <strong>openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem</strong></p>
+<p><a target="_blank" rel="noopener" href="https://gitprod.statestr.com/E662491/blog/blob/master/Technology_Stack/https/OpenSSL%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.md">查看完整流程</a></p>
+<hr>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a target="_blank" rel="noopener" href="https://webcache.googleusercontent.com/search?q=cache:iUUhh5njQbkJ:https://www.cnblogs.com/guogangj/p/4118605.html+&cd=1&hl=zh-CN&ct=clnk&gl=hk">那些证书相关的玩意儿(SSL,X.509,PEM,DER,CRT,CER,KEY,CSR,P12等)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/6c981b44293d">HTTPS与HTTP区别 – TLS&#x2F;SSL</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/f5f93c89155e">openssl 查看证书</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Security/" rel="tag"># Security</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/16/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java-HappenBefore/" rel="prev" title="Java-HappenBefore">
+                  <i class="fa fa-angle-left"></i> Java-HappenBefore
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/17/Components/Security/openssl%E8%AF%81%E4%B9%A6%E5%AE%9E%E6%88%98/" rel="next" title="openssl证书实战">
+                  openssl证书实战 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

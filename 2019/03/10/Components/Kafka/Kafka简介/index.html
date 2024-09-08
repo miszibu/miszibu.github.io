@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Kafka 的扫盲篇，了解其基本模型架构和名字概念。 这篇文章讲的特别细节且深入，直接看这篇就可以再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka简介">
+<meta property="og:url" content="https://miszibu.github.io/2019/03/10/Components/Kafka/Kafka%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Kafka 的扫盲篇，了解其基本模型架构和名字概念。 这篇文章讲的特别细节且深入，直接看这篇就可以再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/Kafka%E7%AE%80%E4%BB%8B/kafka_overview.webp">
+<meta property="og:image" content="https://miszibu.github.io/Kafka%E7%AE%80%E4%BB%8B/log_anatomy.png">
+<meta property="og:image" content="https://miszibu.github.io/Kafka%E7%AE%80%E4%BB%8B/log_consumer.png">
+<meta property="og:image" content="https://miszibu.github.io/Kafka%E7%AE%80%E4%BB%8B/consumer-groups.png">
+<meta property="article:published_time" content="2019-03-10T05:52:46.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.049Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Kafka">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/Kafka%E7%AE%80%E4%BB%8B/kafka_overview.webp">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2019/03/10/Components/Kafka/Kafka%E7%AE%80%E4%BB%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2019/03/10/Components/Kafka/Kafka%E7%AE%80%E4%BB%8B/","path":"2019/03/10/Components/Kafka/Kafka简介/","title":"Kafka简介"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Kafka简介 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">Kafka的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5%E6%80%BB%E8%A7%88"><span class="nav-number">2.</span> <span class="nav-text">基础概念总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Topic-And-Logs"><span class="nav-number">3.</span> <span class="nav-text">Topic And Logs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F-Distribution"><span class="nav-number">4.</span> <span class="nav-text">分布式 | Distribution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E4%BA%A7%E8%80%85-Producers"><span class="nav-number">5.</span> <span class="nav-text">生产者(Producers)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85-Consumers-Pub-Sub-Group"><span class="nav-number">6.</span> <span class="nav-text">消费者(Consumers) | Pub&#x2F;Sub Group</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%BA%90%E6%96%87%E6%A1%A3"><span class="nav-number">7.</span> <span class="nav-text">相关资源文档</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2019/03/10/Components/Kafka/Kafka%E7%AE%80%E4%BB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Kafka简介 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kafka简介
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-10 13:52:46" itemprop="dateCreated datePublished" datetime="2019-03-10T13:52:46+08:00">2019-03-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>Kafka 的扫盲篇，了解其基本模型架构和名字概念。</p>
+<p>这篇文章讲的特别细节且深入，直接看这篇就可以<a target="_blank" rel="noopener" href="https://gitbook.cn/books/5bc446269a9adf54c7ccb8bc/index.html">再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Kafka的优点"><a href="#Kafka的优点" class="headerlink" title="Kafka的优点"></a>Kafka的优点</h2><p>Kafka用于构造实时数据管道和流处理APP，它拥有<strong>高性能，数据持久化，容错性，横向扩展</strong>等特性。</p>
+<ul>
+<li><strong>解耦和拓展性</strong>：消息中间件都具有解耦的特性。原本耦合的服务之间，繁杂的相互调用，可以通过消息中间件来实现生产消息，消费消息。服务之间的关系，清晰明了。服务之间，遵循共同的topic，内部实现逻辑可以自由更改。</li>
+<li><strong>容错性</strong>：当Kafka集群中，部分服务宕机，在存在N个备份情况下，支持N-1的服务容错。当然zk不能挂，我们也需要一个ZK集群，避免服务正常，zk挂了的现象。</li>
+<li><strong>削峰：</strong>当上游服务接受到大量请求时，可以直接推入Kafka中，慢慢消费。避免了下游服务，因为过高流量宕机。</li>
+<li><strong>顺序保障</strong>：Kakfa是Pub&#x2F;Sub Group模型，支持每个partition内消息有序。</li>
+<li><strong>数据持久化</strong>：Kafka会保存已消费的数据一段时间，一定程度上避免数据丢失的现象。Kafka的记录是直接append到文件中去的，效率高。</li>
+</ul>
+<p>在Kafka中，Client和Server之间是以简单，高效，语言无关的TCP协议进行沟通的，支持多种语言。</p>
+<hr>
+<h2 id="基础概念总览"><a href="#基础概念总览" class="headerlink" title="基础概念总览"></a>基础概念总览</h2><ul>
+<li><strong>Topic :</strong> 消息类别，根据 topic 来分类消息</li>
+<li><strong>Partition</strong> ：一个topic可以有1-N个分区，每个分区存储topic的不同记录，通过划分分区，减少一台服务器的访问压力。可以通过增加分区，分散压力，实现<strong>横向扩展</strong>。</li>
+<li><strong>Producer  &#x2F;  Consumer</strong></li>
+<li><strong>Broker</strong> ：kafka 服务器，负责消息的存储和转发。</li>
+<li><strong>Record</strong> ：每一条记录，<strong>Key，Value</strong>和<strong>Timestamp</strong>组成。只有value是必填的。</li>
+<li><strong>Consumer Group</strong>: 消费者分组，每个 consumer 必须属于一个分组，分组共享 offset</li>
+<li><strong>ZK:</strong> Kafka 需要 ZK 来做一致性选举且保存broker, topic, partition 等 meta 数据。</li>
+</ul>
+<p><img src="/Kafka%E7%AE%80%E4%BB%8B/kafka_overview.webp"></p>
+<p>有了基础概念的铺垫，我们可以看懂这幅图片。描述了Kafka的data flow。</p>
+<ol>
+<li>首先，图中存在3个Broker，也就是3个Kafka实例。</li>
+<li>存在两个Topic，Topic0跟Topic1。Topic0具有两个分区，因此只有两个Broker中的分区会被使用。另外一个Broker的数据，相当于backup。此时，如果Broker0,1接连宕机，也有Broker2来顶替。</li>
+<li>Pub&#x2F;Sub Group模型：每一个Partition都会被所有订阅的Counsumer Group消费，只有Consumer Group中的一个会消费该数据。</li>
+</ol>
+<hr>
+<h2 id="Topic-And-Logs"><a href="#Topic-And-Logs" class="headerlink" title="Topic And Logs"></a>Topic And Logs</h2><p>对于每一个Topic，Kafka集群维持了一个如下所示的分区日志。一个 Topic被划分为多个分区。</p>
+<p><img src="/Kafka%E7%AE%80%E4%BB%8B/log_anatomy.png"></p>
+<p><strong>每个分区</strong>都是一串<strong>有序的</strong>（Kafka提供的分区 记录有序性），不可变的记录队列，不断附加到结构化提交日志中（append到文件中，效率高）。分区中的每一个记录都有一个<strong>Offset</strong>，偏移量作为UUID，来保证每条记录主键不同。</p>
+<p>Kafka集群通过使用<strong>可配置的保存时长</strong>，持久化保存所有数据，无论他们是否被消费。举例而言，当配置了数据保存时长为2天时，当发布记录后的两天后，这条记录将会被丢弃，来释放内存空间。</p>
+<p><img src="/Kafka%E7%AE%80%E4%BB%8B/log_consumer.png"></p>
+<p><strong>Cousumer获取Topic中的数据是通过Offset</strong>。实际上消费者所持有的仅有的元数据就是这个偏移量，也就是消费者在这个log中的位置。 这个偏移量由消费者控制：正常情况当消费者消费消息的时候，偏移量也线性的的增加。但是实际偏移量由消费者控制，消费者可以将偏移量重置为更老的一个偏移量，重新读取消息。 可以看到这种设计对消费者来说操作自如， 一个消费者的操作不会影响其它消费者对此log的处理。 </p>
+<p>再说说分区。Kafka中采用分区的设计有几个目的。</p>
+<ol>
+<li>一个Topic的数据 ，分散到多个Broker中，负载均衡。通过增加partition，来提高集群性能。</li>
+<li>分区可以作为并行处理的单元，稍后会谈到这一点。</li>
+</ol>
+<hr>
+<h2 id="分布式-Distribution"><a href="#分布式-Distribution" class="headerlink" title="分布式 | Distribution"></a>分布式 | Distribution</h2><p>Topic的分区被分布到集群中的多个服务器上。每个服务器处理它分到的分区。 根据配置每个分区还可以复制到其它服务器作为备份容错。 </p>
+<p>每个<strong>分区</strong>有一个leader，零或多个follower。（Tips：partition leader）</p>
+<p>Leader处理此分区的所有的读写请求，而follower被动的复制数据。如果leader宕机，其它的一个follower会被推举为新的leader。 一台服务器可能同时是一个分区的leader，另一个分区的follower。 这样可以实现负载均衡，避免所有的请求都只让一台或者某几台服务器处理。</p>
+<hr>
+<h2 id="生产者-Producers"><a href="#生产者-Producers" class="headerlink" title="生产者(Producers)"></a>生产者(Producers)</h2><p>生产者往某个Topic发布数据时。生产者有责任选择这条记录发布到该Topic的任意分区。这可以通过<code>round-robin</code>来简单轮询分区列表，也可以对某些具体的Key设置权重，来选择分区。</p>
+<p>步骤流程：</p>
+<ol>
+<li>创建一条记录，Topic+Value（必填），Key+Partition(可选)，并将记录序列化，</li>
+<li>判断所属分区：如果没有key，则使用Round-Robin来选择分区。如果有Key，则Hash(Key)，选择分区。</li>
+<li>根据分区，放到对应分区发送队列中，等到（数量达标||等待一定时间 ）进行<strong>批量发送</strong>。</li>
+</ol>
+<hr>
+<h2 id="消费者-Consumers-Pub-Sub-Group"><a href="#消费者-Consumers-Pub-Sub-Group" class="headerlink" title="消费者(Consumers) | Pub&#x2F;Sub Group"></a>消费者(Consumers) | Pub&#x2F;Sub Group</h2><p>通常而言，消息模型可以分为Queue和Pub-Sub模式。</p>
+<ul>
+<li><strong>Queue</strong>：一组消费者从消息队列中获取消息，一条消息只能被一个消费者获取。</li>
+<li><strong>Pub-Sub</strong>：一条消息被推送后，所有订阅该类消息的消费者都会获取该消息。</li>
+</ul>
+<p>Kafka提出了Consumers Group的概念。一个Consumer Group包含多个Consumer Instance，一个发布在Topic上的消息被分发给此消费者组中的一个消费者。当所有Consumer Instance在一个组中，这就是Queue。当每一个Cousumer自己一个组时，这就是Pub-Sub模型。之所以提出Cousumer Group的概念，有两个优点：</p>
+<ul>
+<li><strong>Fault-tolerance</strong> ：当一组内，部分机器挂掉时，不影响整体服务。</li>
+<li><strong>Scalability</strong>：良好的伸缩性，有利于性能拓展</li>
+</ul>
+<blockquote>
+<p>可以简单的理解为，Kafka的模式Pub-Group Sub，每组订阅Topic。</p>
+</blockquote>
+<p><img src="/Kafka%E7%AE%80%E4%BB%8B/consumer-groups.png"></p>
+<p>一个Topic具有多个分区的时候，记录被分别送往不同的分区，在某个分区内，消费者在消费记录时是有序消费的。但是总体而言，各个分区的记录消费顺序不一定有序。如果我们想实现记录被按序消费，那么就只能设置一个分区。</p>
+<h2 id="相关资源文档"><a href="#相关资源文档" class="headerlink" title="相关资源文档"></a>相关资源文档</h2><p><a target="_blank" rel="noopener" href="https://kafka.apache.org/intro">Kafka官方文档</a></p>
+<p><a target="_blank" rel="noopener" href="http://orchome.com/5">半兽人的Kafka Blog</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lizhitao/article/details/39499283">Kafka CSDN</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/d3e963ff8b70">震惊了！原来这才是kafka！</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/03/05/Components/Elasticsearch/ES-XPack-Security/" rel="prev" title="ES_XPack_Security">
+                  <i class="fa fa-angle-left"></i> ES_XPack_Security
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/03/14/Components/Kafka/Kafka-QucikStart/" rel="next" title="Kafka_QucikStart">
+                  Kafka_QucikStart <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

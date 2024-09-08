@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="简单示例123456789101112131415#!&#x2F;bin&#x2F;sh          #是shell脚本的注释 #!作为开头 专有注释 标识路径后所指定的程序即使解释此脚本文件shell程序DIR&#x3D;&#96;dirname $0&#96;   #&#x27;dirname $0&#x27;为当前脚本文件的父目录 DIR&#x3D;即为声明一个变量为DIR，&#x3D;号左右不可以有空格cd $DIR			   # 进入父目录下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shell脚本编程">
+<meta property="og:url" content="https://miszibu.github.io/2018/09/18/General/OS/shell/shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="简单示例123456789101112131415#!&#x2F;bin&#x2F;sh          #是shell脚本的注释 #!作为开头 专有注释 标识路径后所指定的程序即使解释此脚本文件shell程序DIR&#x3D;&#96;dirname $0&#96;   #&#x27;dirname $0&#x27;为当前脚本文件的父目录 DIR&#x3D;即为声明一个变量为DIR，&#x3D;号左右不可以有空格cd $DIR			   # 进入父目录下">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-09-18T02:08:01.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.069Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Shell">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/09/18/General/OS/shell/shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/09/18/General/OS/shell/shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/","path":"2018/09/18/General/OS/shell/shell脚本编程/","title":"shell脚本编程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>shell脚本编程 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.</span> <span class="nav-text">简单示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%8F%9C"><span class="nav-number">2.</span> <span class="nav-text">前菜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell%E5%9F%BA%E7%A1%80"><span class="nav-number">3.</span> <span class="nav-text">Shell基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Shell-%E7%8E%AF%E5%A2%83"><span class="nav-number">3.1.</span> <span class="nav-text">Shell 环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C-Shell-%E8%84%9A%E6%9C%AC%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">执行 Shell 脚本：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell%E5%8F%98%E9%87%8F"><span class="nav-number">4.</span> <span class="nav-text">Shell变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E%E5%8F%98%E9%87%8F%EF%BC%9A%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F-%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">4.1.</span> <span class="nav-text">声明变量：局部变量 环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%8F%8C%E5%BC%95%E5%8F%B7"><span class="nav-number">4.2.</span> <span class="nav-text">字符串：单引号 双引号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%EF%BC%9A%E5%8F%AA%E6%94%AF%E6%8C%81%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84"><span class="nav-number">4.3.</span> <span class="nav-text">数组：只支持一维数组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell%E8%BF%90%E7%AE%97%E7%AC%A6%EF%BC%9A%E7%AE%97%E6%95%B0%EF%BC%8C%E5%85%B3%E7%B3%BB%EF%BC%8C%E9%80%BB%E8%BE%91%EF%BC%8C%E5%B8%83%E5%B0%94%EF%BC%8C%E6%96%87%E4%BB%B6%E6%B5%8B%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">Shell运算符：算数，关系，逻辑，布尔，文件测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%95%B0%E5%85%B3%E7%B3%BB%E8%BF%90%E7%AE%97%EF%BC%9A%E5%8E%9F%E7%94%9F%E4%B8%8D%E6%94%AF%E6%8C%81-%E5%88%A9%E7%94%A8expr%E5%91%BD%E4%BB%A4"><span class="nav-number">5.1.</span> <span class="nav-text">算数关系运算：原生不支持 利用expr命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%BC%95%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">相关引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/09/18/General/OS/shell/shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="shell脚本编程 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          shell脚本编程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-09-18 10:08:01" itemprop="dateCreated datePublished" datetime="2018-09-18T10:08:01+08:00">2018-09-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><span id="more"></span>
+
+<h2 id="简单示例"><a href="#简单示例" class="headerlink" title="简单示例"></a>简单示例</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh          <span class="comment">#是shell脚本的注释 #!作为开头 专有注释 标识路径后所指定的程序即使解释此脚本文件shell程序</span></span></span><br><span class="line">DIR=`dirname $0`   #&#x27;dirname $0&#x27;为当前脚本文件的父目录 DIR=即为声明一个变量为DIR，=号左右不可以有空格</span><br><span class="line">cd $DIR			   # 进入父目录下、即为当前目录</span><br><span class="line">nohup java -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -Xms512M -Xmx4G -jar `ls | grep jar` &gt; /dev/null 2&gt;&amp;1 &amp; </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">java -jar <span class="string">&#x27;ls | grep jar&#x27;</span> 启动已经打包好的jar包</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-XX:+UseG1GC 使用G1 GC收集器</span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-XX:+HeapDumpOnOutOfMemoryError  当堆内存空间溢出时输出堆的内存快照。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-Xms512M 初始堆大小 默认值为物理内存的1/64 当空余堆内存小于40%时，JVM会增大堆</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-Xmx4G 最大堆大小 默认值为物理内存的1/4 当空余对内存大于70%时，JVM会减小堆</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&gt; 标准输出流重定向 /dev/null 重定向到空设备文件 2：标准错误流 1：标准输出流</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">2&gt;&amp;1 stdout/stderr 往一个设备文件输出 但是stderr会沿用sedout的pipe</span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&gt;a 2&gt;a 则会打开两个pipe，每个管道往文件里写入数据时,会flush掉原有的数据</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&amp; 等同 2&gt;&amp;1 2的重定向(&gt;)等于1</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">./xx.sh 执行 注意查看是否具有执行权限</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="前菜"><a href="#前菜" class="headerlink" title="前菜"></a>前菜</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cd `dirname $0`</span><br><span class="line">BIN_DIR=`pwd` # 脚本所在目录</span><br><span class="line">cd ..</span><br><span class="line">PROJECT_DIR=`pwd` # 脚本所在父目录 项目目录</span><br><span class="line"></span><br><span class="line">mvn clean install -DskipTests # 清除原有Jar包 并 重新Install</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-DskipTests，不执行测试用例，但编译测试用例类生成相应的class文件至target/test-classes下。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-Dmaven.test.skip=<span class="literal">true</span>，不执行测试用例，也不编译测试用例类。</span></span><br><span class="line"></span><br><span class="line">TARGET_JAR=&quot;$PROJECT_DIR/trade-web/target/trade.jar&quot; # 选定目标Jar文件</span><br><span class="line"></span><br><span class="line">if [ ! -f $TARGET_JAR ]; then	# 如果目标文件不存在 输出错误信息 并 退出</span><br><span class="line">    echo &quot;ERROR: $TARGET_JAR not exist&quot;</span><br><span class="line">    exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">rm -rf ./trade.jar # 移除当前目录下的Jar文件</span><br><span class="line">cp $TARGET_JAR ./	# 拷贝新打包的Jar文件</span><br><span class="line"></span><br><span class="line">echo &quot;kill prev app..&quot;</span><br><span class="line"></span><br><span class="line">ps aux | grep java | grep &quot;trade-web&quot; | awk &#x27;&#123;print $2&#125;&#x27; | xargs kill -9</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找出并杀死原有项目进程</span></span><br><span class="line"></span><br><span class="line">DEBUG_OPT=&quot;-agentlib:jdwp=transport=dt_socket,address=48091,server=y,suspend=n&quot;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">设置远程调试的Agent，JVM允许外部的库运行时注入到JVM，这些外部的库就是Agent,Agent能够动态修改Class文件(方法区)</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">**-agentlib:jdwp=... **来引入 jdwp 这个 Agent 的。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">jdwp 是一个 JVM 特定的 JDWP（Java Debug Wire Protocol） 可选实现，用来定义调试者与运行JVM之间的通讯，它的是通过 JVM 本地库的 jdwp.so 或者 jdwp.dll 支持实现的。</span></span><br><span class="line"></span><br><span class="line">nohup java $DEBUG_OPT -Dfile.encoding=UTF-8 -DappName=trade-web -jar $PROJECT_DIR/trade.jar --spring.profiles.active=dev &gt; app.log 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">tail -f $PROJECT_DIR/app.log</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看<span class="built_in">log</span>日志</span> </span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Shell基础"><a href="#Shell基础" class="headerlink" title="Shell基础"></a>Shell基础</h2><h3 id="Shell-环境"><a href="#Shell-环境" class="headerlink" title="Shell 环境"></a>Shell 环境</h3><p>Linux 的 Shell 种类众多，常见的有：</p>
+<ul>
+<li><strong>Bourne Shell</strong>（&#x2F;usr&#x2F;bin&#x2F;sh或&#x2F;bin&#x2F;sh）</li>
+<li><strong>Bourne Again Shell</strong>（&#x2F;bin&#x2F;bash）</li>
+<li>C Shell（&#x2F;usr&#x2F;bin&#x2F;csh）</li>
+<li>K Shell（&#x2F;usr&#x2F;bin&#x2F;ksh）</li>
+<li>Shell for Root（&#x2F;sbin&#x2F;sh）</li>
+</ul>
+<p> Bourne Again Shell**(Bash)**是Bourne Shell的后续兼容版本  ，所以，像 <strong>#!&#x2F;bin&#x2F;sh</strong>，它同样也可以改为 <strong>#!&#x2F;bin&#x2F;bash</strong>。</p>
+<hr>
+<h3 id="执行-Shell-脚本："><a href="#执行-Shell-脚本：" class="headerlink" title="执行 Shell 脚本："></a>执行 Shell 脚本：</h3><p><strong>1、作为可执行程序</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使脚本具有执行权限</span></span><br><span class="line">chmod +x run.sh </span><br><span class="line">chmod 777 test.sh  </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">执行脚本</span></span><br><span class="line">./test.sh  </span><br></pre></td></tr></table></figure>
+
+<p>注意，一定要写成 .&#x2F;test.sh，而不是 <strong>test.sh</strong>，运行其它二进制的程序也一样，直接写 test.sh，linux 系统会去 PATH 里寻找有没有叫 test.sh 的，而只有 &#x2F;bin, &#x2F;sbin, &#x2F;usr&#x2F;bin，&#x2F;usr&#x2F;sbin 等在 PATH 里,因此需要告诉系统在当前目录需找对应文件。</p>
+<p><strong>2、作为解释器参数</strong></p>
+<p>这种运行方式是，直接运行解释器，其参数就是 shell 脚本的文件名，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/bin/sh test.sh</span><br><span class="line">/bin/php test.php</span><br></pre></td></tr></table></figure>
+
+<p>这种方式运行的脚本，不需要在第一行指定解释器信息，写了也没用。</p>
+<hr>
+<h2 id="Shell变量"><a href="#Shell变量" class="headerlink" title="Shell变量"></a>Shell变量</h2><h3 id="声明变量：局部变量-环境变量"><a href="#声明变量：局部变量-环境变量" class="headerlink" title="声明变量：局部变量 环境变量"></a>声明变量：局部变量 环境变量</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">my_name=&quot;zibu&quot; #=号两边不能有空格 </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">变量只可以由数字英文下划线组成 数字不能开头</span></span><br><span class="line"></span><br><span class="line">echo $&#123;my_name&#125; #$&#123;&#125;使用变量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="字符串：单引号-双引号"><a href="#字符串：单引号-双引号" class="headerlink" title="字符串：单引号 双引号"></a>字符串：单引号 双引号</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">str=&#x27;this is a string&#x27; </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的；</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">单引号字串中不能出现单独一个的单引号（对单引号使用转义符后也不行），但可成对出现，作为字符串拼接使用。</span></span><br><span class="line"></span><br><span class="line">your_name=&#x27;runoob&#x27;</span><br><span class="line">str=&quot;Hello, I know you are \&quot;$your_name\&quot;! \n&quot;</span><br><span class="line">echo $str</span><br><span class="line">Hello, I know you are &quot;runoob&quot;! </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">双引号里可以有变量</span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">双引号里可以出现转义字符</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数组：只支持一维数组"><a href="#数组：只支持一维数组" class="headerlink" title="数组：只支持一维数组"></a>数组：只支持一维数组</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">array_name=&#123;value0 value1 value2&#125; # shell数组之间使用空格分割 一次性声明数组</span><br><span class="line">array_name[0]=value0</span><br><span class="line">array_name[1]=value1</span><br><span class="line">array_name[2]=value2  			  # 单独定义数组的各个分量</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;array_name[n]&#125;				  <span class="comment"># 读取数组某个元素</span></span></span><br><span class="line">echo $&#123;array_name[@]&#125;			  # 获取数组的全部元素</span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;#array_name[@]&#125;				  <span class="comment"># 获得数组的长度</span></span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;#array_name[n]&#125;				  <span class="comment"># 获取某个元素某个位置的数据长度</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="Shell运算符：算数，关系，逻辑，布尔，文件测试"><a href="#Shell运算符：算数，关系，逻辑，布尔，文件测试" class="headerlink" title="Shell运算符：算数，关系，逻辑，布尔，文件测试"></a>Shell运算符：算数，关系，逻辑，布尔，文件测试</h2><h3 id="算数关系运算：原生不支持-利用expr命令"><a href="#算数关系运算：原生不支持-利用expr命令" class="headerlink" title="算数关系运算：原生不支持 利用expr命令"></a>算数关系运算：原生不支持 利用expr命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">val=`expr 2 + 2`		# `是反引号 &#x27;单引号是字符串 表达符和运算符之间有空格</span><br><span class="line">echo &quot;两数之和为 : $val&quot;</span><br><span class="line"></span><br><span class="line">+	加法	`expr $a + $b` 结果为 30。</span><br><span class="line">-	减法	`expr $a - $b` 结果为 -10。</span><br><span class="line">*	乘法	`expr $a \* $b` 结果为  200。 	# *需要转义符</span><br><span class="line">/	除法	`expr $b / $a` 结果为 2。</span><br><span class="line"><span class="meta prompt_">%</span><span class="language-bash">	取余	`<span class="built_in">expr</span> <span class="variable">$b</span> % <span class="variable">$a</span>` 结果为 0。</span></span><br><span class="line">=	赋值	a=$b 将把变量 b 的值赋给 a。</span><br><span class="line">==	相等。用于比较两个数字，相同则返回 true。	[ $a == $b ] 返回 false。</span><br><span class="line">!=	不相等。用于比较两个数字，不相同则返回 true。	[ $a != $b ] 返回 true</span><br></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="相关引用"><a href="#相关引用" class="headerlink" title="相关引用"></a>相关引用</h2><p><a target="_blank" rel="noopener" href="http://www.runoob.com/linux/linux-shell.html">菜鸟驿站-shell教程</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Shell/" rel="tag"># Shell</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/09/11/%E6%9D%82%E8%B0%88/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AF%A6%E8%A7%A3/" rel="prev" title="正则表达式详解">
+                  <i class="fa fa-angle-left"></i> 正则表达式详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/09/23/Code_Language/Python/python%E7%AE%80%E6%98%8E%E8%AF%AD%E6%B3%95/" rel="next" title="python简明语法">
+                  python简明语法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

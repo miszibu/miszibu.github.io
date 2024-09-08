@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Mysql相关的内容，由于当前工作上原因接触并不多，但数据库方面作为一名后端工程师不可轻废，这篇文章来源自无缺哥分享的Mysql索引分享会的资料，在此做个整理和备份。 58到家MySQL军规升级版">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql-58到家军规">
+<meta property="og:url" content="https://miszibu.github.io/2018/06/13/Components/Mysql/Mysql-58%E5%88%B0%E5%AE%B6%E5%86%9B%E8%A7%84/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Mysql相关的内容，由于当前工作上原因接触并不多，但数据库方面作为一名后端工程师不可轻废，这篇文章来源自无缺哥分享的Mysql索引分享会的资料，在此做个整理和备份。 58到家MySQL军规升级版">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-06-13T09:31:25.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.052Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/06/13/Components/Mysql/Mysql-58%E5%88%B0%E5%AE%B6%E5%86%9B%E8%A7%84/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/06/13/Components/Mysql/Mysql-58%E5%88%B0%E5%AE%B6%E5%86%9B%E8%A7%84/","path":"2018/06/13/Components/Mysql/Mysql-58到家军规/","title":"Mysql-58到家军规"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Mysql-58到家军规 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E7%A1%80%E8%A7%84%E8%8C%83"><span class="nav-number">1.</span> <span class="nav-text">一、基础规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83"><span class="nav-number">2.</span> <span class="nav-text">二、命名规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%A1%A8%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83"><span class="nav-number">3.</span> <span class="nav-text">三、表设计规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83"><span class="nav-number">4.</span> <span class="nav-text">四、字段设计规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%B4%A2%E5%BC%95%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83"><span class="nav-number">5.</span> <span class="nav-text">五、索引设计规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81SQL%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83%EF%BC%9A%E8%A7%84%E9%81%BF%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F"><span class="nav-number">6.</span> <span class="nav-text">六、SQL使用规范：规避全表扫描</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/13/Components/Mysql/Mysql-58%E5%88%B0%E5%AE%B6%E5%86%9B%E8%A7%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Mysql-58到家军规 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql-58到家军规
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-06-13 17:31:25" itemprop="dateCreated datePublished" datetime="2018-06-13T17:31:25+08:00">2018-06-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Mysql相关的内容，由于当前工作上原因接触并不多，但数据库方面作为一名后端工程师不可轻废，这篇文章来源自无缺哥分享的Mysql索引分享会的资料，在此做个整理和备份。</p>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/5b18e46ce4b07596cf4411c4">58到家MySQL军规升级版 </a></p>
+<span id="more"></span>
+
+<h3 id="一、基础规范"><a href="#一、基础规范" class="headerlink" title="一、基础规范"></a>一、基础规范</h3><ol>
+<li><strong>必须使用InnoDB存储引擎</strong><ul>
+<li><strong>InnoDB</strong>：支持事务、行级锁、并发性能更好、CPU及内存缓存页优化使得资源利用率更高 </li>
+<li><strong>MyISAM</strong>：不支持事务，不支持外键，优势是访问速度快，若项目只需要Select和Insert可以考虑。</li>
+<li><strong>Merge</strong>：将MyISAM表合并为一张表，方便数据查询。</li>
+<li><strong>Memory</strong>：使用内存来存储文件，数据并不会持久化。</li>
+</ul>
+</li>
+<li><strong>必须使用utf8mb4字符集</strong>：utf8mb4是utf8的超集，emoji表情以及部分不常见汉字在utf8下会表现为乱码，故需要升级至utf8mb4，标准，万国码，无需转码，无乱码风险 </li>
+<li><strong>数据表、数据字段必须加入中文注释</strong> ：为了日后维护，注释必需</li>
+<li><strong>禁止使用存储过程、视图、触发器、Event</strong> ：高并发大数据的互联网业务，架构设计思路是“解放数据库CPU，将计算转移到服务层”，并发量大的情况下，这些功能很可能将数据库拖死，业务逻辑放到服务层具备更好的扩展性，能够轻易实现“增机器就加性能”。数据库擅长存储与索引，CPU计算还是上移吧 </li>
+<li><strong>禁止存储大文件或者大照片</strong> ：大文件和照片存储在文件系统，数据库里只需要存放存URI。让数据库存放他适合的数据，发挥最大的作用。</li>
+</ol>
+<h3 id="二、命名规范"><a href="#二、命名规范" class="headerlink" title="二、命名规范"></a>二、命名规范</h3><ol start="6">
+<li><strong>只允许使用内网域名，而不是ip连接数据库</strong> : 虽然域名多了一层IP地址解析的过程，但如果服务器IP地址变化，只需要修改DNS即可。</li>
+<li><strong>线上环境、开发环境、测试环境数据库内网域名遵循命名规范</strong> </li>
+<li><strong>库名、表名、字段名：小写，下划线风格，不超过32个字符，必须见名知意，禁止拼音英文混用</strong> </li>
+<li><strong>表名t_xxx，非唯一索引名idx_xxx，唯一索引名uniq_xxx</strong></li>
+</ol>
+<h3 id="三、表设计规范"><a href="#三、表设计规范" class="headerlink" title="三、表设计规范"></a>三、表设计规范</h3><ol start="10">
+<li><strong>单实例表数目必须小于500</strong> </li>
+<li><strong>单表列数目必须小于30</strong> </li>
+<li><strong>表必须有主键，例如自增主键</strong> ：<ul>
+<li>主键要选择较短的数据类型， Innodb引擎普通索引都会保存主键的值，较短的数据类型可以有效的减少索引的磁盘空间，提高索引的缓存效率 </li>
+<li>无主键的表删除，在row模式的主从架构，会导致备库夯住 。binlog：binary log 二进制日志，对数据库的增删改操作都会生成日志，通过binlog我们可以做数据恢复， 做主从复制等。这对于数据库运维而言很重要。<ul>
+<li><strong>Row</strong>：日志中会记录成每一行数据被修改的形式，然后在slave端再对相同的数据进行修改，只记录要修改的数据，只有value，不会有sql多表关联的情况。 </li>
+<li><strong>Statement</strong>：每一条会修改数据的sql都会记录到master的binlog中，slave在复制的时候sql进程会解析成和原来master端执行多相同的sql再执行。 </li>
+<li><strong>Mixed</strong>：会根据执行的每一条具体的SQL来区分对待记录的日志形式。也就是在Row和Statement中选择一种合适的形式。</li>
+</ul>
+</li>
+<li>主键递增，数据行写入可以提高插入性能，可以避免page分裂，减少表碎片提升空间和内存的使用</li>
+</ul>
+</li>
+<li><strong>禁止使用外键，如果有外键完整性约束，需要应用程序控制</strong> ：外键会导致表与表之间耦合，update与delete操作都会涉及相关联的表，十分影响sql 的性能，甚至会造成死锁。高并发情况下容易造成数据库性能，大数据高并发业务场景数据库使用以性能优先</li>
+</ol>
+<h3 id="四、字段设计规范"><a href="#四、字段设计规范" class="headerlink" title="四、字段设计规范"></a>四、字段设计规范</h3><ol start="14">
+<li><strong>必须把字段定义为NOT NULL并且提供默认值</strong> <ul>
+<li>null的列使索引&#x2F;索引统计&#x2F;值比较都更加复杂，对MySQL来说更难优化</li>
+<li>null 这种类型MySQL内部需要进行特殊处理，增加数据库处理记录的复杂性；同等条件下，表中有较多空字段的时候，数据库的处理性能会降低很多</li>
+<li>null值需要更多的存储空间，无论是表还是索引中每行中的null的列都需要额外的空间来标识</li>
+<li>对null 的处理时候，只能采用is null或is not null，而不能采用&#x3D;、in、&lt;、&lt;&gt;、!&#x3D;、not in这些操作符号。如：where name!&#x3D;’shenjian’，如果存在name为null值的记录，查询结果就不会包含name为null值的记录</li>
+</ul>
+</li>
+<li><strong>禁止使用TEXT、BLOB类型</strong> ：会浪费更多的磁盘和内存空间，非必要的大量的大字段查询会淘汰掉热数据，导致内存命中率急剧降低，影响数据库性能 </li>
+<li><strong>禁止使用小数存储货币</strong> ：使用decimal(10,1)而不是float，float容易导致钱对不上，因为会自动四舍五入。 </li>
+<li><strong>必须使用varchar(20)存储手机号</strong> ：varchar可以支持模糊查询，例如：like “138%”，在涉及到国家时会出现字符。</li>
+<li><strong>禁止使用ENUM，可使用TINYINT代替</strong> ：ENUM内部实际存储的就是整数。</li>
+</ol>
+<h3 id="五、索引设计规范"><a href="#五、索引设计规范" class="headerlink" title="五、索引设计规范"></a>五、索引设计规范</h3><ol start="19">
+<li><strong>单表索引建议控制在5个以内</strong>： 当索引超过5个时，实际已经不能有效的过滤数据了。</li>
+<li><strong>禁止在更新十分频繁、区分度不高的属性上建立索引：</strong> <ul>
+<li>更新会变更B+树，更新频繁的字段建立索引会大大降低数据库性能</li>
+<li>“性别”这种区分度不大的属性，建立索引是没有什么意义的，不能有效过滤数据，性能与全表扫描类似</li>
+</ul>
+</li>
+<li><strong>建立组合索引，必须把区分度高的字段放在前面</strong> ：能够更加有效的过滤数据</li>
+</ol>
+<h3 id="六、SQL使用规范：规避全表扫描"><a href="#六、SQL使用规范：规避全表扫描" class="headerlink" title="六、SQL使用规范：规避全表扫描"></a>六、SQL使用规范：规避全表扫描</h3><ol start="23">
+<li>*<em>禁止使用SELECT <em>，只获取必要的字段，需要显示说明列属性</em></em> ：<ul>
+<li>不必要的字段，是对CPU，IO,NET资源的消耗，每条SQL语句就查询需要的数据。</li>
+<li>不能有效的覆盖索引</li>
+<li>使用SELECT * 容易在增加或删除字段后出现程序BUG</li>
+</ul>
+</li>
+<li><strong>禁止使用INSERT INTO t_xxx VALUES(xxx)，必须显示指定插入的列属性</strong>：在Go语言中也是如此，新建结构体的时候指明字段既增加了代码可读性，也规避了日后结构&#x2F;表变更的危险。 </li>
+<li><strong>禁止使用属性隐式转换</strong> ：</li>
+<li><strong>禁止在WHERE条件的属性上使用函数或者表达式</strong> ：<ul>
+<li>SELECT uid FROM t_user WHERE from_unixtime(day)&gt;&#x3D;’2017-02-15’ 会导致全表扫描 </li>
+<li>SELECT uid FROM t_user WHERE day&gt;&#x3D; unix_timestamp(‘2017-02-15 00:00:00’)</li>
+</ul>
+</li>
+<li><strong>禁止负向查询，以及%开头的模糊查询</strong> ：<ul>
+<li>负向查询条件：NOT、!&#x3D;、&lt;&gt;、!&lt;、!&gt;、NOT IN、NOT LIKE等，会导致全表扫描</li>
+<li>%开头的模糊查询，会导致全表扫描</li>
+</ul>
+</li>
+<li><strong>禁止大表使用JOIN查询，禁止大表使用子查询</strong> ：会产生临时表，消耗较多内存与CPU，极大影响数据库性 </li>
+<li><strong>禁止使用OR条件，必须改为IN查询</strong> ：旧版本Mysql的OR查询是不能命中索引的，即使能命中索引，为何要让数据库耗费更多的CPU帮助实施查询优化 </li>
+<li><strong>应用程序必须捕获SQL异常，并有相应处理</strong> </li>
+<li><strong>禁止使用应用程序配置文件内的帐号手工访问线上数据库</strong> </li>
+<li><strong>禁止非DBA对线上数据库进行写操作，修改线上数据需要提交工单，由DBA执行，提交的SQL语句必须经过测试</strong> </li>
+<li><strong>分配非DBA以只读帐号，必须通过VPN+跳板机访问授权的从库</strong> </li>
+<li><strong>开发、测试、线上环境隔离</strong></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/12/Code_Language/Golang/Go_%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" rel="prev" title="Go_异常处理">
+                  <i class="fa fa-angle-left"></i> Go_异常处理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/06/14/Components/Mysql/Mysql-%E7%B4%A2%E5%BC%95/" rel="next" title="Mysql-索引">
+                  Mysql-索引 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="🚧">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES_XPack_Security">
+<meta property="og:url" content="https://miszibu.github.io/2019/03/05/Components/Elasticsearch/ES-XPack-Security/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="🚧">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-03-05T14:56:20.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.036Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2019/03/05/Components/Elasticsearch/ES-XPack-Security/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2019/03/05/Components/Elasticsearch/ES-XPack-Security/","path":"2019/03/05/Components/Elasticsearch/ES-XPack-Security/","title":"ES_XPack_Security"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ES_XPack_Security | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ElasticSearch-X-Pack-Security"><span class="nav-number">1.</span> <span class="nav-text">ElasticSearch &amp;&amp; X_Pack_Security</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#X-Pack-Security%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE"><span class="nav-number">1.0.1.</span> <span class="nav-text">X_Pack_Security基础配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90Security%E5%AF%86%E7%A0%81"><span class="nav-number">1.0.2.</span> <span class="nav-text">生成Security密码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link"><span class="nav-number">1.0.3.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#X-Pack-Security-API"><span class="nav-number">1.0.4.</span> <span class="nav-text">X_Pack_Security API</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%94%A8%E6%88%B7CRUD-API"><span class="nav-number">1.0.4.1.</span> <span class="nav-text">用户CRUD API</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A7%92%E8%89%B2CRUD-API"><span class="nav-number">1.0.4.2.</span> <span class="nav-text">角色CRUD API</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kibana-X-Pack-Security"><span class="nav-number">2.</span> <span class="nav-text">Kibana &amp;&amp; X_Pack_Security</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#X-Pack-Security%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE-1"><span class="nav-number">2.0.1.</span> <span class="nav-text">X_Pack_Security基础配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Kibana%E7%9A%84%E7%94%A8%E6%88%B7%E8%AE%A4%E8%AF%81%E6%96%B9%E5%BC%8F"><span class="nav-number">2.0.2.</span> <span class="nav-text">Kibana的用户认证方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#User-authentication"><span class="nav-number">2.0.3.</span> <span class="nav-text">User authentication</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2019/03/05/Components/Elasticsearch/ES-XPack-Security/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ES_XPack_Security | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES_XPack_Security
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-05 22:56:20" itemprop="dateCreated datePublished" datetime="2019-03-05T22:56:20+08:00">2019-03-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>🚧</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="ElasticSearch-X-Pack-Security"><a href="#ElasticSearch-X-Pack-Security" class="headerlink" title="ElasticSearch &amp;&amp; X_Pack_Security"></a>ElasticSearch &amp;&amp; X_Pack_Security</h2><h4 id="X-Pack-Security基础配置"><a href="#X-Pack-Security基础配置" class="headerlink" title="X_Pack_Security基础配置"></a>X_Pack_Security基础配置</h4><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动security配置 所有Master/Data节点都需要配置</span></span><br><span class="line"><span class="attr">xpack.security.enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment"># 设置是否禁用初始密码 「changeme」, 设置为false，禁用初始密码</span></span><br><span class="line"><span class="attr">xpack.security.authc.accept_default_password:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment"># 配置relam</span></span><br><span class="line"><span class="attr">xpack.security.authc.realms:</span></span><br><span class="line">	<span class="comment"># 自定义领域名称</span></span><br><span class="line">    <span class="attr">realm1:</span></span><br><span class="line">    	<span class="comment"># 可选值有native, ldap, active_directory, pki,  file</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">native</span></span><br><span class="line">        <span class="comment"># 优先级顺序 越低越高</span></span><br><span class="line">        <span class="attr">order:</span> <span class="number">0</span></span><br><span class="line">        <span class="comment"># 是否开启，默认开启</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">relam2:</span></span><br><span class="line">    	<span class="attr">type:</span> <span class="string">ldap</span></span><br><span class="line">    	<span class="attr">order:</span> <span class="number">1</span></span><br><span class="line"><span class="comment"># 配置匿名用户，用户名，所属 </span></span><br><span class="line"><span class="attr">xpack.security.authc:</span></span><br><span class="line">  <span class="attr">anonymous:</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">anonymous_user</span> </span><br><span class="line">    <span class="comment"># 指定匿名用户所具有的角色权限</span></span><br><span class="line">    <span class="attr">roles:</span> <span class="string">role1,</span> <span class="string">role2</span> </span><br><span class="line">    <span class="comment"># 当匿名用户执行相关请求时，若缺少权限，则返回http403 response，且不会提示(默认为true)</span></span><br><span class="line">    <span class="comment"># false时，无权限访问则返回401，且提示相关信息。若需要与HTTP结合使用，则选择false</span></span><br><span class="line">    <span class="attr">authz_exception:</span> <span class="literal">true</span> </span><br></pre></td></tr></table></figure>
+
+<h4 id="生成Security密码"><a href="#生成Security密码" class="headerlink" title="生成Security密码"></a>生成Security密码</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd bin</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">自动生成</span></span><br><span class="line">./elasticsearch-setup-passwords auto</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">手动生成 注意：该命令仅仅第一次执行有效，后续若希望修改密码，可以通过KibanaUI/ES X_PACK_Security API进行修改</span></span><br><span class="line">./elasticsearch-setup-passwords interactive</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>elastic　　超级用户</li>
+<li>Kibana　　用于连接并且和Elasticsearch通信的</li>
+<li>logstash_system     用于在Elasticsearch中存储监控信息</li>
+<li>beats_system    用于在Elasticsearch中存储监控信息</li>
+</ul>
+<blockquote>
+<p>Tips : 千万要注意自己的配置，笔者在配置集群YML文件时，设置最小Cluster Master节点需要两个。因此执行密码手动重置时，抛出Master节点不足错误。</p>
+</blockquote>
+<h4 id=""><a href="#" class="headerlink" title=""></a></h4><hr>
+<h4 id="X-Pack-Security-API"><a href="#X-Pack-Security-API" class="headerlink" title="X_Pack_Security API"></a>X_Pack_Security API</h4><h5 id="用户CRUD-API"><a href="#用户CRUD-API" class="headerlink" title="用户CRUD API"></a>用户CRUD API</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看所有用户</span></span><br><span class="line">curl -X GET -u elastic &quot;localhost:9200/_xpack/security/user&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看指定用户</span></span><br><span class="line">curl -X GET -u elastic &quot;localhost:9200/_xpack/security/user/$&#123;userName&#125;&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建用户</span></span><br><span class="line">curl -X POST -u elastic &quot;localhost:9200/_xpack/security/user/$&#123;userName&#125;&quot; -H &#x27;Content-Type: application/json&#x27; -d&#x27;</span><br><span class="line">&#123;	</span><br><span class="line"><span class="meta prompt_">   #</span><span class="language-bash">声明密码 分配权限</span> </span><br><span class="line">  &quot;password&quot; : &quot;j@rV1s&quot;,</span><br><span class="line">  &quot;roles&quot; : [ &quot;admin&quot;, &quot;other_role1&quot; ],</span><br><span class="line">  &quot;full_name&quot; : &quot;Jack Nicholson&quot;,</span><br><span class="line">  &quot;email&quot; : &quot;jacknich@example.com&quot;,</span><br><span class="line">  &quot;metadata&quot; : &#123;</span><br><span class="line">    &quot;intelligence&quot; : 7</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改密码</span></span><br><span class="line">curl -X POST &quot;localhost:9200/_xpack/security/user/$&#123;userName&#125;/_password&quot; -H &#x27;Content-Type: application/json&#x27; -d&#x27;</span><br><span class="line">&#123;</span><br><span class="line">  &quot;password&quot; : &quot;s3cr3t&quot;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">禁用、启用、删除用户</span></span><br><span class="line">curl -X PUT &quot;localhost:9200/_xpack/security/user/$&#123;userName&#125;/_disable&quot;</span><br><span class="line">curl -X PUT &quot;localhost:9200/_xpack/security/user/$&#123;userName&#125;/_enable&quot;</span><br><span class="line">curl -X DELETE &quot;localhost:9200/_xpack/security/user/$&#123;userName&#125;&quot;</span><br></pre></td></tr></table></figure>
+
+<h5 id="角色CRUD-API"><a href="#角色CRUD-API" class="headerlink" title="角色CRUD API"></a>角色CRUD API</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查询所有角色</span></span><br><span class="line">curl -X GET &quot;localhost:9200/_xpack/security/role&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查询具体role</span></span><br><span class="line">curl -X GET &quot;localhost:9200/_xpack/security/role/$&#123;roleName&#125;&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">删除角色</span></span><br><span class="line">curl -X DELETE &quot;localhost:9200/_xpack/security/role/$&#123;roleName&#125;&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建角色</span></span><br><span class="line">curl -X POST &quot;localhost:9200/_xpack/security/role/$&#123;roleName&#125;&quot; -H &#x27;Content-Type: application/json&#x27; -d&#x27;</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta prompt_">   # </span><span class="language-bash">角色 所能操作的cluster</span></span><br><span class="line">  &quot;cluster&quot;: [&quot;all&quot;],</span><br><span class="line">  &quot;indices&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      # role所能操作的cluster 符合条件的index(必选)</span><br><span class="line">      &quot;names&quot;: [ &quot;index1&quot;, &quot;index2&quot; ], </span><br><span class="line">      # 具体权限(必选)</span><br><span class="line">      &quot;privileges&quot;: [&quot;all&quot;],</span><br><span class="line">      &quot;field_security&quot; : &#123; // 可选</span><br><span class="line">        &quot;grant&quot; : [ &quot;title&quot;, &quot;body&quot; ]</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;query&quot;: &quot;&#123;&quot;match&quot;: &#123;&quot;title&quot;: &quot;foo&quot;&#125;&#125;&quot; // 可选</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  &quot;run_as&quot;: [ &quot;other_user&quot; ], // 可选</span><br><span class="line">  &quot;metadata&quot; : &#123; // 可选</span><br><span class="line">    &quot;version&quot; : 1</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="Kibana-X-Pack-Security"><a href="#Kibana-X-Pack-Security" class="headerlink" title="Kibana &amp;&amp; X_Pack_Security"></a>Kibana &amp;&amp; X_Pack_Security</h2><h4 id="X-Pack-Security基础配置-1"><a href="#X-Pack-Security基础配置-1" class="headerlink" title="X_Pack_Security基础配置"></a>X_Pack_Security基础配置</h4><p>当es集群启动后，Kibana想要连接到集群，则需要配置相关权限账户信息。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 直接于yml文件标注帐密</span></span><br><span class="line"><span class="attr">elasticsearch.username:</span> <span class="string">&quot;kibana&quot;</span></span><br><span class="line"><span class="attr">elasticsearch.password:</span> <span class="string">&quot;<span class="template-variable">%&#123;password&#125;</span>&quot;</span></span><br><span class="line"><span class="comment"># 使用key_Store 安全标注帐密</span></span><br><span class="line"><span class="string">//todo</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 标注启用xpack</span></span><br><span class="line"><span class="attr">xpack.security.enabled:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选，默认情况下kibana将自动生成该key,存放内存中。修改后，原有session失效</span></span><br><span class="line"><span class="attr">xpack.security.encryptionKey:</span> <span class="string">&quot;32位或更长自定义加密KEY&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选，更改默认session过期时间</span></span><br><span class="line"><span class="attr">xpack.security.sessionTimeout:</span> <span class="number">600000</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="Kibana的用户认证方式"><a href="#Kibana的用户认证方式" class="headerlink" title="Kibana的用户认证方式"></a>Kibana的用户认证方式</h4><ul>
+<li>Basic Authentication：<strong>默认选项</strong>，登录kibana时，需要填写帐密。基于ES的native  relam</li>
+<li>SAML Single Sign-On：允许用户使用外部身份提供者（如Okta或Auth0）登录Kibana。在Kibana中设置SAML之前，请确保在Elasticsearch中启用和配置SAML。</li>
+</ul>
+<hr>
+<h4 id="User-authentication"><a href="#User-authentication" class="headerlink" title="User authentication"></a>User authentication</h4><p>为了访问受保护的资源，一个用户必须通过密码、凭证、或者其它方式（通常是token）来证明他们的身份标识。</p>
+<p>认证过程由一个或多个被称为“realms”的认证服务来处理。</p>
+<p>你可以用本机支持管理和认证用户，或者集成外部的用户管理系统（比如：LDAP 和 Active Directory）。</p>
+<p>X-Pack安全特性提供了内置的realms，比如：native，ldap，active_directory，pki，file 和 saml。如果没有一个内置realms满足你的需求，你还可以构建自己的realm。</p>
+<p>当启用X-Pack安全特性时，根据你配置的realms，你必须将用户凭证附加到发送到Elasticsearch的请求中。例如，当使用支持用户名和密码的realms时，你可以简单的将basic auth头信息添加到请求中。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/01/08/Code_Language/Java/Java%E9%9B%86%E5%90%88%E7%B1%BB/java-ConcurrentHashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" rel="prev" title="java_ConcurrentHashMap源码解析">
+                  <i class="fa fa-angle-left"></i> java_ConcurrentHashMap源码解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/03/10/Components/Kafka/Kafka%E7%AE%80%E4%BB%8B/" rel="next" title="Kafka简介">
+                  Kafka简介 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

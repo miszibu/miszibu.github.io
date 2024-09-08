@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="IntroductionILM(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。 在时序型数据的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ILM_Index_Lifecycle_Management">
+<meta property="og:url" content="https://miszibu.github.io/2020/04/13/Components/Elasticsearch/ILM-Index-Lifecycle-Management/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="IntroductionILM(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。 在时序型数据的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/ILM-Index-Lifecycle-Management/index-life-cycle.png">
+<meta property="article:published_time" content="2020-04-12T16:02:27.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.045Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/ILM-Index-Lifecycle-Management/index-life-cycle.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/04/13/Components/Elasticsearch/ILM-Index-Lifecycle-Management/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/04/13/Components/Elasticsearch/ILM-Index-Lifecycle-Management/","path":"2020/04/13/Components/Elasticsearch/ILM-Index-Lifecycle-Management/","title":"ILM_Index_Lifecycle_Management"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ILM_Index_Lifecycle_Management | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Index-Life-Cycle-Introduction"><span class="nav-number">2.</span> <span class="nav-text">Index Life Cycle Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hot-Phase"><span class="nav-number">2.1.</span> <span class="nav-text">Hot Phase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Warm-Phase"><span class="nav-number">2.2.</span> <span class="nav-text">Warm Phase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cold-Phase"><span class="nav-number">2.3.</span> <span class="nav-text">Cold Phase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Delete-Phase"><span class="nav-number">2.4.</span> <span class="nav-text">Delete Phase</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%83%AD%E6%B8%A9%E5%86%B7%E6%9E%B6%E6%9E%84-Hot-Warm-Cold-Architecture"><span class="nav-number">3.</span> <span class="nav-text">热温冷架构 Hot-Warm-Cold Architecture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Policy"><span class="nav-number">4.</span> <span class="nav-text">Policy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Timing"><span class="nav-number">4.1.</span> <span class="nav-text">Timing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Phase-Execution"><span class="nav-number">4.2.</span> <span class="nav-text">Phase Execution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Actions"><span class="nav-number">4.3.</span> <span class="nav-text">Actions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Full-Policy"><span class="nav-number">4.4.</span> <span class="nav-text">Full Policy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Practice"><span class="nav-number">5.</span> <span class="nav-text">Practice</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Create-a-ILM-policy"><span class="nav-number">5.1.</span> <span class="nav-text">1. Create a ILM policy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Applying-a-policy-to-an-index-template"><span class="nav-number">5.2.</span> <span class="nav-text">2. Applying a policy to an index template</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Modify-ILM-Polling-Interval"><span class="nav-number">5.3.</span> <span class="nav-text">3. Modify ILM Polling Interval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Startup-metricbeat-to-generate-data"><span class="nav-number">5.4.</span> <span class="nav-text">4. Startup metricbeat to generate data</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Check-Indices"><span class="nav-number">5.5.</span> <span class="nav-text">5. Check Indices</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/04/13/Components/Elasticsearch/ILM-Index-Lifecycle-Management/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ILM_Index_Lifecycle_Management | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ILM_Index_Lifecycle_Management
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-13 00:02:27" itemprop="dateCreated datePublished" datetime="2020-04-13T00:02:27+08:00">2020-04-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a><strong>Introduction</strong></h2><p><strong>ILM</strong>(Index Lifecycle Managment)是 ES6.6.版本发布的新的特性，用于管理索引的生命周期。</p>
+<p>在<strong>时序型数据</strong>的场景中，比如 Metricbeat 持续不断的发送 metric 到 ES ，以日期为单位创建 Daily Index。我们会希望，单个 Index 的大小不要超过一个合适值，比如50GB，我们也不希望过时的数据，继续占用磁盘空间，那么就要指定一个规则删除无效 Index。这就是 ILM 可以帮助我们做到的。</p>
+<p>在这篇 Blog 中，我们会介绍 ILM 所涉及的相关概念，并通过 ILM 来实现时序型日志的定时删除功能，这在之前的版本中往往是需要 由 Crontab 定期触发 curator 来实现的，相对复杂。</p>
+<span id="more"></span>
+
+<h2 id="Index-Life-Cycle-Introduction"><a href="#Index-Life-Cycle-Introduction" class="headerlink" title="Index Life Cycle Introduction"></a>Index Life Cycle Introduction</h2><p><img src="/./ILM-Index-Lifecycle-Management/index-life-cycle.png" alt="index-life-cycle"></p>
+<p>这 ILM 中，Index的生命周期被划分为了4个阶段，<strong>Hot  Warm Cold &amp; Delete</strong>。</p>
+<p>Index 可以存在最多四个阶段，但并不必须，可任意拼接。在普通的场景中Hot+Delete 是最为常见的组合。</p>
+<h3 id="Hot-Phase"><a href="#Hot-Phase" class="headerlink" title="Hot Phase"></a>Hot Phase</h3><p>Index刚生成时，处于频繁<strong>读写数据</strong>的状态。此时的 Index 会消耗大量的内存和磁盘空间。</p>
+<h3 id="Warm-Phase"><a href="#Warm-Phase" class="headerlink" title="Warm Phase"></a>Warm Phase</h3><p>举例如时序型日志Index在过了数据输入阶段时，此时<strong>只负责数据的查询</strong>。该阶段的index 则为 Warm Phase</p>
+<h3 id="Cold-Phase"><a href="#Cold-Phase" class="headerlink" title="Cold Phase"></a>Cold Phase</h3><p>处于 Cold Phase 的 Index，数据读取查询的请求锐减，节点只需要消耗少量的系统资源即可。</p>
+<h3 id="Delete-Phase"><a href="#Delete-Phase" class="headerlink" title="Delete Phase"></a>Delete Phase</h3><p>Index 不再不需要，寿终正寝。</p>
+<h2 id="热温冷架构-Hot-Warm-Cold-Architecture"><a href="#热温冷架构-Hot-Warm-Cold-Architecture" class="headerlink" title="热温冷架构 Hot-Warm-Cold Architecture"></a>热温冷架构 Hot-Warm-Cold Architecture</h2><p>在知道了 Index 的生命管理周期后，我们发现不同时期的 Index 对于系统资源的消耗，需要也是不一样的。那么我们可以通过在启动 ES 节点时，手动设置节点的属性为 Hot warm or Cold。将硬件资源好的节点设置为 HOT,将硬件资源一般的设置为 Cold。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin/elasticsearch -Enode.attr.data=hot</span><br><span class="line">bin/elasticsearch -Enode.attr.data=warm</span><br><span class="line">bin/elasticsearch -Enode.attr.data=cold</span><br></pre></td></tr></table></figure>
+
+<p>在实际设置 ILM 策略时，就可以指定目标节点的属性，将 Hot Index 存储在 Hot 节点上，以此来最大化系统硬件的使用效率。</p>
+<p>**Note:**这一部分的功能都是基于<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.7/allocation-awareness.html">shard allocation awarness</a> 来实现的，不是必须，此处不再展开。</p>
+<h2 id="Policy"><a href="#Policy" class="headerlink" title="Policy"></a>Policy</h2><p>Index 存在4个不同的生命周期，policy 则规定了每个生命周期，对Index 所进行的操作。Policy 不一定需要包含全部四个周期，举例而言，我们可以创建只包含 Hot 和 Delete 阶段的 Policy。.</p>
+<h3 id="Timing"><a href="#Timing" class="headerlink" title="Timing"></a>Timing</h3><p>参数<code>min_age</code>决定了Indices 何时进入下一个生命周期。只有当 Indices 的时长（Indices在 rollover以后时长会被刷新）大于 <code>min_age</code>时，才会进入下一个生命周期。</p>
+<p>对任意周期，未指定时<code>min_age</code>的默认值为0秒。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">PUT _ilm/policy/my_policy</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;policy&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;phases&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;warm&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;min_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1d&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;allocate&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;number_of_replicas&quot;</span><span class="punctuation">:</span> <span class="number">1</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;delete&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;min_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;30d&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;delete&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>如上图的案例中，只有 indices的创建时间大于30天，Indices 才会进入 Delete Phase，被删除。</p>
+<p>之前阶段的 actions 尚未完成时，indices 暂时不进入下一周期，直至之前阶段的 Action 完成。</p>
+<h3 id="Phase-Execution"><a href="#Phase-Execution" class="headerlink" title="Phase Execution"></a>Phase Execution</h3><p>可以通过 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.7/ilm-explain-lifecycle.html">Explain Lifecycle API</a>来获取 Indices 的状态。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET &lt;index&gt;/_ilm/explain</span><br></pre></td></tr></table></figure>
+
+<h3 id="Actions"><a href="#Actions" class="headerlink" title="Actions"></a>Actions</h3><p>Actions 决定了在个生命阶段，Indices 所做的操作，在不同阶段所支持的 Actions 也是不同的。</p>
+<p>Actions 的定义顺序决定了 Actions 的执行顺序，这点需要注意。</p>
+<p>具体内容请参考<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.7/_actions.html">官方 API</a>.</p>
+<h3 id="Full-Policy"><a href="#Full-Policy" class="headerlink" title="Full Policy"></a>Full Policy</h3><p>我们通过一个Policy 案例来详细介绍下。下面的 API 会生成一个名为 full_policy 的 Policy。当处于 Hot阶段的 Indices 的时长大于7天或大小大于50GB 时，将会 rollover 到一个新的 Indices。</p>
+<p>After 30 days it enters the warm phase and increases the replicas to 2, force merges and shrinks. After 60 days it enters the cold phase and allocates to “cold” nodes, and after 90 days the index is deleted.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">PUT _ilm/policy/full_policy</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;policy&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;phases&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;hot&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;rollover&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;max_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;7d&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;max_size&quot;</span><span class="punctuation">:</span> <span class="string">&quot;50G&quot;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;warm&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;min_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;30d&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;forcemerge&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;max_num_segments&quot;</span><span class="punctuation">:</span> <span class="number">1</span></span><br><span class="line">          <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;shrink&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;number_of_shards&quot;</span><span class="punctuation">:</span> <span class="number">1</span></span><br><span class="line">          <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;allocate&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;number_of_replicas&quot;</span><span class="punctuation">:</span> <span class="number">2</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;cold&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;min_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;60d&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;allocate&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;require&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">              <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cold&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">          <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;delete&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;min_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;90d&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;delete&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Practice"><a href="#Practice" class="headerlink" title="Practice"></a>Practice</h2><p>在测试案例中，我们会使用 metricbeat 来生产数据，以分钟为划分在 ES 上创建时序型Indices。通过 ILM Policy来删除时长超过3分钟的 Indices。实际的 Case 中往往以日期划分。</p>
+<blockquote>
+<p>Note: Metricbeat 与 ILM 存在集成，可以在 Metricbat 端直接配置 ILM，我们此处只是使用 Metricbeat来生成数据，作演示。</p>
+</blockquote>
+<h3 id="1-Create-a-ILM-policy"><a href="#1-Create-a-ILM-policy" class="headerlink" title="1. Create a ILM policy"></a>1. Create a ILM policy</h3><p>创建一个名为 common_beat_policy 的LIM Policy，并声明当 indices 的时长超过3分钟时，进入 Delete 阶段。</p>
+<p>所有被该 Policy 管理的 Indices，时长超过3分钟的都会被删除。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PUT _ilm/policy/common_beat_policy   </span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;policy&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;phases&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;delete&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;min_age&quot;</span><span class="punctuation">:</span> <span class="string">&quot;3m&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;actions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;delete&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Applying-a-policy-to-an-index-template"><a href="#2-Applying-a-policy-to-an-index-template" class="headerlink" title="2. Applying a policy to an index template"></a>2. Applying a policy to an index template</h3><p>通过 Get API 获取 Meticbeat-6.7.0 templates，然后将<code>index.lifecycle.name</code>参数添加到 template中。那么所有使用该 Template的 Index 都将会应用<code>comon_beat_policy</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GET _template/metricbeat<span class="number">-6.7</span><span class="number">.0</span></span><br><span class="line"></span><br><span class="line">PUT _template/metricbeat<span class="number">-6.7</span><span class="number">.0</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;number_of_shards&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;number_of_replicas&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;index.lifecycle.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;common_beat_policy&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  ....</span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Modify-ILM-Polling-Interval"><a href="#3-Modify-ILM-Polling-Interval" class="headerlink" title="3. Modify ILM Polling Interval"></a>3. Modify ILM Polling Interval</h3><p>ILM Service 会在后台轮询执行 Policy，默认间隔时间为 10 分钟，为了更快地看到效果，我们将其修改为 1 秒。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT _cluster/settings</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;persistent&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;indices.lifecycle.poll_interval&quot;</span><span class="punctuation">:</span><span class="string">&quot;1s&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-Startup-metricbeat-to-generate-data"><a href="#4-Startup-metricbeat-to-generate-data" class="headerlink" title="4. Startup metricbeat to generate data"></a>4. Startup metricbeat to generate data</h3><p>以下为 Meticbeat 配置，数据将被写入到本地监听9200端口的 ES 中。并以分钟为划分来创建 Index。</p>
+<p>当我们更新<code>output.elasticsearch.index</code>时，需要指定 <code>template.name &amp; template.pattern</code></p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">output.elasticsearch:</span></span><br><span class="line">  <span class="comment"># Array of hosts to connect to.</span></span><br><span class="line">  <span class="attr">hosts:</span> [<span class="string">&quot;localhost:9200&quot;</span>]</span><br><span class="line">  <span class="attr">index:</span> <span class="string">&quot;metricbeat-<span class="template-variable">%&#123;[beat.version]&#125;</span>-<span class="template-variable">%&#123;+yyyy.MM.dd.hh.mm&#125;</span>&quot;</span></span><br><span class="line"><span class="attr">setup.template.name:</span> <span class="string">&quot;metricbeat-<span class="template-variable">%&#123;[beat.version]&#125;</span>&quot;</span></span><br><span class="line"><span class="attr">setup.template.pattern:</span> <span class="string">&quot;metricbeat-<span class="template-variable">%&#123;[beat.version]&#125;</span>-*&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-Check-Indices"><a href="#5-Check-Indices" class="headerlink" title="5. Check Indices"></a>5. Check Indices</h3><p>通过查看 Indices 可以发现，只有最近的3分钟的 indices 存在，查看具体的 Indices 也可以看到<code>common_beat_policy</code>已经生效。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Check the indices</span></span><br><span class="line">GET _cat/indices</span><br><span class="line">yellow open metricbeat<span class="number">-6.7</span><span class="number">.0</span><span class="number">-2020.04</span><span class="number">.14</span><span class="number">.12</span><span class="number">.51</span> TPWc03HZSPyk1Pc7Zz16jA <span class="number">1</span> <span class="number">1</span> <span class="number">189</span> <span class="number">0</span> <span class="number">282.8</span>kb <span class="number">282.8</span>kb</span><br><span class="line">yellow open metricbeat<span class="number">-6.7</span><span class="number">.0</span><span class="number">-2020.04</span><span class="number">.14</span><span class="number">.12</span><span class="number">.52</span> zzbBHGQ-SuOHBUu65re5UQ <span class="number">1</span> <span class="number">1</span>  <span class="number">92</span> <span class="number">0</span> <span class="number">129.8</span>kb <span class="number">129.8</span>kb</span><br><span class="line">yellow open metricbeat<span class="number">-6.7</span><span class="number">.0</span><span class="number">-2020.04</span><span class="number">.14</span><span class="number">.12</span><span class="number">.50</span> <span class="number">90</span>OhX4rTTJOgp-OLHv0y-g <span class="number">1</span> <span class="number">1</span> <span class="number">196</span> <span class="number">0</span> <span class="number">286.9</span>kb <span class="number">286.9</span>kb</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get the ilm status of index</span></span><br><span class="line">GET metricbeat<span class="number">-6.7</span><span class="number">.0</span><span class="number">-2020.04</span><span class="number">.14</span><span class="number">.12</span><span class="number">.49</span>/_ilm/explain</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;indices&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;metricbeat-6.7.0-2020.04.14.12.49&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;index&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;metricbeat-6.7.0-2020.04.14.12.49&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;managed&quot;</span> <span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;policy&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;common_beat_policy&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;lifecycle_date_millis&quot;</span> <span class="punctuation">:</span> <span class="number">1586879342034</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;phase&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;new&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;phase_time_millis&quot;</span> <span class="punctuation">:</span> <span class="number">1586879342080</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;action&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;complete&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;action_time_millis&quot;</span> <span class="punctuation">:</span> <span class="number">1586879342080</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;step&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;complete&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;step_time_millis&quot;</span> <span class="punctuation">:</span> <span class="number">1586879342080</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://www.elastic.co/blog/implementing-hot-warm-cold-in-elasticsearch-with-index-lifecycle-management">Implementing a Hot-Warm-Cold Architecture with Index Lifecycle Management</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.7/getting-started-index-lifecycle-management.html">ES6.7 getting-started-index-lifecycle-management.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://elasticsearch.cn/article/6358">Elasticsearch 6.6 Index Lifecycle Management 尝鲜</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/09/11/Fitness/%E7%90%A6%E7%8E%89%E8%80%81%E5%B8%88%E7%9A%84%E8%AE%A1%E5%88%92/" rel="prev" title="一拳超人训练计划-改">
+                  <i class="fa fa-angle-left"></i> 一拳超人训练计划-改
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/04/13/Components/Elasticsearch/CCR-Cross-Cluster-Replicaiton/" rel="next" title="CCR-Cross_Cluster_Replicaiton">
+                  CCR-Cross_Cluster_Replicaiton <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

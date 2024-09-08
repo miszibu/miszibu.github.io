@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Not Only Sql数据库非关系型数据库,这其实是个误称。实际上应该叫做超Sql数据库，NOSQL删除了传统SQL中ACID特性，既原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability），从而提高了程序的效率。因此受到了互联网公司的追捧，然后在正规的事务处理中，传统的关系型数据库的事务性仍然是必不可少的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql-常用命令">
+<meta property="og:url" content="https://miszibu.github.io/2017/08/20/Components/Mysql/Mysql-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Not Only Sql数据库非关系型数据库,这其实是个误称。实际上应该叫做超Sql数据库，NOSQL删除了传统SQL中ACID特性，既原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability），从而提高了程序的效率。因此受到了互联网公司的追捧，然后在正规的事务处理中，传统的关系型数据库的事务性仍然是必不可少的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-08-20T09:38:47.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.053Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2017/08/20/Components/Mysql/Mysql-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2017/08/20/Components/Mysql/Mysql-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/","path":"2017/08/20/Components/Mysql/Mysql-常用命令/","title":"Mysql-常用命令"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Mysql-常用命令 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Not-Only-Sql%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">Not Only Sql数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E8%A7%84%E8%8C%83"><span class="nav-number">2.</span> <span class="nav-text">语法规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sql%E8%AF%AD%E5%8F%A5"><span class="nav-number">3.</span> <span class="nav-text">Sql语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">相关引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2017/08/20/Components/Mysql/Mysql-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Mysql-常用命令 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql-常用命令
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-08-20 17:38:47" itemprop="dateCreated datePublished" datetime="2017-08-20T17:38:47+08:00">2017-08-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Not-Only-Sql数据库"><a href="#Not-Only-Sql数据库" class="headerlink" title="Not Only Sql数据库"></a>Not Only Sql数据库</h2><p>非关系型数据库,这其实是个误称。实际上应该叫做超Sql数据库，NOSQL删除了传统SQL中ACID特性，既<strong>原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability）</strong>，从而提高了程序的效率。因此受到了互联网公司的追捧，然后在正规的事务处理中，传统的关系型数据库的事务性仍然是必不可少的。</p>
+<span id="more"></span>
+
+<h2 id="语法规范"><a href="#语法规范" class="headerlink" title="语法规范"></a>语法规范</h2><p>关键词大写，为了在长SQL时保持较好的可阅读性。实际上SQL语句对大小写并不敏感。</p>
+<h2 id="Sql语句"><a href="#Sql语句" class="headerlink" title="Sql语句"></a>Sql语句</h2><p><strong>Database</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE databaseName;//创建数据库</span><br><span class="line"></span><br><span class="line">SHOW DATABASES;//查询数据库列表</span><br><span class="line"></span><br><span class="line">USE DBName;//选择数据库</span><br><span class="line"></span><br><span class="line">DROP databaseName;//丢掉数据库</span><br></pre></td></tr></table></figure>
+
+<p><strong>Table</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE TBName(name1 type1 NOT NULL PRIMARY KEY AUTO_INCREMENT,...);//创建表</span><br><span class="line"></span><br><span class="line">USE TBName；//选择表</span><br><span class="line"></span><br><span class="line">SHOW TABLES;//查看所有表</span><br><span class="line"></span><br><span class="line">DROP TABLE TBName;//删除数据表</span><br><span class="line"></span><br><span class="line">DELETE FROM TBName;//清空表中记录</span><br><span class="line"></span><br><span class="line">DESC TBName;</span><br><span class="line">DESCRIBE TBName;</span><br><span class="line">SHOW COLUMNS FROM TBName;//查看User的表结构</span><br><span class="line"></span><br><span class="line">ALTER TABLE pet ADD id INT NOT NULL PRIMARY KEY AUTO_INCREMENT FIRST;//增加表的一列 </span><br><span class="line">ALTER TABLE pet DROP COLUMN des;//删除表的一列</span><br><span class="line"></span><br><span class="line">ALTER TABLE TBName PRIMARY KEY(colName);//将表的一行设为主键(主键不可重复)</span><br><span class="line">ALTER TABLE TBName DROP PRIMARY KEY(colName);//将表的一行删除主键</span><br><span class="line"></span><br><span class="line">RENAME TABLE pet TO animal;//变更表名</span><br></pre></td></tr></table></figure>
+
+<p><strong>索引</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CREATE INDEX idxName ON TBName(colName);//为一行设置索引(索引名字UNIQUE)</span><br><span class="line">DROP INDEX idxName ON TBName;//删除索引</span><br><span class="line">注：索引是不可更改的，想更改必须删除重新建。</span><br></pre></td></tr></table></figure>
+
+<p><strong>基本语法</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">查找：select * from table1 where field1 like ’%value1%’ //使用like来做相似查找</span><br><span class="line">插入：insert into table1(field1,field2) values(value1,value2)</span><br><span class="line">删除：delete from table1 where 范围</span><br><span class="line">更新：update table1 set field1=value1 where 范围</span><br><span class="line">排序：select * from table1 order by field1,field2 [desc]</span><br><span class="line">总数：select count(*) as totalcount from table1</span><br><span class="line">求和：select sum(field1) as sumvalue from table1</span><br><span class="line">平均：select avg(field1) as avgvalue from table1</span><br><span class="line">最大：select max(field1) as maxvalue from table1</span><br><span class="line">最小：select min(field1) as minvalue from table1[separator]</span><br></pre></td></tr></table></figure>
+
+<p><strong>进阶</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Mysql 进阶篇 先挖个坑 等工作上有需要了 来填 基础的功能已经够工作使用了</span><br></pre></td></tr></table></figure>
+
+<p><strong>视图</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Mysql视图是一个虚拟表，其内容由查询定义。同真实的表一样，视图包含一系列带有名称的列和行数据。但是，视图并不在数据库中以存储的数据值集形式存在。行和列数据来自由定义视图的查询所引用的表，并且在引用视图时动态生成。</span><br><span class="line"></span><br><span class="line">视图是存储在数据库中的查询的sql 语句，它主要出于两种原因：安全原因，视图可以隐藏一些数据，如：社会保险基金表，可以用视图只显示姓名，地址，而不显示社会保险号和工资数等，另一原因是可使复杂的查询易于理解和使用。</span><br><span class="line"></span><br><span class="line">MySQL视图：查看图形或文档的方式。</span><br><span class="line"></span><br><span class="line">视图是从一个或多个表或视图中导出的表，其结构和数据是建立在对表的查询基础上的。和表一样，视图也是包括几个被定义的数据列和多个数据行，但就本质而言这些数据列和数据行来源于其所引用的表。</span><br></pre></td></tr></table></figure>
+
+<h2 id="相关引用"><a href="#相关引用" class="headerlink" title="相关引用"></a>相关引用</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/19719997">MySQL 对于千万级的大表要怎么优化？</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/0351jiazhuang/p/4530366.html">常用SQL命令</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/11/13/General/OS/BaseKnowledge/OS_%E5%8D%95%E6%A0%B8%E8%87%B3%E5%A4%9A%E6%A0%B8%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6/" rel="prev" title="操作系统_单核至多核的进程调度">
+                  <i class="fa fa-angle-left"></i> 操作系统_单核至多核的进程调度
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/03/16/Code_Language/Java/Java%E5%BA%94%E7%94%A8%E5%9F%BA%E7%A1%80/Java_IO/" rel="next" title="Java_IO">
+                  Java_IO <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="​	Volatile是轻量级的synchronized，如果一个变量是用volatile，则它的成本低于synchronized，由于它不会引起线程上下文切换和调度。 当一个变量被定义为volatile之后，它将具备两种性质  保证该变量对所有线程的可见值。倘若某个线程对volatile修饰的共享变量进行更新，那么其他线程立马可以看到这个更新。因此所有线程取该变量值时，都是最新的值。 禁止指令重排">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java_Volatile">
+<meta property="og:url" content="https://miszibu.github.io/2018/04/11/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java_Volatile/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="​	Volatile是轻量级的synchronized，如果一个变量是用volatile，则它的成本低于synchronized，由于它不会引起线程上下文切换和调度。 当一个变量被定义为volatile之后，它将具备两种性质  保证该变量对所有线程的可见值。倘若某个线程对volatile修饰的共享变量进行更新，那么其他线程立马可以看到这个更新。因此所有线程取该变量值时，都是最新的值。 禁止指令重排">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-04-11T01:53:09.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.021Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="多线程">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/04/11/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java_Volatile/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/04/11/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java_Volatile/","path":"2018/04/11/Code_Language/Java/Java多线程/Java_Volatile/","title":"Java_Volatile"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java_Volatile | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">内存模型概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">Java内存模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">原子性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="nav-number">2.3.</span> <span class="nav-text">有序性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%96%E6%9E%90volatile%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">剖析volatile原理</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/04/11/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java_Volatile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java_Volatile | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java_Volatile
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-04-11 09:53:09" itemprop="dateCreated datePublished" datetime="2018-04-11T09:53:09+08:00">2018-04-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>​	Volatile是轻量级的synchronized，如果一个变量是用volatile，则它的成本低于synchronized，由于它不会引起线程上下文切换和调度。</p>
+<p>当一个变量被定义为volatile之后，它将具备两种性质</p>
+<ol>
+<li><strong>保证该变量对所有线程的可见值</strong>。倘若某个线程对volatile修饰的共享变量进行更新，那么其他线程立马可以看到这个更新。因此所有线程取该变量值时，都是最新的值。</li>
+<li><strong>禁止指令重排序</strong>。</li>
+</ol>
+<span id="more"></span>
+
+<h2 id="内存模型概念"><a href="#内存模型概念" class="headerlink" title="内存模型概念"></a>内存模型概念</h2><p>​	计算机在运行程序时，在CPU中执行指令，在主存中进行读写，主存读写的速度慢于指令执行的速度，倘若任何交互都需要与主存打交道则会影响效率，因此有了cache，然而CPU缓存为某个CPU独有，只与在该CPU运行的线程有关。</p>
+<p>​	虽然Cache解决了效率问题，但带来了数据一致性的问题，在多线程环境下会出现异常，这时我们需要引入方案解决缓存一致性问题。共有两种</p>
+<ul>
+<li><p>通过在总线加LOCK锁的方式</p>
+</li>
+<li><p>通过缓存一致性协议</p>
+<p>但是总线是CPU共享的，若被独占，其他CPU会被阻塞，违反了我们想要提高效率的初衷。</p>
+</li>
+</ul>
+<p>​        缓存一致性协议（MESI协议）它确保每个缓存中使用的共享变量的副本是一致的。其核心思想如下：当某个CPU在写数据时，如果发现操作的变量是共享变量，则会通知其他CPU告知该变量的缓存行是无效的，因此其他CPU在读取该变量时，发现其无效会重新从主存中加载数据。</p>
+<h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>​	上面是操作系统如何保证数据一致性，下面我们来看一下Java内存模型，稍微研究一下Java内存模型为我们提供了哪些保证以及在Java中提供了哪些方法和机制来让我们在进行多线程编程时能够保证程序执行的正确性。</p>
+<p>在并发编程中我们一般都会遇到这三个基本概念：原子性、可见性、有序性。我们稍微看下volatile</p>
+<h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><blockquote>
+<p>原子性：即一个操作或者多个操作 要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。</p>
+</blockquote>
+<p>这点类似于数据库的事务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="number">0</span>;             ---<span class="number">1</span></span><br><span class="line">j = i ;            ---<span class="number">2</span></span><br><span class="line">i++;               ---<span class="number">3</span></span><br><span class="line">i = j + <span class="number">1</span>;         ---<span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>上面四个操作，其实只有1才是原子操作，其余均不是。</p>
+<p>1—在Java中，对基本数据类型的变量和赋值操作都是原子性操作；<br>2—包含了两个操作：读取i，将i值赋值给j<br>3—包含了三个操作：读取i值、i + 1 、将+1结果赋值给i；<br>4—同三</p>
+<p>在单线程环境下我们可以认为整个步骤都是原子性操作，但是在多线程环境下则不同，Java只保证了基本数据类型的变量和赋值操作才是原子性的（注：在32位的JDK环境下，对64位数据的读取不是原子性操作，如long、double）。要想在多线程环境下保证原子性，则可以通过锁、synchronized来确保。</p>
+<blockquote>
+<p>volatile是无法保证复合操作的原子性</p>
+</blockquote>
+<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><blockquote>
+<p>可见性是指当多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。</p>
+</blockquote>
+<p>在上面已经分析了，在多线程环境下，一个线程对共享变量的操作对其他线程是不可见的。</p>
+<p>Java提供了volatile来保证可见性。</p>
+<p>当一个变量被volatile修饰后，表示着线程本地内存无效，当一个线程修改共享变量后他会立即被更新到主内存中，当其他线程读取共享变量时，它会直接从主内存中读取。<br>当然，synchronize和锁都可以保证可见性。</p>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><blockquote>
+<p>有序性：即程序执行的顺序按照代码的先后顺序执行。</p>
+</blockquote>
+<p>在Java内存模型中，为了效率是允许编译器和处理器对指令进行重排序，当然重排序它不会影响单线程的运行结果，但是对多线程会有影响。</p>
+<p>Java提供volatile来保证一定的有序性。最著名的例子就是单例模式里面的DCL（双重检查锁）。</p>
+<h2 id="剖析volatile原理"><a href="#剖析volatile原理" class="headerlink" title="剖析volatile原理"></a>剖析volatile原理</h2><blockquote>
+<p>volatile可以保证线程可见性且提供了一定的有序性，但是无法保证原子性。在JVM底层volatile是采用“内存屏障”来实现的。</p>
+</blockquote>
+<p>由于volatile变量只能保证可见性，在不符合以下两条规则的运算场景中，我们仍然要通过加锁（synchronized或者JUC包下的院子类）来保证原子性。</p>
+<ol>
+<li><strong>运算结果并不依赖变量的当前值（反例：a++），或者能够确保只有单一的线程修改变量的值。</strong></li>
+<li><strong>变量不需要与其他的状态变量共同参与不变约束</strong></li>
+</ol>
+<p><strong>常用volatile关键字的两个场景：</strong></p>
+<p>1.状态标记量</p>
+<p>在高并发的场景中，通过一个boolean类型的变量isopen，控制代码是否走促销逻辑，该如何实现?</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ServerHandler</span> &#123;</span><br><span class="line">　　<span class="keyword">private</span> <span class="keyword">volatile</span> isopen;</span><br><span class="line">　　<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (isopen) &#123;</span><br><span class="line">          <span class="comment">//促销逻辑</span></span><br><span class="line">　　	   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">　　		<span class="comment">//正常逻辑</span></span><br><span class="line">	 　　&#125;</span><br><span class="line">　　&#125;</span><br><span class="line"> 　<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setIsopen</span><span class="params">(<span class="type">boolean</span> isopen)</span> &#123;</span><br><span class="line"> 　   <span class="built_in">this</span>.isopen = isopen</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​	用户的请求线程执行run方法，如果需要开启促销活动，可以通过后台设置，具体实现可以发送一个请求，调用setIsopen方法并设置isopen为true，由于isopen是volatile修饰的，所以一经修改，其他线程都可以拿到isopen的最新值，用户请求就可以执行促销逻辑了。</p>
+<p>2.double check</p>
+<p>​	单例模式的一种实现方式，但很多人会忽略volatile关键字，因为没有该关键字，程序也可以很好的运行，只不过代码的稳定性总不是100%，说不定在未来的某个时刻，隐藏的bug就出来了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line">　　<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">　　<span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">　	　<span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">　	　  syschronized(Singleton.class) &#123;</span><br><span class="line">　　		 <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">　　         instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">　　       &#125;</span><br><span class="line">　　     &#125;</span><br><span class="line">　　   &#125;</span><br><span class="line">　   　<span class="keyword">return</span> instance;</span><br><span class="line">　　&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>　不过在众多单例模式的实现中，我比较推荐懒加载的优雅写法Initialization on Demand Holder(IODH)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line">　　<span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SingletonHolder</span> &#123;</span><br><span class="line">　　  <span class="keyword">static</span> <span class="type">Singleton</span> <span class="variable">instance</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">　　&#125;</span><br><span class="line">　　<span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">　　  <span class="keyword">return</span> SingletonHolder.instance;</span><br><span class="line">　　&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>如何保证内存可见性?</strong></p>
+<p>​	在JVM的内存模型中，有主内存和工作内存的概念，每个线程对应一个工作内存，并共享主内存的数据，下面看看操作普通变量和volatile变量有什么不同：</p>
+<p>​	1、对于<strong>普通变量</strong>：读操作会优先读取工作内存的数据，如果工作内存中不存在，则从主内存中拷贝一份数据到工作内存中;写操作只会修改工作内存的副本数据，这种情况下，其它线程就无法读取变量的最新值。</p>
+<p>　　2、对于<strong>volatile变量</strong>，读操作时JMM会把工作内存中对应的值设为无效，要求线程从主内存中读取数据;写操作时JMM会把工作内存中对应的数据刷新到主内存中，这种情况下，其它线程就可以读取变量的最新值。</p>
+<p>　　volatile变量的内存可见性是基于**内存屏障(Memory Barrier)**实现的，什么是内存屏障?内存屏障，又称内存栅栏，是一个CPU指令。在程序运行时，为了提高执行性能，编译器和处理器会对指令进行重排序，JMM为了保证在不同的编译器和CPU上有相同的结果，通过插入特定类型的内存屏障来禁止特定类型的编译器重排序和处理器重排序，插入一条内存屏障会告诉编译器和CPU：不管什么指令都不能和这条Memory Barrier指令重排序。</p>
+<p>​	<strong>Java代码</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">　instance = new Singleton();</span><br></pre></td></tr></table></figure>
+
+<p>　　<strong>汇编代码</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">　0x01a3de1d: movb $0x0,0x1104800(%esi);</span><br><span class="line"></span><br><span class="line">　0x01a3de24: **lock** addl $0x0,(%esp);</span><br></pre></td></tr></table></figure>
+
+<p>　　这个lock前缀指令相当于上述的内存屏障，提供了以下保证：</p>
+<p>　　1、将当前CPU缓存行的数据写回到主内存;</p>
+<p>　　2、这个写回内存的操作会导致在其它CPU里缓存了该内存地址的数据无效。</p>
+<p>　　CPU为了提高处理性能，并不直接和内存进行通信，而是将内存的数据读取到内部缓存(L1，L2)再进行操作，但操作完并不能确定何时写回到内存，如果对volatile变量进行写操作，当CPU执行到Lock前缀指令时，会将这个变量所在缓存行的数据写回到内存，不过还是存在一个问题，就算内存的数据是最新的，其它CPU缓存的还是旧值，所以为了保证各个CPU的缓存一致性，每个CPU通过嗅探在总线上传播的数据来检查自己缓存的数据有效性，当发现自己缓存行对应的内存地址的数据被修改，就会将该缓存行设置成无效状态，当CPU读取该变量时，发现所在的缓存行被设置为无效，就会重新从内存中读取数据到缓存中。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/04/11/Code_Language/Java/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java_%E9%94%81/" rel="prev" title="Java_锁">
+                  <i class="fa fa-angle-left"></i> Java_锁
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/04/11/%E6%9D%82%E8%B0%88/ssh/" rel="next" title="SSH git秘钥 远程连接">
+                  SSH git秘钥 远程连接 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

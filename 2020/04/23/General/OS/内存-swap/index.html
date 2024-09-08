@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。 Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存-swap">
+<meta property="og:url" content="https://miszibu.github.io/2020/04/23/General/OS/%E5%86%85%E5%AD%98-swap/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="内存 Swap是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。 Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-23T14:26:48.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.069Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="OS">
+<meta property="article:tag" content="Memory">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/04/23/General/OS/%E5%86%85%E5%AD%98-swap/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/04/23/General/OS/%E5%86%85%E5%AD%98-swap/","path":"2020/04/23/General/OS/内存-swap/","title":"内存-swap"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>内存-swap | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-%E5%AE%9A%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">Swapping 定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">Swapping 作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="nav-number">3.</span> <span class="nav-text">Swapping 的不足</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swapping-%E7%A9%BA%E9%97%B4%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">Swapping 空间类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8BSwap-%E7%A9%BA%E9%97%B4%E7%B1%BB%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">查看Swap 空间类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%B7%BB%E5%8A%A0-SwappIng-Space"><span class="nav-number">6.</span> <span class="nav-text">如何添加 SwappIng Space</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swap-Space-%E7%9A%84%E5%A4%A7%E5%B0%8F%E5%A4%9A%E5%B0%91%E4%B8%BA%E5%AE%9C"><span class="nav-number">7.</span> <span class="nav-text">Swap Space 的大小多少为宜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-Kernal-2-6-%E2%80%94swappiness"><span class="nav-number">8.</span> <span class="nav-text">Linux Kernal 2.6 —swappiness</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/04/23/General/OS/%E5%86%85%E5%AD%98-swap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="内存-swap | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          内存-swap
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-23 22:26:48" itemprop="dateCreated datePublished" datetime="2020-04-23T22:26:48+08:00">2020-04-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>内存 <strong>Swap</strong>是指：当物理内存不够时，系统将就会把一些不常用的内存页交换到 swap 空间（磁盘），以释放内存。</p>
+<p>Swap 在提高内存使用上限的同时，也会由于磁盘本身的读写速率的问题，一定程度的降低内存读写效率。因此请根据具体情况使用 Swap 内存，且不宜超过物理内存的50%。</p>
+<span id="more"></span>
+
+<h2 id="Swapping-定义"><a href="#Swapping-定义" class="headerlink" title="Swapping 定义"></a>Swapping 定义</h2><p>Linux 将物理内存 <strong>RAM</strong>（Random Access Memory）划分为称之为内存页（<strong>Page</strong>）的小块。Swapping 指的就是将一部分内存页从内存拷贝到我们称之为 Swap 空间的磁盘区域，从而释放内存页。这部分物理内存和 Swap 空间我们称之为<strong>虚拟内存</strong>。</p>
+<blockquote>
+<p>虚拟内存 &#x3D; Swap Space + 部分物理内存</p>
+</blockquote>
+<h2 id="Swapping-作用"><a href="#Swapping-作用" class="headerlink" title="Swapping 作用"></a>Swapping 作用</h2><p>Swapping 有以下俩个作用，</p>
+<ol>
+<li>当系统实际需要内存大于物理内存上限时，内核将部分低使用率的内存页交换到磁盘上去，从而腾出足够的内存空间给急需内存的应用和程序。<ul>
+<li>举例说：我们启动在只有5GB的可用内存情况下，启动一个-xms -xmx &#x3D; 6GB 的 Java 程序，那么不足的1GB，将由系统通过 Swapping 腾出。</li>
+</ul>
+</li>
+<li>在应用启动时，往往需要大量的内存空间来完成初始化，而这一部分空间在之后的使用率却很低，系统则能swap这部分内存页给其他应用，甚至于磁盘缓存。</li>
+</ol>
+<h2 id="Swapping-的不足"><a href="#Swapping-的不足" class="headerlink" title="Swapping 的不足"></a>Swapping 的不足</h2><blockquote>
+<p>当 Swpping 频繁发生的时候，增大RAM 是最好的选择。</p>
+</blockquote>
+<p>然而, Swapping 也存在不足，因为磁盘的读写速度与内存相比存在着巨大的差距。内存的读写是纳秒级别的，磁盘的读写是毫秒级别的，这里存在上千倍的差距。访问磁盘的速度和访问内存的速度差距十分明显。</p>
+<p>当 Swapping 频繁发生的时候，系统的performance 会明显下降。</p>
+<p>有时候，内存页被频繁换入换出，系统在艰难的从内存中寻找空闲空间来保持应用的正常运行。在这个情况下，最好的方式就是增大 RAM。</p>
+<p>为什么呢，因为系统会优先选择低使用率的内存页来进行 Swap，然而频繁的 Swap 表示，内存资源紧俏，不存在低使用率的内存页了。</p>
+<h2 id="Swapping-空间类型"><a href="#Swapping-空间类型" class="headerlink" title="Swapping 空间类型"></a>Swapping 空间类型</h2><p>Linux存在两种不同类型的 Swap 空间，</p>
+<ul>
+<li>Swap Partition: Swap分区是磁盘中一块只用于swapping 使用的单独分区。</li>
+<li>Swap File: 一个特殊的文件，介于系统文件和数据文件之间</li>
+</ul>
+<h2 id="查看Swap-空间类型"><a href="#查看Swap-空间类型" class="headerlink" title="查看Swap 空间类型"></a>查看Swap 空间类型</h2><p>使用 <code>swapon -s</code> 命令来查看系统使用的 swap 空间类型，输出如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Filename  Type       Size       Used Priority</span><br><span class="line">/dev/sda5 partition  859436  0       -1</span><br></pre></td></tr></table></figure>
+
+<p>每一行代表着一个单独的 Swap 空间。</p>
+<ul>
+<li>Type: <ul>
+<li>Partition: swap space</li>
+<li>File: swap file</li>
+</ul>
+</li>
+<li>Size: 以 KB 为单位</li>
+<li>Used: 已使用的Swapping space size</li>
+<li>Priority: 当同时 mount 多个 swap spaces ，且它们的优先级相同时（往往在不同的设备上），系统会交替安排其 swapping 活动，从而提高 swapping 的 performance.<ul>
+<li>其实这很好理解，因为 SwappIng 的问题，存在于磁盘和内存空间读取效率的巨大差距，可以对内存页码进行分配，进而提高 N 倍读取效率。</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何添加-SwappIng-Space"><a href="#如何添加-SwappIng-Space" class="headerlink" title="如何添加 SwappIng Space"></a>如何添加 SwappIng Space</h2><p>这部分内容不太会涉及，有需要请参考<a target="_blank" rel="noopener" href="https://www.linux.com/news/all-about-linux-swap-space/">all-about-linux-swap-space</a></p>
+<h2 id="Swap-Space-的大小多少为宜"><a href="#Swap-Space-的大小多少为宜" class="headerlink" title="Swap Space 的大小多少为宜"></a>Swap Space 的大小多少为宜</h2><p>当物理内存足够使用时，不需要Swap Space，系统也能良好运行。但当物理内存不足，系统崩溃时，我们所能做的最佳方案就是使用 swap space，因为磁盘的价格确实便宜。</p>
+<p>在旧版本的 类Unix 操作系统中（比如 Sun OS 和 Ultrix)，往往需要两到三倍物理内存大小的虚拟内存空间。</p>
+<p>在现代操作系统中，如 Linux，最佳的方案是根据使用场景的不同来划分虚拟内存的大小。</p>
+<ol>
+<li>桌面系统：建议 Swap Space 的大小是系统物理内存的两倍，这可以是我们尽可能多的运行APP（空闲 APP 的内存页将被换出）</li>
+<li><strong>Server: 建议为系统物理内存的一半</strong>，这样，我们可以获得 swapping 带来的一定灵活性，记得监控 swap space 的使用情况，必要时升级内存。</li>
+</ol>
+<h2 id="Linux-Kernal-2-6-—swappiness"><a href="#Linux-Kernal-2-6-—swappiness" class="headerlink" title="Linux Kernal 2.6 —swappiness"></a>Linux Kernal 2.6 —swappiness</h2><p>Linux 内核在2.6版本添加了一个新的内核参数<code>swappiness</code> 来管理swap 的方式，值为0-100。</p>
+<p>更高的值，内存页的 swap更频繁，相对的，更低的值，内存中将保持更多应用，哪怕当应用处于空闲状态。</p>
+<p>swappiness 的值默认时60，使用 root账号运行以下命令，可以临时改变这个参数（直到下次重启）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 50 &gt; /proc/sys/vm/swappiness</span><br></pre></td></tr></table></figure>
+
+<p>通过修改在&#x2F;etc&#x2F;sysctl.conf 中的 vm.swappiness 的值来永久修改该参数</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://www.linux.com/news/all-about-linux-swap-space/">all-about-linux-swap-space&#x2F;</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OS/" rel="tag"># OS</a>
+              <a href="/tags/Memory/" rel="tag"># Memory</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/04/21/Algorithm/Bitmap/" rel="prev" title="Bitmap">
+                  <i class="fa fa-angle-left"></i> Bitmap
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/04/26/Components/Container/Docker%E6%90%AD%E5%BB%BAES%E9%9B%86%E7%BE%A4/" rel="next" title="Docker搭建ES集群">
+                  Docker搭建ES集群 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

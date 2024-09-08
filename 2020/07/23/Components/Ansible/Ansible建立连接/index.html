@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Ansible可以通过账号密码 和 RSA Key的方式来远程控制目标机器。 本文会讲解如何配置Ansible来连接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible建立连接">
+<meta property="og:url" content="https://miszibu.github.io/2020/07/23/Components/Ansible/Ansible%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Ansible可以通过账号密码 和 RSA Key的方式来远程控制目标机器。 本文会讲解如何配置Ansible来连接">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-23T15:29:41.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.029Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Ansible">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/07/23/Components/Ansible/Ansible%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/07/23/Components/Ansible/Ansible%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5/","path":"2020/07/23/Components/Ansible/Ansible建立连接/","title":"Ansible建立连接"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Ansible建立连接 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BAAnsible-%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">个人Ansible 常用配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81%E7%99%BB%E9%99%86"><span class="nav-number">2.</span> <span class="nav-text">使用账号密码登陆</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Necessary-Dependency"><span class="nav-number">2.1.</span> <span class="nav-text">Necessary Dependency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Add-Fingerprint"><span class="nav-number">2.2.</span> <span class="nav-text">Add Fingerprint</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8ssh%E5%85%8D%E5%AF%86%E7%99%BB%E9%99%86"><span class="nav-number">3.</span> <span class="nav-text">使用ssh免密登陆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5Docker-Container"><span class="nav-number">4.</span> <span class="nav-text">连接Docker Container</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH"><span class="nav-number">4.1.</span> <span class="nav-text">SSH</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E9%95%9C%E5%83%8F-%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8"><span class="nav-number">4.1.1.</span> <span class="nav-text">寻找镜像 创建容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%AE%BE%E7%BD%AERSA%E5%AF%86%E9%92%A5"><span class="nav-number">4.1.2.</span> <span class="nav-text">在容器中设置RSA密钥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ansible-%E6%9B%B4%E6%94%B9%E6%9C%BA%E5%99%A8%E9%BB%98%E8%AE%A4SSH%E7%AB%AF%E5%8F%A3"><span class="nav-number">4.1.3.</span> <span class="nav-text">Ansible 更改机器默认SSH端口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Delegate-To"><span class="nav-number">4.2.</span> <span class="nav-text">Delegate To</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/23/Components/Ansible/Ansible%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Ansible建立连接 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ansible建立连接
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-23 23:29:41" itemprop="dateCreated datePublished" datetime="2020-07-23T23:29:41+08:00">2020-07-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Ansible可以通过账号密码 和 RSA Key的方式来远程控制目标机器。</p>
+<p>本文会讲解如何配置Ansible来连接</p>
+<span id="more"></span>
+
+<h2 id="个人Ansible-常用配置"><a href="#个人Ansible-常用配置" class="headerlink" title="个人Ansible 常用配置"></a><strong>个人Ansible 常用配置</strong></h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">vi</span> <span class="string">ansible.cfg</span></span><br><span class="line"></span><br><span class="line">[<span class="string">defaults</span>]</span><br><span class="line"><span class="string">inventory=./hosts</span>           <span class="string">//</span> <span class="string">指定本地host文件目录</span></span><br><span class="line"><span class="string">log_path=./playbook_output</span>  <span class="string">//</span> <span class="string">指定playbook(下文简称pb)的log目录</span></span><br><span class="line"><span class="string">gather_timeout</span> <span class="string">=</span> <span class="number">40</span>         <span class="string">//</span> <span class="string">Ansible默认会获取目标机器的metric数据，如果目标机器反应较慢，常常超时，设置其超时时间</span></span><br><span class="line"><span class="string">command_warnings=False</span>      <span class="string">//</span> <span class="string">关闭一些无用的warning，</span> <span class="string">新手可以不设置</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用账号密码登陆"><a href="#使用账号密码登陆" class="headerlink" title="使用账号密码登陆"></a>使用账号密码登陆</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">cd $&#123;your_ansible_home&#125;</span><br><span class="line">vi hosts</span><br><span class="line"></span><br><span class="line">[test_group_with_customize_port]</span><br><span class="line">127.0.0.1:22</span><br><span class="line"></span><br><span class="line">[test_group_default_port]</span><br><span class="line">127.0.0.2</span><br><span class="line"></span><br><span class="line">[all:vars]</span><br><span class="line">ansible_connection=ssh</span><br><span class="line">ansible_user=test</span><br><span class="line">ansible_ssh_pass=testpwd</span><br></pre></td></tr></table></figure>
+
+<p>将ssh连接用户的账号密码设置在host文件中，上面将其设置为全局，也可以针对group设置。</p>
+<h3 id="Necessary-Dependency"><a href="#Necessary-Dependency" class="headerlink" title="Necessary Dependency"></a>Necessary Dependency</h3><p>选择合适的包管理器来安装sshpass</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum install -y http://mirror.centos.org/centos/7/extras/x86_64/Packages/sshpass-1.06-2.el7.x86_64.rpm</span><br><span class="line"></span><br><span class="line">apt-get install sshpass</span><br><span class="line"></span><br><span class="line">brew install sshpass</span><br></pre></td></tr></table></figure>
+
+<h3 id="Add-Fingerprint"><a href="#Add-Fingerprint" class="headerlink" title="Add Fingerprint"></a>Add Fingerprint</h3><p><strong>添加本机fingerprint 到目标的机器的known_hosts</strong></p>
+<p>第一次ssh连接远程机器时，需要用户确认是否信任目标机器，而ansible则会抛出一个异常。</p>
+<p>解决方法很简单，手动先连接一遍，选择信任，再退出，重新使用ansible即可。</p>
+<h2 id="使用ssh免密登陆"><a href="#使用ssh免密登陆" class="headerlink" title="使用ssh免密登陆"></a>使用ssh免密登陆</h2><p>这里不需要任何配置，你只需要预先设置好RSA Key就可以。</p>
+<p><strong>详情请见RSA免密登陆章节。</strong></p>
+<h2 id="连接Docker-Container"><a href="#连接Docker-Container" class="headerlink" title="连接Docker Container"></a>连接Docker Container</h2><p>Docker Container提供了方便多样的测试环境，如何连接container有如下两种方案</p>
+<ol>
+<li><strong>SSH连接容器</strong></li>
+<li><strong>使用Ansible的Delegate_to</strong></li>
+</ol>
+<h3 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h3><h4 id="寻找镜像-创建容器"><a href="#寻找镜像-创建容器" class="headerlink" title="寻找镜像 创建容器"></a>寻找镜像 创建容器</h4><p>在Container中设置sshd服务，并绑定端口到外部宿主机其他端口</p>
+<p>在这里可以直接去找预先安装了python和sshd服务的镜像，没有必要自己单独再造轮子，如果真要打镜像，没必要写docker file，太慢了，直接找个基础镜像，做完操作再commit即可。</p>
+<blockquote>
+<p>docker run -itd –name centos-ansible –privileged -p 2222:22 be666a0ce5e7 &#x2F;bin&#x2F;bash</p>
+</blockquote>
+<h4 id="在容器中设置RSA密钥"><a href="#在容器中设置RSA密钥" class="headerlink" title="在容器中设置RSA密钥"></a>在容器中设置RSA密钥</h4><p>详情见rsa免密登陆一文</p>
+<h4 id="Ansible-更改机器默认SSH端口"><a href="#Ansible-更改机器默认SSH端口" class="headerlink" title="Ansible 更改机器默认SSH端口"></a>Ansible 更改机器默认SSH端口</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi hosts</span><br><span class="line"></span><br><span class="line">[my_server]</span><br><span class="line">hostname:2222</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Delegate-To"><a href="#Delegate-To" class="headerlink" title="Delegate To"></a>Delegate To</h3><p>Ansible提供了Task的delegate to方法，可以把Task指定给某台机器执行。我们可以预先注册Docker Container为Host，然后将任务指定给Docker Container执行。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">add</span> <span class="string">container</span> <span class="string">to</span> <span class="string">inventory</span></span><br><span class="line">  <span class="attr">add_host:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">centos5-ansible</span></span><br><span class="line">    <span class="attr">ansible_connection:</span> <span class="string">docker</span></span><br><span class="line">    <span class="attr">ansible_user:</span> <span class="string">root</span></span><br><span class="line">  <span class="attr">changed_when:</span> <span class="literal">false</span></span><br><span class="line">  </span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">print</span> <span class="string">hostname</span></span><br><span class="line">  <span class="attr">delegate_to:</span> <span class="string">centos5-ansible</span></span><br><span class="line">  <span class="attr">command:</span> <span class="string">hostname</span></span><br><span class="line">  <span class="attr">register:</span> <span class="string">result</span></span><br><span class="line">  <span class="attr">ignore_errors:</span> <span class="literal">yes</span></span><br></pre></td></tr></table></figure>
+
+<p>通过add_host 将container加入到host中，然后后续的所有tasks，都可以通过添加delegate_to: centos5-ansible 来指定container执行。</p>
+<blockquote>
+<p>Note: 为每一个Module添加delegate_to过于繁复，可以使用include的配置叠加的性质，来拓展到include的所有tasks上</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Ansible/" rel="tag"># Ansible</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/20/Components/Elasticsearch/ES-Bulk-Requests/" rel="prev" title="ES-Bulk-Requests">
+                  <i class="fa fa-angle-left"></i> ES-Bulk-Requests
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/29/General/SSH/RSA%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%E8%BF%9C%E7%A8%8B%E6%9C%BA%E5%99%A8/" rel="next" title="RSA免密登录远程机器">
+                  RSA免密登录远程机器 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

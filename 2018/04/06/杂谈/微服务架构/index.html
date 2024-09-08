@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="SOA综述提到微服务架构就不得不提SOA(Service Oriented Architecture):面向服务架构 SOA是一种粗粒度、松耦合服务架构，服务之间通过简单、精确定义接口进行通讯，不涉及底层编程接口和通讯模型。SOA可以看作是B&#x2F;S模型(浏览器，服务器)、XML（Extensible Markup Language）&#x2F;Web Service技术之后的自然延伸。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微服务架构">
+<meta property="og:url" content="https://miszibu.github.io/2018/04/06/%E6%9D%82%E8%B0%88/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="SOA综述提到微服务架构就不得不提SOA(Service Oriented Architecture):面向服务架构 SOA是一种粗粒度、松耦合服务架构，服务之间通过简单、精确定义接口进行通讯，不涉及底层编程接口和通讯模型。SOA可以看作是B&#x2F;S模型(浏览器，服务器)、XML（Extensible Markup Language）&#x2F;Web Service技术之后的自然延伸。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-1.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-2.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-3.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-4.png">
+<meta property="og:image" content="https://miszibu.github.io/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-5.png">
+<meta property="article:published_time" content="2018-04-06T07:06:45.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.073Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="微服务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-1.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/04/06/%E6%9D%82%E8%B0%88/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/04/06/%E6%9D%82%E8%B0%88/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/","path":"2018/04/06/杂谈/微服务架构/","title":"微服务架构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>微服务架构 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SOA%E7%BB%BC%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">SOA综述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E7%BB%BC%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">微服务架构综述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%85%B7%E4%BD%93%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">微服务架构具体分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E5%8D%95%E4%BD%93%E5%BC%8F%E5%BA%94%E7%94%A8"><span class="nav-number">3.0.1.</span> <span class="nav-text">开发单体式应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%95%E4%BD%93%E5%BC%8F%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="nav-number">3.0.2.</span> <span class="nav-text">单体式应用的不足</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BE%AE%E5%A4%84%E7%90%86%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E5%A4%84%E7%90%86%E5%A4%8D%E6%9D%82%E4%BA%8B%E7%89%A9"><span class="nav-number">3.0.3.</span> <span class="nav-text">微处理架构——处理复杂事物</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="nav-number">3.0.4.</span> <span class="nav-text">微服务架构的好处</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="nav-number">3.0.5.</span> <span class="nav-text">微服务架构的不足</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.0.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/04/06/%E6%9D%82%E8%B0%88/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="微服务架构 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          微服务架构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-04-06 15:06:45" itemprop="dateCreated datePublished" datetime="2018-04-06T15:06:45+08:00">2018-04-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="SOA综述"><a href="#SOA综述" class="headerlink" title="SOA综述"></a>SOA综述</h2><p>提到微服务架构就不得不提SOA(Service Oriented Architecture):面向服务架构</p>
+<p>SOA是一种<strong>粗粒度</strong>、<strong>松耦合</strong>服务架构，服务之间通过简单、精确定义<strong>接口进行通讯</strong>，不涉及底层编程接口和通讯模型。SOA可以看作是B&#x2F;S模型(浏览器，服务器)、XML（Extensible Markup Language）&#x2F;Web Service技术之后的自然延伸。</p>
+<span id="more"></span>
+
+<p><strong>松耦合</strong>:中立的接口定义（既不固定具体的实现）称为服务间的松耦合，松耦合使得系统各个服务之间的内部结构，具体实现无关，通过固定的接口进行访问通信，因此在程序任一组件实现变化时，并不影响总体程序。</p>
+<p><strong>粗粒度</strong>：粒度表示的是服务的大小，也可以理解为服务操作的范围，粗粒度的服务，操作的内容广而且杂；细粒度的服务，操作的内容细而且简单。粗粒度的服务设计，可以减小服务之间的耦合性，但付出的代价就是增加服务的复杂性，服务具备了太多的功能，增加了设计的复杂性和维护的难度；细粒度的服务，可以让服务的实现变得简单，但这样会增加服务的数量，服务过细过多，这样必然有一些服务需要组合才能实现一定的功能，那样就增加了服务之间的耦合度，只要其中一个服务发生了变动，势必牵一发而动全身。</p>
+<h2 id="微服务架构综述"><a href="#微服务架构综述" class="headerlink" title="微服务架构综述"></a>微服务架构综述</h2><p>微服务架构的重点在于：<strong>业务系统需要彻底的组件化和服务化</strong>。</p>
+<p>一个业务系统被拆分到各个小的组件（应用），每一个组件都包含了UI，控制层，逻辑层，数据库持久层，数据库完整的一个系列。因此可以称作应用。</p>
+<p>对于每一个小应用，都实现了SOA的思想，从而实现了真正意义上的组件化，SOA:分层提供服务，类似于OSI模型。</p>
+<h2 id="微服务架构具体分析"><a href="#微服务架构具体分析" class="headerlink" title="微服务架构具体分析"></a>微服务架构具体分析</h2><p>本文原文：<a target="_blank" rel="noopener" href="https://www.nginx.com/blog/introduction-to-microservices/">https://www.nginx.com/blog/introduction-to-microservices/</a></p>
+<p>本文是系列文章的第一篇，也透过他来了解微服务架构，也暂时性满足了这方面 理解的需求。具体深入学习开发，部署可以阅读接下的六篇。这里就不再深入了。</p>
+<p>文章相当精彩，但是实际上架构如此，但是很多情况下并没有这么好的理论场景更多时候小项目不会如此架构，而大项目又臃肿到难以下定决心重构。</p>
+<p>首先我们看看为什么要考虑使用微服务。</p>
+<h4 id="开发单体式应用"><a href="#开发单体式应用" class="headerlink" title="开发单体式应用"></a>开发单体式应用</h4><p>假设你正准备开发一款与Uber和Hailo竞争的出租车调度软件，经过初步会议和需求分析，你可能会手动或者使用基于Rails、Spring Boot、Play或者Maven的生成器开始这个新项目，它的六边形架构是模块化的 ，架构图如下：</p>
+<p><img src="/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-1.png" alt="1.png"></p>
+<p>应用核心是业务逻辑，由定义服务、域对象和事件的模块完成。围绕着核心的是与外界打交道的适配器。适配器包括数据库访问组件、生产和处理消息的消息组件，以及提供API或者UI访问支持的web模块等。</p>
+<p>尽管也是模块化逻辑，但是最终它还是会打包并部署为单体式应用。具体的格式依赖于应用语言和框架。例如，许多Java应用会被打包为WAR格式，部署在Tomcat或者Jetty上，而另外一些Java应用会被打包成自包含的JAR格式，同样，Rails和Node.js会被打包成层级目录。</p>
+<p>这种应用开发风格很常见，因为IDE和其它工具都擅长开发一个简单应用，这类应用也很易于调试，只需要简单运行此应用，用Selenium链接UI就可以完成端到端测试。单体式应用也易于部署，只需要把打包应用拷贝到服务器端，通过在负载均衡器后端运行多个拷贝就可以轻松实现应用扩展。在早期这类应用运行的很好。</p>
+<h4 id="单体式应用的不足"><a href="#单体式应用的不足" class="headerlink" title="单体式应用的不足"></a>单体式应用的不足</h4><p>不幸的是，这种简单方法却有很大的局限性。一个简单的应用会随着时间推移逐渐变大。在每次的</p>
+<p>sprint</p>
+<p>中，开发团队都会面对新“故事”，然后开发许多新代码。几年后，这个小而简单的应用会变成了一个巨大的怪物。这儿有一个例子，我最近和一个开发者讨论，他正在写一个工具，用来分析他们一个拥有数百万行代码的应用中JAR文件之间的依赖关系。我很确信这个代码正是很多开发者经过多年努力开发出来的一个怪物。</p>
+<p>一旦你的应用变成一个又大又复杂的怪物，那开发团队肯定很痛苦。敏捷开发和部署举步维艰，其中最主要问题就是这个应用太复杂，以至于任何单个开发者都不可能搞懂它。因此，修正bug和正确的添加新功能变的非常困难，并且很耗时。另外，团队士气也会走下坡路。如果代码难于理解，就不可能被正确的修改。最终会走向巨大的、不可理解的泥潭。</p>
+<p>单体式应用也会降低开发速度。应用越大，启动时间会越长。比如，最近的一个调查表明，有时候应用的启动时间居然超过了12分钟。我还听说某些应用需要40分钟启动时间。如果开发者需要经常重启应用，那么大部分时间就要在等待中渡过，生产效率受到极大影响。</p>
+<p>另外，复杂而巨大的单体式应用也不利于持续性开发。今天，SaaS应用常态就是每天会改变很多次，而这对于单体式应用模式非常困难。另外，这种变化带来的影响并没有很好的被理解，所以不得不做很多手工测试。那么接下来，持续部署也会很艰难。</p>
+<p>单体式应用在不同模块发生资源冲突时，扩展将会非常困难。比如，一个模块完成一个CPU敏感逻辑，应该部署在AWS EC2 Compute Optimized instances，而另外一个内存数据库模块更合适于EC2 Memory-optimized instances。然而，由于这些模块部署在一起，因此不得不在硬件选择上做一个妥协。</p>
+<p>单体式应用另外一个问题是可靠性。因为所有模块都运行在一个进程中，任何一个模块中的一个bug，比如内存泄露，将会有可能弄垮整个进程。除此之外，因为所有应用实例都是唯一的，这个bug将会影响到整个应用的可靠性。</p>
+<p>最后，单体式应用使得采用新架构和语言非常困难。比如，设想你有两百万行采用XYZ框架写的代码。如果想改成ABC框架，无论是时间还是成本都是非常昂贵的，即使ABC框架更好。因此，这是一个无法逾越的鸿沟。你不得不在最初选择面前低头。</p>
+<p>总结一下：一开始你有一个很成功的关键业务应用，后来就变成了一个巨大的，无法理解的怪物。因为采用过时的，效率低的技术，使得雇佣有潜力的开发者很困难。应用无法扩展，可靠性很低，最终，敏捷性开发和部署变的无法完成。</p>
+<p>那么如何应对呢？</p>
+<h4 id="微处理架构——处理复杂事物"><a href="#微处理架构——处理复杂事物" class="headerlink" title="微处理架构——处理复杂事物"></a>微处理架构——处理复杂事物</h4><p>许多公司，比如Amazon、eBay和NetFlix，通过采用微处理结构模式解决了上述问题。其思路不是开发一个巨大的单体式的应用，而是将应用分解为小的、互相连接的微服务。</p>
+<p>一个微服务一般完成某个特定的功能，比如下单管理、客户管理等等。每一个微服务都是微型六角形应用，都有自己的业务逻辑和适配器。一些微服务还会发布API给其它微服务和应用客户端使用。其它微服务完成一个Web UI，运行时，每一个实例可能是一个云VM或者是Docker容器。</p>
+<p>比如，一个前面描述系统可能的分解如下：</p>
+<p><img src="/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-2.png" alt="2.png"></p>
+<p>每一个应用功能区都使用微服务完成，另外，Web应用会被拆分成一系列简单的Web应用（比如一个对乘客，一个对出租车驾驶员）。这样的拆分对于不同用户、设备和特殊应用场景部署都更容易。</p>
+<p>每一个后台服务开放一个REST API，许多服务本身也采用了其它服务提供的API。比如，驾驶员管理使用了告知驾驶员一个潜在需求的通知服务。UI服务激活其它服务来更新Web页面。所有服务都是采用异步的，基于消息的通讯。微服务内部机制将会在后续系列中讨论。</p>
+<p>一些REST API也对乘客和驾驶员采用的移动应用开放。这些应用并不直接访问后台服务，而是通过API Gateway来传递中间消息。API Gateway负责负载均衡、缓存、访问控制、API 计费监控等等任务，可以通过NGINX方便实现，后续文章将会介绍到API Gateway。</p>
+<p><img src="/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-3.png" alt="3.png"></p>
+<p>微服务架构模式在上图中对应于代表可扩展Scale Cube的Y轴，这是一个在《The Art of Scalability》书中描述过的三维扩展模型。另外两个可扩展轴，X轴由负载均衡器后端运行的多个应用副本组成，Z轴是将需求路由到相关服务。</p>
+<p>应用基本可以用以上三个维度来表示，Y轴代表将应用分解为微服务。运行时，X轴代表运行多个隐藏在负载均衡器之后的实例，提供吞吐能力。一些应用可能还是用Z轴将服务分区。下面的图演示行程管理服务如何部署在运行于AWS EC2上的Docker上。</p>
+<p><img src="/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-4.png" alt="4.png"></p>
+<p>运行时，行程管理服务由多个服务实例构成。每一个服务实例都是一个Docker容器。为了保证高可用，这些容器一般都运行在多个云VM上。服务实例前是一层诸如NGINX的负载均衡器，他们负责在各个实例间分发请求。负载均衡器也同时处理其它请求，例如缓存、权限控制、API统计和监控。</p>
+<p>这种微服务架构模式深刻影响了应用和数据库之间的关系，</p>
+<p>不像传统多个服务共享一个数据库，微服务架构每个服务都有自己的数据库</p>
+<p>。另外，这种思路也影响到了企业级数据模式。同时，这种模式意味着多份数据，但是，如果你想获得微服务带来的好处，每个服务独有一个数据库是必须的，因为这种架构需要这种松耦合。下面的图演示示例应用数据库架构。</p>
+<p><img src="/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-5.png" alt="5.png"></p>
+<p>每种服务都有自己的数据库，另外，每种服务可以用更适合自己的数据库类型，也被称作多语言一致性架构。比如，驾驶员管理（发现哪个驾驶员更靠近乘客），必须使用支持地理信息查询的数据库。</p>
+<p>表面上看来，微服务架构模式有点像SOA，他们都由多个服务构成。但是，可以从另外一个角度看此问题，微服务架构模式是一个不包含Web服务（WS-）和ESB服务的SOA。微服务应用乐于采用简单轻量级协议，比如REST，而不是WS-，在微服务内部避免使用ESB以及ESB类似功能。微服务架构模式也拒绝使用canonical schema等SOA概念。</p>
+<h4 id="微服务架构的好处"><a href="#微服务架构的好处" class="headerlink" title="微服务架构的好处"></a>微服务架构的好处</h4><p>微服务架构模式有很多好处。首先，通过分解巨大单体式应用为多个服务方法解决了复杂性问题。在功能不变的情况下，应用被分解为多个可管理的分支或服务。每个服务都有一个用RPC-或者消息驱动API定义清楚的边界。微服务架构模式给采用单体式编码方式很难实现的功能提供了模块化的解决方案，由此，单个服务很容易开发、理解和维护。</p>
+<p>第二，这种架构使得每个服务都可以有专门开发团队来开发。开发者可以自由选择开发技术，提供API服务。当然，许多公司试图避免混乱，只提供某些技术选择。然后，这种自由意味着开发者不需要被迫使用某项目开始时采用的过时技术，他们可以选择现在的技术。甚至于，因为服务都是相对简单，即使用现在技术重写以前代码也不是很困难的事情。</p>
+<p>第三，微服务架构模式是每个微服务独立的部署。开发者不再需要协调其它服务部署对本服务的影响。这种改变可以加快部署速度。UI团队可以采用AB测试，快速的部署变化。微服务架构模式使得持续化部署成为可能。</p>
+<p>最后，微服务架构模式使得每个服务独立扩展。你可以根据每个服务的规模来部署满足需求的规模。甚至于，你可以使用更适合于服务资源需求的硬件。比如，你可以在EC2 Compute Optimized instances上部署CPU敏感的服务，而在EC2 memory-optimized instances上部署内存数据库。</p>
+<h4 id="微服务架构的不足"><a href="#微服务架构的不足" class="headerlink" title="微服务架构的不足"></a>微服务架构的不足</h4><p>Fred Brooks在30年前写道，“there are no silver bullets”，像任何其它科技一样，微服务架构也有不足。其中一个跟他的名字类似，『微服务』强调了服务大小，实际上，有一些开发者鼓吹建立稍微大一些的，10-100 LOC服务组。尽管小服务更乐于被采用，但是不要忘了这只是终端的选择而不是最终的目的。微服务的目的是有效的拆分应用，实现敏捷开发和部署。</p>
+<p>另外一个主要的不足是，微服务应用是分布式系统，由此会带来固有的复杂性。开发者需要在RPC或者消息传递之间选择并完成进程间通讯机制。更甚于，他们必须写代码来处理消息传递中速度过慢或者不可用等局部失效问题。当然这并不是什么难事，但相对于单体式应用中通过语言层级的方法或者进程调用，微服务下这种技术显得更复杂一些。</p>
+<p>另外一个关于微服务的挑战来自于分区的数据库架构。商业交易中同时给多个业务分主体更新消息很普遍。这种交易对于单体式应用来说很容易，因为只有一个数据库。在微服务架构应用中，需要更新不同服务所使用的不同的数据库。使用分布式交易并不一定是好的选择，不仅仅是因为CAP理论，还因为今天高扩展性的NoSQL数据库和消息传递中间件并不支持这一需求。最终你不得不使用一个最终一致性的方法，从而对开发者提出了更高的要求和挑战。</p>
+<p>测试一个基于微服务架构的应用也是很复杂的任务。比如，采用流行的Spring Boot架构，对一个单体式web应用，测试它的REST API，是很容易的事情。反过来，同样的服务测试需要启动和它有关的所有服务（至少需要这些服务的stubs）。再重申一次，不能低估了采用微服务架构带来的复杂性。</p>
+<p>另外一个挑战在于，微服务架构模式应用的改变将会波及多个服务。比如，假设你在完成一个案例，需要修改服务A、B、C，而A依赖B，B依赖C。在单体式应用中，你只需要改变相关模块，整合变化，部署就好了。对比之下，微服务架构模式就需要考虑相关改变对不同服务的影响。比如，你需要更新服务C，然后是B，最后才是A，幸运的是，许多改变一般只影响一个服务，而需要协调多服务的改变很少。</p>
+<p>部署一个微服务应用也很复杂，一个分布式应用只需要简单在复杂均衡器后面部署各自的服务器就好了。每个应用实例是需要配置诸如数据库和消息中间件等基础服务。相对比，一个微服务应用一般由大批服务构成。例如，根据Adrian Cockcroft，</p>
+<p>Hailo有160个不同服务构成，NetFlix有大约600个服务。每个服务都有多个实例。这就造成许多需要配置、部署、扩展和监控的部分，除此之外，你还需要完成一个服务发现机制（后续文章中发表），以用来发现与它通讯服务的地址（包括服务器地址和端口）。传统的解决问题办法不能用于解决这么复杂的问题。接续而来，成功部署一个微服务应用需要开发者有足够的控制部署方法，并高度自动化。</p>
+<p>一种自动化方法是使用PaaS服务，例如Cloud Foundry，PaaS给开发者提供一个部署和管理微服务的简单方法，它把所有这些问题都打包内置解决了。同时，配置PaaS的系统和网络专家可以采用最佳实践和策略来简化这些问题。另外一个自动部署微服务应用的方法是开发对于你来说最基础的PaaS系统。一个典型的开始点是使用一个集群化方案，比如配合Docker使用Mesos或者Kubernetes。后面的系列我们会看看如何基于软件部署方法例如NGINX，可以方便的在微服务层面提供缓存、权限控制、API统计和监控。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>构建复杂的应用真的是非常困难。单体式的架构更适合轻量级的简单应用。如果你用它来开发复杂应用，那真的会很糟糕。微服务架构模式可以用来构建复杂应用，当然，这种架构模型也有自己的缺点和挑战。</p>
+<p>在后续的博客中，我会深入探索微服务架构模式，并讨论诸如服务发现、服务部署选择和如何分解一个分布式应用为多个服务的策略。</p>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p><a target="_blank" rel="noopener" href="https://martinfowler.com/articles/microservices.html">Fowler 微服务 原文</a></p>
+<p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/SOA/2140650#viewPageContent">SOA百度百科</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.dockone.io/article/394">微服务实战（一）：微服务架构的优势与不足</a></p>
+<p><a href="">SOA 与 微服务架构有什么不同</a><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37808426">https://www.zhihu.com/question/37808426</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag"># 微服务</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/04/01/Code_Language/Java/Java_Java8/" rel="prev" title="Java8 新特性">
+                  <i class="fa fa-angle-left"></i> Java8 新特性
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/04/11/General/Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C_HTTP%E5%8D%8F%E8%AE%AE/" rel="next" title="回顾计算机网络-HTTP协议">
+                  回顾计算机网络-HTTP协议 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

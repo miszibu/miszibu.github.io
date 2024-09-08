@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Channel是Go中的一个核心类型，可以把它看作一个管道，通过它可以完成goroutine之间的通信。Channel是FIFO的队列，而且当多个goroutine可以同时读写channel而不用考虑同步。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go-chan并发">
+<meta property="og:url" content="https://miszibu.github.io/2018/06/03/Code_Language/Golang/Go_chan%E5%B9%B6%E5%8F%91/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Channel是Go中的一个核心类型，可以把它看作一个管道，通过它可以完成goroutine之间的通信。Channel是FIFO的队列，而且当多个goroutine可以同时读写channel而不用考虑同步。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-06-03T06:04:55.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.013Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2018/06/03/Code_Language/Golang/Go_chan%E5%B9%B6%E5%8F%91/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2018/06/03/Code_Language/Golang/Go_chan%E5%B9%B6%E5%8F%91/","path":"2018/06/03/Code_Language/Golang/Go_chan并发/","title":"Go-chan并发"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go-chan并发 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E7%AE%AD%E5%A4%B4%E8%A1%A8%E7%A4%BA%E7%9D%80%E6%95%B0%E6%8D%AE%E7%9A%84%E6%96%B9%E5%90%91"><span class="nav-number">1.</span> <span class="nav-text">基本操作——箭头表示着数据的方向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel%E7%9A%84%E7%B1%BB%E5%9E%8B%E2%80%94%E2%80%94%E5%8F%AA%E8%AF%BB%E5%8F%AA%E5%86%99-%E8%AF%BB%E5%86%99%E5%90%8C%E6%97%B6"><span class="nav-number">2.</span> <span class="nav-text">Channel的类型——只读只写 读写同时###</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E5%85%B3%E9%97%AD"><span class="nav-number">3.</span> <span class="nav-text">Channel的创建和关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#timeout"><span class="nav-number">4.</span> <span class="nav-text">timeout&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Timer-Ticker"><span class="nav-number">5.</span> <span class="nav-text">Timer&#x2F;Ticker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8channel%E5%AE%9E%E7%8E%B0%E5%90%8C%E6%AD%A5"><span class="nav-number">6.</span> <span class="nav-text">使用channel实现同步###</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">相关引用###</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2018/06/03/Code_Language/Golang/Go_chan%E5%B9%B6%E5%8F%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go-chan并发 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go-chan并发
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-06-03 14:04:55" itemprop="dateCreated datePublished" datetime="2018-06-03T14:04:55+08:00">2018-06-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Channel是Go中的一个核心类型，可以把它看作一个<strong>管道</strong>，通过它可以完成goroutine之间的通信。Channel是<strong>FIFO的队列</strong>，而且当多个goroutine可以同时读写channel而<strong>不用考虑同步</strong>。</p>
+<span id="more"></span>
+
+<h3 id="基本操作——箭头表示着数据的方向"><a href="#基本操作——箭头表示着数据的方向" class="headerlink" title="基本操作——箭头表示着数据的方向"></a>基本操作——箭头表示着数据的方向</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>)<span class="comment">//通过make函数创建一个可读可写Int类型的channel-v</span></span><br><span class="line">ch&lt;-v			   <span class="comment">//将V写进channel中</span></span><br><span class="line">v := &lt;-ch		    <span class="comment">//从channel中取出一个数据 写入v中</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Channel的类型——只读只写-读写同时"><a href="#Channel的类型——只读只写-读写同时" class="headerlink" title="Channel的类型——只读只写 读写同时###"></a>Channel的类型——只读只写 读写同时###</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">chan</span> T  <span class="comment">//可以接收和发送类型为T的数据</span></span><br><span class="line"><span class="keyword">chan</span>&lt;-T <span class="comment">//只写channel</span></span><br><span class="line">&lt;-<span class="keyword">chan</span> t<span class="comment">//只读channel</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>)</span><br><span class="line">    <span class="keyword">go</span> send(c)</span><br><span class="line">    <span class="keyword">go</span> recv(c)</span><br><span class="line">    time.Sleep(<span class="number">3</span> * time.Second)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//只读只写channel只有在参数传递中能有作用</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">send</span><span class="params">(c <span class="keyword">chan</span>&lt;- <span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">10</span>; i++ &#123;</span><br><span class="line">        c &lt;- i</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">recv</span><span class="params">(c &lt;-<span class="keyword">chan</span> <span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="keyword">range</span> c &#123;</span><br><span class="line">        fmt.Println(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Channel的创建和关闭"><a href="#Channel的创建和关闭" class="headerlink" title="Channel的创建和关闭"></a>Channel的创建和关闭</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span> , <span class="number">100</span>)<span class="comment">//创建一个100容量的channel，当channel空的时候，receiver队列阻塞，当channel满的时候，sender队列阻塞。如果没有设置大小，就默认设置为0</span></span><br><span class="line">v,ok := &lt;-ch</span><br></pre></td></tr></table></figure>
+
+<p>这句语句可以检查channel的开关状态，如果ok为false表示着 channel已经被关闭了</p>
+<ul>
+<li>如果向一个已经关闭的channel写数据会抛出运行时异常</li>
+<li>如果读取一个已经关闭的channel，则会将缓冲区的数据读取完，而且可以一直读取该channel数据类型的零值t</li>
+<li>往一个nil channel中读写数据都会被Block</li>
+</ul>
+<p>###Select——适用于管道的Switch</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> c1, c2, c3 <span class="keyword">chan</span> <span class="type">int</span></span><br><span class="line">	<span class="keyword">var</span> i1, i2 <span class="type">int</span></span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> i1 = &lt;-c1:</span><br><span class="line">		fmt.Printf(<span class="string">&quot;received &quot;</span>, i1, <span class="string">&quot; from c1\n&quot;</span>)</span><br><span class="line">	<span class="keyword">case</span> c2 &lt;- i2:</span><br><span class="line">		fmt.Printf(<span class="string">&quot;sent &quot;</span>, i2, <span class="string">&quot; to c2\n&quot;</span>)</span><br><span class="line">	<span class="keyword">case</span> i3, ok := (&lt;-c3):  <span class="comment">// same as: i3, ok := &lt;-c3</span></span><br><span class="line">		<span class="keyword">if</span> ok &#123;</span><br><span class="line">			fmt.Printf(<span class="string">&quot;received &quot;</span>, i3, <span class="string">&quot; from c3\n&quot;</span>)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			fmt.Printf(<span class="string">&quot;c3 is closed\n&quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		fmt.Printf(<span class="string">&quot;no communication\n&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>select是Go中的一个控制结构，类似于用于<strong>通信的switch语句</strong>。每个case必须是一个<strong>通信操作</strong>，要么是发送要么是接收。select随机执行一个可运行的case。如果没有case可运行，它将阻塞，直到有case为止。</p>
+<ul>
+<li>每个case都必须是一个通信</li>
+<li>所有channel表达式都会被求值</li>
+<li>所有被发送的表达式都会被求值</li>
+<li>如果任意某个通信可以进行，它就执行；其他被忽略。</li>
+<li>如果有多个case都可以运行，Select会随机公平地选出一个执行。其他不会执行。 如果没有default字句，select将阻塞，直到某个通信可以运行；Go不会重新对channel或值进行求值。</li>
+</ul>
+<h3 id="timeout"><a href="#timeout" class="headerlink" title="timeout&gt;"></a>timeout&gt;</h3><p>select有很重要的一个应用就是超时处理。因为select语句当没有case可处理时会无限等待。因此需要一个超时操作来处理。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    c1 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">string</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        time.Sleep(time.Second * <span class="number">2</span>)</span><br><span class="line">        c1 &lt;- <span class="string">&quot;result 1&quot;</span></span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> res := &lt;-c1:</span><br><span class="line">        fmt.Println(res)</span><br><span class="line">    <span class="keyword">case</span> &lt;-time.After(time.Second * <span class="number">1</span>):</span><br><span class="line">        fmt.Println(<span class="string">&quot;timeout 1&quot;</span>)<span class="comment">//超时操作限制1S</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Timer-Ticker"><a href="#Timer-Ticker" class="headerlink" title="Timer&#x2F;Ticker"></a>Timer&#x2F;Ticker</h3><p>定义了一个Timer后，会阻塞规定的时间，然后输出一个channel，在将来的那个时间Channel提供了一个当前时间值。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">timer := time.NewTimer(time.Second*<span class="number">2</span>)</span><br><span class="line">fmt.Println(&lt;-timer.C)</span><br><span class="line">fmt.Println(time.Now())</span><br></pre></td></tr></table></figure>
+
+<p>倘若只是想阻塞线程一定时间，使用time.sleep即可。</p>
+<p>可以使用timer.stop来停止计时器</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">timer2 := time.NewTimer(time.Second)</span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">    &lt;-timer2.C</span><br><span class="line">	fmt.Println(<span class="string">&quot;Timer 2 expired&quot;</span>)</span><br><span class="line">&#125;()</span><br><span class="line">stop2 := timer2.Stop()</span><br><span class="line"><span class="keyword">if</span> stop2 &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;Timer 2 stopped&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Ticker是一个定时器，会不断的以设定的时间为间隔Interval</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ticker := time.NewTicker(time.Millisecond*<span class="number">300</span>)<span class="comment">//每300MS设置一个ticker</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> t := <span class="keyword">range</span> ticker.C &#123;<span class="comment">//从ticker的channel中轮询访问</span></span><br><span class="line">			fmt.Println(t)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">100</span>*time.Second)<span class="comment">//主线程设置时间 否则主进程结束 进程结束</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用channel实现同步"><a href="#使用channel实现同步" class="headerlink" title="使用channel实现同步###"></a>使用channel实现同步###</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">bool</span>, <span class="number">1</span>)</span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">	time.Sleep(time.Second)</span><br><span class="line">    ch&lt;-<span class="literal">true</span></span><br><span class="line">		fmt.Println(<span class="string">&quot;A 任务完成&quot;</span>)</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">    isFinished := &lt;-ch</span><br><span class="line">	<span class="keyword">if</span> isFinished &#123;</span><br><span class="line">        fmt.Println(<span class="string">&quot;B 在A后 任务完成&quot;</span>)</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;B 任务失败&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;()</span><br><span class="line">time.Sleep(time.Hour)</span><br></pre></td></tr></table></figure>
+
+<h3 id="相关引用"><a href="#相关引用" class="headerlink" title="相关引用###"></a>相关引用###</h3><p><a target="_blank" rel="noopener" href="https://leokongwq.github.io/2016/10/15/golang-chan.html">golang之chan简介</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/netdxy/article/details/54564436">Golang 关于通道 Chan 详解</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Go/" rel="tag"># Go</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/03/Code_Language/Golang/Go_%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87/" rel="prev" title="Go-Bug记录">
+                  <i class="fa fa-angle-left"></i> Go-Bug记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/06/03/Code_Language/Golang/Go_Bug%E8%AE%B0%E5%BD%95/" rel="next" title="Go-Bug记录">
+                  Go-Bug记录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

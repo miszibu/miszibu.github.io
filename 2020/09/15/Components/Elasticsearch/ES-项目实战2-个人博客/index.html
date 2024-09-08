@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="这篇是上一篇ES-项目实战1-唐诗300首的姊妹篇，从本地磁盘读取个人博客内容，转化格式后，基于 Java High-Level Restful API 导入到 ES 集群中，并做数据分析和可视化相关的内容。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES-项目实战2-个人博客">
+<meta property="og:url" content="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="这篇是上一篇ES-项目实战1-唐诗300首的姊妹篇，从本地磁盘读取个人博客内容，转化格式后，基于 Java High-Level Restful API 导入到 ES 集群中，并做数据分析和可视化相关的内容。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/indexPattern.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/tagsCloud.png">
+<meta property="og:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/blogNum.png">
+<meta property="article:published_time" content="2020-09-15T04:53:20.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.041Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miszibu.github.io/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/indexPattern.png">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/","path":"2020/09/15/Components/Elasticsearch/ES-项目实战2-个人博客/","title":"ES-项目实战2-个人博客"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ES-项目实战2-个人博客 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%87%E9%98%B6%E6%AE%B5"><span class="nav-number">1.</span> <span class="nav-text">数据预备阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83"><span class="nav-number">1.1.</span> <span class="nav-text">准备测试环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AF%BC%E5%85%A5%E5%8F%8A%E5%85%B6%E5%87%86%E5%A4%87"><span class="nav-number">1.2.</span> <span class="nav-text">数据导入及其准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAtemplate"><span class="nav-number">1.2.1.</span> <span class="nav-text">创建template</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAIngest-Pipeline"><span class="nav-number">1.2.2.</span> <span class="nav-text">创建Ingest Pipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.3.</span> <span class="nav-text">批量导入数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96%E9%98%B6%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text">数据可视化阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Index-Pattern"><span class="nav-number">2.1.</span> <span class="nav-text">创建 Index-Pattern</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%B6%E4%BD%9C-Visualization"><span class="nav-number">2.2.</span> <span class="nav-text">制作 Visualization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tags-%E8%AF%8D%E4%BA%91"><span class="nav-number">2.2.1.</span> <span class="nav-text">Tags-词云</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%8F%E6%9C%88%E5%8D%9A%E5%AE%A2%E6%95%B0%E9%87%8F%E6%8A%98%E7%BA%BF%E5%9B%BE"><span class="nav-number">2.2.2.</span> <span class="nav-text">每月博客数量折线图</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/09/15/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ES-项目实战2-个人博客 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES-项目实战2-个人博客
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-09-15 12:53:20" itemprop="dateCreated datePublished" datetime="2020-09-15T12:53:20+08:00">2020-09-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>这篇是上一篇<a href="https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/#more">ES-项目实战1-唐诗300首</a>的姊妹篇，从本地磁盘读取个人博客内容，转化格式后，基于 <code>Java High-Level Restful API </code>导入到 ES 集群中，并做数据分析和可视化相关的内容。</p>
+<span id="more"></span>
+
+<h1 id="数据预备阶段"><a href="#数据预备阶段" class="headerlink" title="数据预备阶段"></a>数据预备阶段</h1><h2 id="准备测试环境"><a href="#准备测试环境" class="headerlink" title="准备测试环境"></a>准备测试环境</h2><p><a href="https://miszibu.github.io/2020/09/10/Components/Elasticsearch/ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%981-%E5%94%90%E8%AF%97300%E9%A6%96/#more">见上篇测试环境准备</a>。</p>
+<h2 id="数据导入及其准备"><a href="#数据导入及其准备" class="headerlink" title="数据导入及其准备"></a>数据导入及其准备</h2><p>实验数据来自于本地个人博客的Markdown文件，文件格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: ElasticSearch Snapshot</span><br><span class="line">date: 2020-04-16 16:43:42</span><br><span class="line">tags: [Elasticsearch]</span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">Content</span><br></pre></td></tr></table></figure>
+
+<p>基于文件内容，我们的设置了如下建模结构：</p>
+<table>
+<thead>
+<tr>
+<th align="left">字段名称</th>
+<th align="left">字段类型</th>
+<th align="left">备注说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">_id</td>
+<td align="left"></td>
+<td align="left">对应自增id</td>
+</tr>
+<tr>
+<td align="left">contents</td>
+<td align="left">text &amp; keyword</td>
+<td align="left">涉及分词，注意开启：fielddata：true</td>
+</tr>
+<tr>
+<td align="left">tags</td>
+<td align="left">text &amp; keyword</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">title</td>
+<td align="left">text &amp; keyword</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">timestamp</td>
+<td align="left">date</td>
+<td align="left">代表blog创建时间</td>
+</tr>
+<tr>
+<td align="left">date</td>
+<td align="left">text &amp; keyword</td>
+<td align="left">文件创建时间（String）格式</td>
+</tr>
+<tr>
+<td align="left">cont_length</td>
+<td align="left">long</td>
+<td align="left">contents长度， 排序用</td>
+</tr>
+</tbody></table>
+<h3 id="创建template"><a href="#创建template" class="headerlink" title="创建template"></a>创建template</h3><p>将设计好的Index Mapping 转换为 Templates。 并绑定了默认的 pipeline。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">PUT _template/blog_tpl</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index_patterns&quot;: [</span><br><span class="line">    &quot;blog*&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;index.default_pipeline&quot;: &quot;add_content_length&quot;,</span><br><span class="line">    &quot;number_of_replicas&quot;: 1,</span><br><span class="line">    &quot;refresh_interval&quot;: &quot;30s&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;properties&quot;: &#123;</span><br><span class="line">      &quot;cont_length&quot;:&#123;</span><br><span class="line">        &quot;type&quot;:&quot;long&quot;</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;contents&quot;: &#123;</span><br><span class="line">        &quot;type&quot;: &quot;text&quot;,</span><br><span class="line">        &quot;fields&quot;: &#123;</span><br><span class="line">          &quot;field&quot;: &#123;</span><br><span class="line">            &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;analyzer&quot;: &quot;ik_smart&quot;,</span><br><span class="line">        &quot;fielddata&quot;: true</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;timestamp&quot;: &#123;</span><br><span class="line">        &quot;type&quot;: &quot;date&quot;</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;title&quot;: &#123;</span><br><span class="line">        &quot;type&quot;: &quot;text&quot;,</span><br><span class="line">        &quot;fields&quot;: &#123;</span><br><span class="line">          &quot;field&quot;: &#123;</span><br><span class="line">            &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;analyzer&quot;: &quot;ik_smart&quot;</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;tags&quot;: &#123;</span><br><span class="line">        &quot;type&quot;: &quot;text&quot;,</span><br><span class="line">        &quot;fields&quot;: &#123;</span><br><span class="line">          &quot;field&quot;: &#123;</span><br><span class="line">            &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;analyzer&quot;: &quot;ik_smart&quot;</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;date&quot; : &#123;</span><br><span class="line">          &quot;type&quot; : &quot;text&quot;,</span><br><span class="line">          &quot;fields&quot; : &#123;</span><br><span class="line">            &quot;keyword&quot; : &#123;</span><br><span class="line">              &quot;type&quot; : &quot;keyword&quot;,</span><br><span class="line">              &quot;ignore_above&quot; : 256</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建Ingest-Pipeline"><a href="#创建Ingest-Pipeline" class="headerlink" title="创建Ingest Pipeline"></a>创建Ingest Pipeline</h3><p>Pipeline 主要实现两个功能</p>
+<ol>
+<li>将 String 类型的博客创建日期转为 Date类型</li>
+<li>统计博客正文长度，并添加到字段 cont_length 中</li>
+</ol>
+<p>由于Blog 的 date 字段，没有在个位数前补0，我们在 timestamp 转化处，同时声明了多个 format，来支持多种不同的日期格式。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">PUT</span> <span class="string">_ingest/pipeline/add_content_length</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;description&quot;:</span> <span class="string">&quot;Add parameter the length of content&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;processors&quot;:</span> [</span><br><span class="line">  &#123;</span><br><span class="line">      <span class="string">&quot;date&quot;</span> <span class="string">:</span> &#123;</span><br><span class="line">        <span class="string">&quot;field&quot;</span> <span class="string">:</span> <span class="string">&quot;date&quot;</span>,</span><br><span class="line">        <span class="string">&quot;target_field&quot;</span> <span class="string">:</span> <span class="string">&quot;timestamp&quot;</span>,</span><br><span class="line">        <span class="string">&quot;formats&quot;</span> <span class="string">:</span> [<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>,<span class="string">&quot;yyyy-MM-dd H:mm:ss&quot;</span>,<span class="string">&quot;yyyy-M-dd HH:mm:ss&quot;</span>,<span class="string">&quot;yyyy-M-dd H:mm:ss&quot;</span>,<span class="string">&quot;yyyy-M-d HH:mm:ss&quot;</span>,<span class="string">&quot;yyyy-M-d H:mm:ss&quot;</span>,<span class="string">&quot;yyyy-MM-d HH:mm:ss&quot;</span>,<span class="string">&quot;yyyy-MM-d H:mm:ss&quot;</span>]</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;script&quot;:</span> &#123;</span><br><span class="line">        <span class="attr">&quot;source&quot;:</span> <span class="string">&quot;ctx.cont_length = ctx.contents.length();&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="批量导入数据"><a href="#批量导入数据" class="headerlink" title="批量导入数据"></a>批量导入数据</h3><p>代码主要分为以下几个部分：</p>
+<ul>
+<li>获取 Blog 文件夹下所有 Markdown 文件的路径</li>
+<li>读取 Markdown 文件内容，将其转为 String[]</li>
+<li>基于 String 数组，转为 Json并由如下几个字段组成（date，content，title，tags）</li>
+<li>将 Json数组通过 BulkAPI 发往 ES</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ES;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.http.HttpHost;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.action.bulk.BulkItemResponse;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.action.bulk.BulkRequest;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.action.bulk.BulkResponse;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.action.index.IndexRequest;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.client.RequestOptions;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.client.RestClient;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.client.RestHighLevelClient;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.common.xcontent.XContentType;</span><br><span class="line"><span class="keyword">import</span> org.json.JSONObject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CovertMdToJson</span> &#123;</span><br><span class="line">    <span class="comment">// Dos \r\n</span></span><br><span class="line">    <span class="comment">// *nix \n</span></span><br><span class="line">    <span class="keyword">public</span>  <span class="keyword">static</span> <span class="type">String</span> <span class="variable">newLineChar</span> <span class="operator">=</span> <span class="string">&quot;\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">CovertMdToJson</span> <span class="variable">covertMdToJson</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CovertMdToJson</span>();</span><br><span class="line">        covertMdToJson.covertMarkdownToJson();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">covertMarkdownToJson</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">blogPwd</span> <span class="operator">=</span> <span class="string">&quot;/Users/ligaofeng/blog/source/_posts/&quot;</span>;</span><br><span class="line">        <span class="comment">// 递归获取 所有文件夹下 Markdown 文件路径</span></span><br><span class="line">        ArrayList&lt;String&gt; fileList = getAllAvailableFilePath(blogPwd);</span><br><span class="line"></span><br><span class="line">        LinkedList&lt;JSONObject&gt; blogJsonList = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">        <span class="comment">// 将 Blog String List --&gt; Blog Json List</span></span><br><span class="line">        fileList.stream().forEach(i -&gt; &#123;</span><br><span class="line">            <span class="comment">// 将 Blog String --&gt; Blog Json</span></span><br><span class="line">            blogJsonList.add(coverStrToJson(readToString(i)));</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将blogJsonList 通过 Bulk API 导入ES集群中</span></span><br><span class="line">        bulkIndexDataToES(blogJsonList);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Done!&quot;</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将 Blog Json List 通过 Bulk API 导入ES集群中</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> blogJsonList  输入博客Json列表</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">bulkIndexDataToES</span><span class="params">(LinkedList&lt;JSONObject&gt; blogJsonList)</span> &#123;</span><br><span class="line">        <span class="type">RestHighLevelClient</span> <span class="variable">client</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RestHighLevelClient</span>(</span><br><span class="line">                RestClient.builder(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">HttpHost</span>(<span class="string">&quot;localhost&quot;</span>, <span class="number">9200</span>, <span class="string">&quot;http&quot;</span>)));</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">BulkRequest</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BulkRequest</span>();</span><br><span class="line">            blogJsonList.stream().forEach(i-&gt;&#123;</span><br><span class="line">                request.add(<span class="keyword">new</span> <span class="title class_">IndexRequest</span>(<span class="string">&quot;blogs&quot;</span>)</span><br><span class="line">                        .source(i.toString().trim(),XContentType.JSON));</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">            <span class="type">BulkResponse</span> <span class="variable">bulkResponse</span> <span class="operator">=</span> client.bulk(request, RequestOptions.DEFAULT);</span><br><span class="line">            <span class="keyword">for</span> (BulkItemResponse bulkItemResponse : bulkResponse) &#123;</span><br><span class="line">                <span class="keyword">if</span> (bulkItemResponse.isFailed()) &#123;</span><br><span class="line">                    BulkItemResponse.<span class="type">Failure</span> <span class="variable">failure</span> <span class="operator">=</span></span><br><span class="line">                            bulkItemResponse.getFailure();</span><br><span class="line">                    System.out.println(<span class="string">&quot;Bulk Request failed on id &quot;</span>+failure.getCause());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                client.close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Error: Can&#x27;t close es connection&quot;</span>);</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 递归获取目标目录下的所有Markdown文件路径列表</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> blogPwd 初始文件夹目录</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 输入文件夹下所有 Markdown 文件的路径</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> ArrayList&lt;String&gt; <span class="title function_">getAllAvailableFilePath</span><span class="params">(String blogPwd)</span> &#123;</span><br><span class="line">        ArrayList&lt;String&gt; filePathList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;String&gt;();</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(blogPwd);</span><br><span class="line">        <span class="keyword">if</span> (file.isDirectory()) &#123;</span><br><span class="line">            File[] tempList = file.listFiles();</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; tempList.length; i++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (tempList[i].getName().startsWith(<span class="string">&quot;.&quot;</span>)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (tempList[i].isFile() &amp;&amp; tempList[i].getName().endsWith(<span class="string">&quot;md&quot;</span>)) &#123;</span><br><span class="line">                    <span class="comment">//System.out.println(&quot;文     件：&quot; + tempList[i]);</span></span><br><span class="line">                    filePathList.add(tempList[i].toString());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (tempList[i].isDirectory()) &#123;</span><br><span class="line">                    <span class="comment">//System.out.println(&quot;文件夹：&quot; + tempList[i]);</span></span><br><span class="line">                    filePathList.addAll(getAllAvailableFilePath(blogPwd + <span class="string">&quot;/&quot;</span> + tempList[i].getName()));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (file.isFile() &amp;&amp; file.getName().endsWith(<span class="string">&quot;md&quot;</span>)) &#123;</span><br><span class="line">            filePathList.add(file.toString());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> filePathList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 读取filePath的文件，将文件中的数据按照行读取到String数组中</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> filePath 文件的路径</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 文件中一行一行的数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String[] readToString(String filePath) &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(filePath);</span><br><span class="line">        <span class="type">Long</span> <span class="variable">fileLength</span> <span class="operator">=</span> file.length(); <span class="comment">// 获取文件长度</span></span><br><span class="line">        <span class="type">byte</span>[] fileContent = <span class="keyword">new</span> <span class="title class_">byte</span>[fileLength.intValue()];</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">FileInputStream</span> <span class="variable">in</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(file);</span><br><span class="line">            in.read(fileContent);</span><br><span class="line">            in.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String[] fileContentArr = <span class="keyword">new</span> <span class="title class_">String</span>(fileContent).split(newLineChar);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> fileContentArr;<span class="comment">// 返回文件内容,默认编码</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> markdownContent String[]Markdown 博客正文</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span>                BlogContent 转换后的 JsonObject</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> JSONObject <span class="title function_">coverStrToJson</span><span class="params">(String[] markdownContent)</span> &#123;</span><br><span class="line">        <span class="type">JSONObject</span> <span class="variable">currBlogCont</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">JSONObject</span>();</span><br><span class="line">        <span class="type">boolean</span> <span class="variable">isHeader</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">headerLineCount</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">StringBuffer</span> <span class="variable">blogContent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; markdownContent.length; i++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="type">String</span> <span class="variable">j</span> <span class="operator">=</span> markdownContent[i].trim();</span><br><span class="line">            <span class="keyword">if</span> (j.length()&lt;<span class="number">1</span>)&#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (isHeader)&#123;</span><br><span class="line">                <span class="keyword">if</span> (markdownContent[i].equals(<span class="string">&quot;---&quot;</span>) )&#123;</span><br><span class="line">                    headerLineCount++;</span><br><span class="line">                    <span class="keyword">if</span> (headerLineCount==<span class="number">2</span>)&#123;</span><br><span class="line">                        isHeader=<span class="literal">false</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">switch</span> (j.substring(<span class="number">0</span>,j.indexOf(<span class="string">&#x27;:&#x27;</span>)))&#123;</span><br><span class="line">                    <span class="keyword">case</span> <span class="string">&quot;title&quot;</span>:</span><br><span class="line">                        currBlogCont.put(<span class="string">&quot;title&quot;</span>, j.substring(j.indexOf(<span class="string">&quot;:&quot;</span>)+<span class="number">1</span>).trim());</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> <span class="string">&quot;tags&quot;</span>:</span><br><span class="line">                        currBlogCont.put(<span class="string">&quot;tags&quot;</span>, j.substring(j.indexOf(<span class="string">&quot;:&quot;</span>)+<span class="number">1</span>).trim());</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> <span class="string">&quot;date&quot;</span>:</span><br><span class="line">                        currBlogCont.put(<span class="string">&quot;date&quot;</span>, j.substring(j.indexOf(<span class="string">&quot;:&quot;</span>)+<span class="number">1</span>).trim());</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">default</span>:</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                blogContent.append(j+<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        currBlogCont.put(<span class="string">&quot;contents&quot;</span>, blogContent.toString());</span><br><span class="line">        <span class="keyword">return</span> currBlogCont;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<h1 id="数据可视化阶段"><a href="#数据可视化阶段" class="headerlink" title="数据可视化阶段"></a>数据可视化阶段</h1><h2 id="创建-Index-Pattern"><a href="#创建-Index-Pattern" class="headerlink" title="创建 Index-Pattern"></a>创建 Index-Pattern</h2><p>以 <code>timestamp</code>字段作为日期创建 index-pattern.</p>
+<blockquote>
+<p>Note: 在创建 template Mapping环节，我们为 date的 keyword 类型命名为 keyword，而其他字段的 keyword 类型则为 field。因此在Fields 中，存在 date.keyword 和 contents.field这两种不同的 Keyword 类型，本质上是在 Mapping multiple fields 中命名不同产生的。</p>
+</blockquote>
+<p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/indexPattern.png"></p>
+<h2 id="制作-Visualization"><a href="#制作-Visualization" class="headerlink" title="制作 Visualization"></a>制作 Visualization</h2><h3 id="Tags-词云"><a href="#Tags-词云" class="headerlink" title="Tags-词云"></a>Tags-词云</h3><p>Golang 好久没碰了，居然之前写了这么多 Blog。</p>
+<p>Mark 果然不少，打了好多 TODO没写。</p>
+<p>有几个 Tags 黏在一起了，IK-Smart 分词器没有分开吗？可以基于 analyze API去解决下这个问题。</p>
+<p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/tagsCloud.png"></p>
+<h3 id="每月博客数量折线图"><a href="#每月博客数量折线图" class="headerlink" title="每月博客数量折线图"></a>每月博客数量折线图</h3><p>18年底-19年初是相当高产的时间段：正处在离职找工作的状态，博客更新很频繁。</p>
+<p>19年初-20年中更新频率一般，工作繁忙，比较投入。</p>
+<p><img src="/./ES-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%982-%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/blogNum.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/09/11/Components/Elasticsearch/ES-Monitoring/" rel="prev" title="ES-Monitoring">
+                  <i class="fa fa-angle-left"></i> ES-Monitoring
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/09/20/Components/Elasticsearch/ES-%E6%9F%A5%E8%AF%A2-%E8%81%9A%E5%90%88%E7%AF%87/" rel="next" title="ES-查询-聚合篇">
+                  ES-查询-聚合篇 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

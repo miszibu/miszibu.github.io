@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。 我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。  **数据发布与订阅(配置中心)**：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。 负载均衡: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zk-应用场景">
+<meta property="og:url" content="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。 我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。  **数据发布与订阅(配置中心)**：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。 负载均衡: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-30T13:39:07.000Z">
+<meta property="article:modified_time" content="2024-09-08T06:15:03.056Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Zookeeper">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF/","path":"2020/07/30/Components/Zookeeper/Zk-应用场景/","title":"Zk-应用场景"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Zk-应用场景 | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8F%91%E5%B8%83%E4%B8%8E%E8%AE%A2%E9%98%85-%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83"><span class="nav-number">1.</span> <span class="nav-text">数据发布与订阅(配置中心)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-number">2.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E6%9C%8D%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">命名服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E8%B0%83-%E9%80%9A%E7%9F%A5"><span class="nav-number">4.</span> <span class="nav-text">分布式协调&#x2F;通知</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8A%82%E7%82%B9%E5%BF%83%E8%B7%B3"><span class="nav-number">4.1.</span> <span class="nav-text">节点心跳:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8A%82%E7%82%B9%E5%8D%8F%E8%B0%83%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">节点协调：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8FUUID"><span class="nav-number">5.</span> <span class="nav-text">分布式UUID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master%E9%80%89%E4%B8%BE"><span class="nav-number">6.</span> <span class="nav-text">Master选举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-number">7.</span> <span class="nav-text">分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%92%E4%BB%96%E9%94%81"><span class="nav-number">7.1.</span> <span class="nav-text">排他锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E9%94%81"><span class="nav-number">7.2.</span> <span class="nav-text">共享锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%98%9F%E5%88%97"><span class="nav-number">8.</span> <span class="nav-text">分布式队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FIFO"><span class="nav-number">8.1.</span> <span class="nav-text">FIFO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Barrier"><span class="nav-number">8.2.</span> <span class="nav-text">Barrier</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2020/07/30/Components/Zookeeper/Zk-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Zk-应用场景 | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zk-应用场景
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-30 21:39:07" itemprop="dateCreated datePublished" datetime="2020-07-30T21:39:07+08:00">2020-07-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文介绍了基于ZK的典型应用场景，这些都基于ZK所提供的ZNode 顺序ID和Watchs功能。</p>
+<p>我们在使用 ZK 来实现组件时，可以考虑使用 Apache Curator，它提供了封装好，方便操作 ZK 的接口。</p>
+<ul>
+<li>**数据发布与订阅(配置中心)**：将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更。</li>
+<li><strong>负载均衡</strong>: 建立服务节点，服务端在该节点下注册自身信息的临时节点，客户端使用Watcher监控子节点变化，获取可用服务列表。</li>
+<li><strong>命名服务</strong>：实现方式同负载均衡</li>
+<li><strong>分布式协调&#x2F;通知</strong>: 注册ZNode，通过监控ZNode数量和节点数据来协调通知节点，</li>
+<li>**分布式UUID:**：基于ZNode的顺序ID功能，注册一个ZNode, 获取其序号。</li>
+<li><strong>Master 选举：</strong> 有两种实现方式</li>
+<li><strong>分布式锁：</strong> 可以实现共享锁和互斥锁</li>
+<li><strong>分布式队列</strong>：可以实现 FIFO Queue 和 Barrier</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="数据发布与订阅-配置中心"><a href="#数据发布与订阅-配置中心" class="headerlink" title="数据发布与订阅(配置中心)"></a>数据发布与订阅(配置中心)</h2><p>将数据放在ZNode上，订阅者通过Watcher监控ZNode的数据变更，从而实现<strong>配置信息的集中式管理和动态更新。</strong></p>
+<blockquote>
+<p>ZNode 存在数据大小的限制，最好不要超过1MB， 请酌情设置。</p>
+</blockquote>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>这里的负载均衡是客户端的负载均衡，客户端获取所有可用服务列表，自身选择合适的负载均衡算法。</p>
+<p><strong>实现思路：</strong></p>
+<ol>
+<li>建立一个服务的ZNode, 如&#x2F;server</li>
+<li>服务端启动时，在&#x2F;server 目录下建立<strong>临时ZNode</strong>, 并设置服务器IP:Port 等连接信息</li>
+<li>客户端启动时获取&#x2F;Server下的所有子节点，即所有可用服务端，并设置<strong>Watcher</strong>监控子节点数量的变动。</li>
+<li>当服务端新增或减少节点时，引起子节点数量变动。客户端获得<strong>Watcher</strong>提醒获取最新服务端列表。</li>
+</ol>
+<h2 id="命名服务"><a href="#命名服务" class="headerlink" title="命名服务"></a>命名服务</h2><p>实现方式同负载均衡。</p>
+<p> 在Dubbo实现中：</p>
+<p> 服务提供者在启动的时候，向ZK上的指定节点**&#x2F;dubbo&#x2F;${serviceName}&#x2F;providers**目录下写入自己的URL地址，这个操作就完成了服务的发布。</p>
+<p> 服务消费者启动的时候，订阅&#x2F;dubbo&#x2F;${serviceName}&#x2F;providers目录下的提供者URL地址， 并向**&#x2F;dubbo&#x2F;${serviceName} &#x2F;consumers目录下写入自己的URL地址。**</p>
+<p> 注意，所有向ZK上注册的地址都是<strong>临时节点</strong>，这样就能够保证服务提供者和消费者能够自动感应资源的变化。</p>
+<p>另外，Dubbo还有针对服务粒度的监控，方法是订阅&#x2F;dubbo&#x2F;${serviceName}目录下所有提供者和消费者的信息。</p>
+<h2 id="分布式协调-通知"><a href="#分布式协调-通知" class="headerlink" title="分布式协调&#x2F;通知"></a>分布式协调&#x2F;通知</h2><h3 id="节点心跳"><a href="#节点心跳" class="headerlink" title="节点心跳:"></a><strong>节点心跳:</strong></h3><p><strong>实现思路：</strong> 注册一个临时ZNode, 节点之间通过Watcher监控ZNode数量，当ZNode不存在时，则表示服务不可用。一般而言，分布式环境通过心跳来判断节点是否存活。</p>
+<p><strong>优点:</strong> 通过ZK来关联节点，减少了系统之间的耦合。</p>
+<h3 id="节点协调："><a href="#节点协调：" class="headerlink" title="节点协调："></a>节点协调：</h3><p><strong>实现思路：</strong> 注册一个ZNode, 通过Watcher监控ZNode数据变动，当发生数据变动时，获取最新数据，由此实现节点协调和数据同步。</p>
+<h2 id="分布式UUID"><a href="#分布式UUID" class="headerlink" title="分布式UUID"></a>分布式UUID</h2><p><strong>实现思路：</strong>基于ZNode的顺序ID功能，注册一个ZNode, 获取其序号。</p>
+<p><strong>缺点：</strong> ZNode的当前最大ID由其父亲ZNode存储，是一个4Byte的Integer， 存在最大ID数量的限制。</p>
+<h2 id="Master选举"><a href="#Master选举" class="headerlink" title="Master选举"></a>Master选举</h2><p>这里存在两种选举思路：</p>
+<p><strong>思路1：</strong>  客户端集群往zookeeper上创建一个&#x2F;master临时节点。在这个过程中，只有一个客户端能够成功创建这个节点，那么这个客户端就成了master。同时其他没有在zookeeper上成功创建节点的客户端，都会在节点&#x2F;master上注册一个变更的watcher，用于监控当前的master机器是否存活，一旦发现当前的master挂了，那么其余的客户端将会重新进行master选举 </p>
+<p><strong>思路2：</strong> 基于顺序ID的功能，所有客户端节点都创建一个子ZNode，谁的顺序ID小谁就是Master并监控所有子Znode的数量，一旦发生Master节点下线，则选举顺序ID最小的节点为新的Master。</p>
+<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p>通过 ZK 实现分布式的共享锁和排他锁。</p>
+<h3 id="排他锁"><a href="#排他锁" class="headerlink" title="排他锁"></a>排他锁</h3><p>排他锁也存在两种实现方式。</p>
+<p><strong>实现1：</strong> </p>
+<p>将一个 ZNode 表示为一个锁，比如&#x2F;distribute_lock</p>
+<ol>
+<li>获取锁，客户端通过 <code>create()</code>创建 临时ZNode，若创建成功则表示获取锁，当使用完锁，删除临时 ZNode.</li>
+<li>若获取锁失败，则注册<strong>一个节点变更的 Watcher</strong></li>
+<li>当Watcher 被触发，所有等待的客户端重新开始新一轮的竞争锁。</li>
+</ol>
+<p><strong>实现2：</strong></p>
+<p>注册一个ZNode 节点，所有客户端再该节点下创建**临时顺序ZNode **&#x2F;distribute_lock&#x2F;Lock-00000000001</p>
+<ol>
+<li>客户端创建 ZNode, 创建完成后，获取所有子节点列表，若序号最小，则获取锁。任务结束后，删除临时子节点。</li>
+<li>创建 ZNode, 发现当前序号非最小，则对前一个序号节点注册监听事件。</li>
+</ol>
+<h3 id="共享锁"><a href="#共享锁" class="headerlink" title="共享锁"></a>共享锁</h3><p>共享锁是基于排他锁实现2的一个扩展，这里我们以读写锁为例，读读共享的一个场景。</p>
+<p>在创建临时的子节点时，我们增加节点<strong>读写属性，</strong>如下所示。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/</span><br><span class="line">├── /host1-R-000000001</span><br><span class="line">├── /host2-R-000000002</span><br><span class="line">├── /host3-W-000000003</span><br><span class="line">├── /host4-R-000000004</span><br><span class="line">├── /host5-R-000000005</span><br><span class="line">├── /host6-R-000000006</span><br><span class="line">└── /host7-W-000000007</span><br></pre></td></tr></table></figure>
+
+<p><strong>实现方式：</strong></p>
+<ol>
+<li>获取锁，客户端在共享锁目录下创建<strong>临时子节点</strong>，并标注其读写属性。<ul>
+<li>对于读锁而言，在创建节点后判断是否存在比自己节点序号更小的写节点，如果没有则获取锁。如果有，则对序号小于自己且最近的写节点注册监听事件。</li>
+<li>对于写锁而言，在创建节点后判断是否存在比自己节点序号更小的节点，如果没有则获取锁。如果有，则对自己的前一个节点注册监听事件。</li>
+</ul>
+</li>
+<li>释放锁，客户端完成业务逻辑后，删除临时节点来释放锁，后续由监听事件来唤醒等待客户端。</li>
+</ol>
+<h2 id="分布式队列"><a href="#分布式队列" class="headerlink" title="分布式队列"></a>分布式队列</h2><h3 id="FIFO"><a href="#FIFO" class="headerlink" title="FIFO"></a>FIFO</h3><p><strong>PUSH:</strong> 在 <code>queue_fifo</code>节点下，创建自增序号子节点，并将数据放入子节点中。</p>
+<p><strong>POP:</strong> 获取 <code>queue_fifo</code>节点下序号最小的节点，取出数据，然后删除此节点。</p>
+<h3 id="Barrier"><a href="#Barrier" class="headerlink" title="Barrier"></a>Barrier</h3><p>在 Java 提供的同步工具类中就有 CylicBarrier，适用于需要所有线程到达一个共同的检查点后，再同时继续的场景。</p>
+<p>通过 ZK 来实现 Barrier：</p>
+<p>首先创建 <code>queue_barrier</code> 节点，并设置节点的值为需要等待的线程数量，所有线程在该节点下<strong>创建临时子节点。</strong>线程创建子节点结束后，判断子节点数量是否等于等待线程数量，如果是则继续，如果不是则注册子节点数量变更的 Watcher.</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[从Paxos到ZooKeeper]</p>
+<p><a target="_blank" rel="noopener" href="https://www.javazhiyin.com/28435.html">图解ZooKeeper的典型应用场景</a></p>
+<p><a target="_blank" rel="noopener" href="http://jm.taobao.org/2011/10/08/1232/">ZooKeeper典型应用场景一览</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/59669985">ZooKeeper 的应用场景</a></p>
+<p><a target="_blank" rel="noopener" href="https://zookeeper.apache.org/doc/current/recipes.html">ZooKeeper Recipes and Solutions</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/29/Components/Elasticsearch/ES-CCR/" rel="prev" title="ES-CCR">
+                  <i class="fa fa-angle-left"></i> ES-CCR
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/31/Components/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F/" rel="next" title="分布式锁的实现方式">
+                  分布式锁的实现方式 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
