@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"miszibu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Linux上进程意外宕机有内存OOM操作系统杀死 或者 进程内存越界被杀死两种场景。本文介绍了如何定位进程是因为哪种原因被操作系统杀死。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统杀死进程排查.md">
+<meta property="og:url" content="https://miszibu.github.io/2024/10/31/General/OS/Linux/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9D%80%E6%AD%BB%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/index.html">
+<meta property="og:site_name" content="ZibuのHippocampus">
+<meta property="og:description" content="Linux上进程意外宕机有内存OOM操作系统杀死 或者 进程内存越界被杀死两种场景。本文介绍了如何定位进程是因为哪种原因被操作系统杀死。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-31T08:54:13.000Z">
+<meta property="article:modified_time" content="2024-10-31T08:55:19.885Z">
+<meta property="article:author" content="zibu">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://miszibu.github.io/2024/10/31/General/OS/Linux/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9D%80%E6%AD%BB%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://miszibu.github.io/2024/10/31/General/OS/Linux/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9D%80%E6%AD%BB%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/","path":"2024/10/31/General/OS/Linux/操作系统杀死进程排查/","title":"操作系统杀死进程排查.md"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>操作系统杀死进程排查.md | ZibuのHippocampus</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ZibuのHippocampus</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生天地间，忽如远行客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9D%80%E6%AD%BB%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">操作系统杀死进程排查</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OOM-Killer"><span class="nav-number">1.1.</span> <span class="nav-text">OOM Killer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Core-Dumped"><span class="nav-number">1.2.</span> <span class="nav-text">Core  Dumped</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Coredump%E6%9C%AA%E7%94%9F%E6%88%90"><span class="nav-number">1.2.1.</span> <span class="nav-text">Coredump未生成</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zibu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">161</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miszibu.github.io/2024/10/31/General/OS/Linux/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9D%80%E6%AD%BB%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zibu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="操作系统杀死进程排查.md | ZibuのHippocampus">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统杀死进程排查.md
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-10-31 16:54:13 / 修改时间：16:55:19" itemprop="dateCreated datePublished" datetime="2024-10-31T16:54:13+08:00">2024-10-31</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>Linux上进程意外宕机有<code>内存OOM操作系统</code>杀死 或者 <code>进程内存越界被杀死</code>两种场景。本文介绍了如何定位进程是因为哪种原因被操作系统杀死。</p>
+</blockquote>
+<span id="more"></span>
+
+
+
+<h1 id="操作系统杀死进程排查"><a href="#操作系统杀死进程排查" class="headerlink" title="操作系统杀死进程排查"></a>操作系统杀死进程排查</h1><p>Linux上进程意外宕机有<code>内存OOM操作系统</code>杀死 或者 <code>进程内存越界被杀死</code>两种场景。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">通过dmesg和/var/logs/messages 获取信息</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/var/logs/messages 文件包含内核和用户空间程序消息，数据持久化保存(主要)</span></span><br><span class="line">cat /var/log/messages |grep -i &quot;dump\|kill&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">dmesg 获取内核消息，服务器重启后消失</span></span><br><span class="line">dmesg -T</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="OOM-Killer"><a href="#OOM-Killer" class="headerlink" title="OOM Killer"></a>OOM Killer</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">通过以下命令发现OOM Killed</span></span><br><span class="line">dmesg -T| egrep -i &#x27;killed process&#x27;</span><br><span class="line">grep -i &#x27;killed process&#x27; /var/log/messages</span><br><span class="line">total-vm:19058680kB, anon-rss:14610188kB, file-rss:76kB</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sar -r 查看内存使用率情况确认</span></span><br><span class="line">Sar 命令查看历史硬件使用率情况</span><br><span class="line">1. 每10分钟刷新一次信息</span><br><span class="line">2. 可以实时监测，也可以查看过去的信息。</span><br><span class="line">3. 存储资源放在/var/log/sa路径，通过文件创建日期来判断数据时间，</span><br><span class="line">sar -r -f /var/log/sa/sa23</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">解决方案：内存扩容或swap扩大</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Core-Dumped"><a href="#Core-Dumped" class="headerlink" title="Core  Dumped"></a>Core  Dumped</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">======= 现象 ============</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">操作系统日志中有dump日志</span></span><br><span class="line">cat /var/log/messages |grep -i &quot;dump\|kill&quot;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">或者有如下日志</span></span><br><span class="line">Segmentation fault(Core dumped)</span><br><span class="line">原因：program tries to access a memory address outside the programs range.</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">======= 解决方案 ============</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查询coredump历史，获取异常PID</span></span><br><span class="line">coredumpctl list</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查询coredump dbp分析（重要）,info指令可以看到简介，gdb指令包含info，并可以直接分析coredump进行debug，若因操作系统原因未生成coredump，则无法查看更多。</span></span><br><span class="line">coredumpctl gdb $pid</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Note: 也可以直接找到coredump文件，使用gdb -c &lt;coredump-file&gt; 进行分析</span></span><br><span class="line">coredumpctl info $pid</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">参考示例</span></span><br><span class="line">           PID: 16042 (npc)</span><br><span class="line">           UID: 1000 (yzy)</span><br><span class="line">           GID: 100 (users)</span><br><span class="line">        Signal: 6 (ABRT)</span><br><span class="line">     Timestamp: Sun 2018-06-17 10:52:15 +08 (7h ago)</span><br><span class="line">  Command Line: ./npc</span><br><span class="line">    Executable: /home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc</span><br><span class="line"> Control Group: /user.slice/user-1000.slice/session-c2.scope</span><br><span class="line">          Unit: session-c2.scope</span><br><span class="line">         Slice: user-1000.slice</span><br><span class="line">       Session: c2</span><br><span class="line">     Owner UID: 1000 (yzy)</span><br><span class="line">       Boot ID: 6d54757c981742b6984d6d89a59ba2a3</span><br><span class="line">    Machine ID: adbc8ab8645546ffb9ef66ec15b02081</span><br><span class="line">      Hostname: yzy-arch</span><br><span class="line">       Storage: /var/lib/systemd/coredump/core.npc.1000.6d54757c981742b6984d6d89a59ba2a3.16042.1529203935000000.lz4</span><br><span class="line">       Message: Process 16042 (npc) of user 1000 dumped core.</span><br><span class="line">                </span><br><span class="line">                Stack trace of thread 16042:</span><br><span class="line">                #0  0x00007f8df8f4986b raise (libc.so.6)</span><br><span class="line">                #1  0x00007f8df8f3440e abort (libc.so.6)</span><br><span class="line">                #2  0x00007f8df8f342e0 __assert_fail_base.cold.0 (libc.so.6)</span><br><span class="line">                #3  0x00007f8df8f42112 __assert_fail (libc.so.6)</span><br><span class="line">                #4  0x0000563a871686f3 n/a (/home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc)</span><br><span class="line">                #5  0x0000563a87166c3c n/a (/home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc)</span><br><span class="line">                #6  0x0000563a8716afe3 n/a (/home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc)</span><br><span class="line">                #7  0x0000563a8716582b n/a (/home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc)</span><br><span class="line">                #8  0x0000563a8715e499 n/a (/home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc)</span><br><span class="line">                #9  0x00007f8df8f3606b __libc_start_main (libc.so.6)</span><br><span class="line">                #10 0x0000563a8715e36a n/a (/home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc)</span><br><span class="line"></span><br><span class="line">GNU gdb (GDB) 8.1</span><br><span class="line">Copyright (C) 2018 Free Software Foundation, Inc.</span><br><span class="line">License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;</span><br><span class="line">This is free software: you are free to change and redistribute it.</span><br><span class="line">There is NO WARRANTY, to the extent permitted by law.  Type &quot;show copying&quot;</span><br><span class="line">and &quot;show warranty&quot; for details.</span><br><span class="line">This GDB was configured as &quot;x86_64-pc-linux-gnu&quot;.</span><br><span class="line">Type &quot;show configuration&quot; for configuration details.</span><br><span class="line">For bug reporting instructions, please see:</span><br><span class="line">&lt;http://www.gnu.org/software/gdb/bugs/&gt;.</span><br><span class="line">Find the GDB manual and other documentation resources online at:</span><br><span class="line">&lt;http://www.gnu.org/software/gdb/documentation/&gt;.</span><br><span class="line">For help, type &quot;help&quot;.</span><br><span class="line">Type &quot;apropos word&quot; to search for commands related to &quot;word&quot;...</span><br><span class="line">Reading symbols from /home/yzy/Repos/naive-pascal-compiler/cmake-build-debug/npc...done.</span><br><span class="line">[New LWP 16042]</span><br><span class="line">Core was generated by `./npc&#x27;.</span><br><span class="line">Program terminated with signal SIGABRT, Aborted.</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">0  0x00007f8df8f4986b <span class="keyword">in</span> raise () from /usr/lib/libc.so.6</span></span><br><span class="line">(gdb)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="Coredump未生成"><a href="#Coredump未生成" class="headerlink" title="Coredump未生成"></a>Coredump未生成</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 声明coredump生成路径及格式</span><br><span class="line"><span class="operator">/</span>proc<span class="operator">/</span>sys<span class="operator">/</span>kernel<span class="operator">/</span>core_pattern</span><br><span class="line"><span class="operator">/</span>proc<span class="operator">/</span>sys<span class="operator">/</span>kernel<span class="operator">/</span>core_pipe_limit</span><br><span class="line"><span class="operator">/</span>proc<span class="operator">/</span>sys<span class="operator">/</span>kernel<span class="operator">/</span>core_uses_pid</span><br><span class="line"></span><br><span class="line"># coredump未生成问题解决</span><br><span class="line"># 查看操作系统限制</span><br><span class="line">ulimit <span class="operator">-</span>a </span><br><span class="line"># 若core file size为<span class="number">0</span>会导致coredump文件无法生成，如下</span><br><span class="line"># core file size <span class="number">0</span></span><br><span class="line"># 修改为unlimited，仅对当前会话生效</span><br><span class="line">ulimit <span class="operator">-</span>c unlimited</span><br><span class="line"># 永久生效，重新登录会话</span><br><span class="line">vi <span class="operator">/</span>etc<span class="operator">/</span>security<span class="operator">/</span>limits.conf</span><br><span class="line"><span class="operator">*</span> hard core unlimited</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/07/20/Components/Redis/Redis%20OOM%20%E6%95%85%E9%9A%9C%E6%B3%A8%E5%85%A5/" rel="prev" title="Redis OOM 故障注入">
+                  <i class="fa fa-angle-left"></i> Redis OOM 故障注入
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zibu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

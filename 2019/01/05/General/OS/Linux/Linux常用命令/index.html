@@ -26,14 +26,14 @@
 <meta property="og:site_name" content="ZibuのHippocampus">
 <meta property="og:description" content="本文将简要介绍常用Linux运维相关的命令如何使用">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://miszibu.github.io/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
-<meta property="og:image" content="https://miszibu.github.io/%E9%A1%B5%E8%A1%A8.jpg">
+<meta property="og:image" content="https://miszibu.github.io/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+<meta property="og:image" content="https://miszibu.github.io/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/%E9%A1%B5%E8%A1%A8.jpg">
 <meta property="article:published_time" content="2019-01-05T08:07:39.000Z">
-<meta property="article:modified_time" content="2024-09-08T06:15:03.067Z">
+<meta property="article:modified_time" content="2024-10-31T08:55:49.917Z">
 <meta property="article:author" content="zibu">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://miszibu.github.io/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+<meta name="twitter:image" content="https://miszibu.github.io/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
 
 
 <link rel="canonical" href="https://miszibu.github.io/2019/01/05/General/OS/Linux/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
@@ -116,7 +116,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Free%E5%91%BD%E4%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">Free命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8A%9F%E8%83%BD"><span class="nav-number">1.1.</span> <span class="nav-text">命令功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">命令参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.4.</span> <span class="nav-text">输出介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#buff-cache"><span class="nav-number">1.5.</span> <span class="nav-text">buff&#x2F;cache</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.5.1.</span> <span class="nav-text">基本概念</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E9%A1%B5%E7%9A%84%E5%A4%A7%E5%B0%8F%E4%B8%BA4kB%E3%80%82%E9%A1%B5%E6%A1%86%E5%A4%A7%E5%B0%8F%E7%AD%89%E4%BA%8E%E9%A1%B5%E7%9A%84%E5%A4%A7%E5%B0%8F%E3%80%82"><span class="nav-number">1.6.</span> <span class="nav-text">一般页的大小为4kB。页框大小等于页的大小。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">1.6.1.</span> <span class="nav-text">地址结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B5%E8%A1%A8"><span class="nav-number">1.6.2.</span> <span class="nav-text">页表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TLB%E5%BF%AB%E8%A1%A8%EF%BC%88%E8%81%94%E6%83%B3%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%89"><span class="nav-number">1.6.3.</span> <span class="nav-text">TLB快表（联想寄存器）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">Top命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8A%9F%E8%83%BD-1"><span class="nav-number">2.1.</span> <span class="nav-text">命令功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0-1"><span class="nav-number">2.2.</span> <span class="nav-text">命令参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">2.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E4%BB%8B%E7%BB%8D-1"><span class="nav-number">2.4.</span> <span class="nav-text">输出介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">2.5.</span> <span class="nav-text">使用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9AU%E5%A4%9A%E6%A0%B8CPU%E7%9B%91%E6%8E%A7"><span class="nav-number">2.5.1.</span> <span class="nav-text">多U多核CPU监控</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E4%BA%AE%E6%98%BE%E7%A4%BA%E5%BD%93%E5%89%8D%E8%BF%90%E8%A1%8C%E8%BF%9B%E7%A8%8B"><span class="nav-number">2.6.</span> <span class="nav-text">高亮显示当前运行进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top%E4%BA%A4%E4%BA%92%E5%91%BD%E4%BB%A4"><span class="nav-number">2.7.</span> <span class="nav-text">top交互命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vmstat"><span class="nav-number">3.</span> <span class="nav-text">vmstat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mpstat"><span class="nav-number">4.</span> <span class="nav-text">mpstat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iostat"><span class="nav-number">5.</span> <span class="nav-text">iostat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Free"><span class="nav-number">1.</span> <span class="nav-text">Free</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">命令参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.3.</span> <span class="nav-text">输出介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#buff-cache"><span class="nav-number">1.4.</span> <span class="nav-text">buff&#x2F;cache</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.4.1.</span> <span class="nav-text">基本概念</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E9%A1%B5%E7%9A%84%E5%A4%A7%E5%B0%8F%E4%B8%BA4kB%E3%80%82%E9%A1%B5%E6%A1%86%E5%A4%A7%E5%B0%8F%E7%AD%89%E4%BA%8E%E9%A1%B5%E7%9A%84%E5%A4%A7%E5%B0%8F%E3%80%82"><span class="nav-number">1.5.</span> <span class="nav-text">一般页的大小为4kB。页框大小等于页的大小。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">1.5.1.</span> <span class="nav-text">地址结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B5%E8%A1%A8"><span class="nav-number">1.5.2.</span> <span class="nav-text">页表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TLB%E5%BF%AB%E8%A1%A8%EF%BC%88%E8%81%94%E6%83%B3%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%89"><span class="nav-number">1.5.3.</span> <span class="nav-text">TLB快表（联想寄存器）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#top"><span class="nav-number">2.</span> <span class="nav-text">top</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8A%9F%E8%83%BD"><span class="nav-number">2.1.</span> <span class="nav-text">命令功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0-1"><span class="nav-number">2.2.</span> <span class="nav-text">命令参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">2.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E4%BB%8B%E7%BB%8D-1"><span class="nav-number">2.4.</span> <span class="nav-text">输出介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">2.5.</span> <span class="nav-text">使用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9AU%E5%A4%9A%E6%A0%B8CPU%E7%9B%91%E6%8E%A7"><span class="nav-number">2.5.1.</span> <span class="nav-text">多U多核CPU监控</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E4%BA%AE%E6%98%BE%E7%A4%BA%E5%BD%93%E5%89%8D%E8%BF%90%E8%A1%8C%E8%BF%9B%E7%A8%8B"><span class="nav-number">2.6.</span> <span class="nav-text">高亮显示当前运行进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top%E4%BA%A4%E4%BA%92%E5%91%BD%E4%BB%A4"><span class="nav-number">2.7.</span> <span class="nav-text">top交互命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">相关资料</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -129,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-count">161</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -198,7 +198,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-09-08 14:15:03" itemprop="dateModified" datetime="2024-09-08T14:15:03+08:00">2024-09-08</time>
+      <time title="修改时间：2024-10-31 16:55:49" itemprop="dateModified" datetime="2024-10-31T16:55:49+08:00">2024-10-31</time>
     </span>
 
   
@@ -215,18 +215,13 @@
 </blockquote>
 <span id="more"></span>
 
-<h2 id="Free命令"><a href="#Free命令" class="headerlink" title="Free命令"></a>Free命令</h2><h3 id="命令功能"><a href="#命令功能" class="headerlink" title="命令功能"></a>命令功能</h3><p>free 命令显示系统使用和空闲的内存情况，包括物理内存、交互区内存(swap)和内核缓冲区内存。共享内存将被忽略</p>
+<h2 id="Free"><a href="#Free" class="headerlink" title="Free"></a>Free</h2><p><strong>功能：</strong>显示系统使用和空闲的内存情况，包括物理内存、交互区内存(swap)和内核缓冲区内存。共享内存将被忽略</p>
 <h3 id="命令参数"><a href="#命令参数" class="headerlink" title="命令参数"></a>命令参数</h3><ul>
-<li>-b 　以Byte为单位显示内存使用情况。 </li>
-<li>-k 　以KB为单位显示内存使用情况。 </li>
-<li>-m 　以MB为单位显示内存使用情况。</li>
-<li>-g   以GB为单位显示内存使用情况。 </li>
-<li>-o 　不显示缓冲区调节列。 </li>
-<li>-s&lt;间隔秒数&gt; 　持续观察内存使用状况。 </li>
-<li>-t 　显示内存总和列。 </li>
-<li>-V 　显示版本信息。</li>
+<li>-g&#x2F;-h  以 GB为单位&#x2F;自适应单位 显示内存使用情况。 </li>
+<li>-s   &lt;间隔秒数&gt; 　持续观察内存使用状况。 </li>
+<li>-t 　显示内存总和列。</li>
 </ul>
-<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">free -m</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">docker的unbuntu容器</span></span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           1998         269         288           0        1441        1572</span><br><span class="line">Swap:          1023           0        1023</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">free -h</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">docker的unbuntu容器</span></span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           1998         269         288           0        1441        1572</span><br><span class="line">Swap:          1023           0        1023</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h3 id="输出介绍"><a href="#输出介绍" class="headerlink" title="输出介绍"></a>输出介绍</h3><ul>
 <li><p><strong>Mem</strong>：内存</p>
@@ -251,7 +246,7 @@
 <li><em>A cache is something that has been “read” from the disk and stored for later use.</em></li>
 </ul>
 <p>根据木桶短板理论，在目前的计算机系统中毫无疑问，磁盘IO是最慢的。因为传统的磁盘（见下图），需要访问某一扇区的数据，需要移动磁头到对应扇区，对应磁道，这些物理上的时间消耗在当今的计算机中实在是太慢了。因此需要提高计算机性能往往从更换外存设备为SSD入手。</p>
-<p><img src="/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png"></p>
+<p><img src="/./Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/%E6%89%87%E5%8C%BA%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png"></p>
 <h4 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h4><ul>
 <li><strong>Page 页：</strong>进程中的块称为页，每个进程的页码都是从0开始，并且在主存中维护一个页表。</li>
 <li><strong>Page Frame 页帧：</strong>内存中的块称为页框，把可用的内存按照页框的大小，从0开始编号。</li>
@@ -280,7 +275,7 @@
 <p>页码*页内偏移量 &#x3D; 4GB, 也就是32位地址内存寻址的极限。</p>
 <h4 id="页表"><a href="#页表" class="headerlink" title="页表"></a>页表</h4><p>为了方便在内存中找到进程的每个页面所对应的物理页框，系统为每个进程建立了一张<strong>页表</strong>，记录页面在内存中对应的物理块号，一般<strong>存放在内存中</strong>。</p>
 <p>页表项的组成不同于地址结构，是由页号和块号组成的。</p>
-<p><img src="/%E9%A1%B5%E8%A1%A8.jpg"></p>
+<p><img src="/./Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/%E9%A1%B5%E8%A1%A8.jpg"></p>
 <p>在配置页表后，进程执行时。通过查找页表，来获取每页在内存中的物理块号。页表的作用是实现从页号到物理块号的地址映射。</p>
 <h4 id="TLB快表（联想寄存器）"><a href="#TLB快表（联想寄存器）" class="headerlink" title="TLB快表（联想寄存器）"></a>TLB快表（联想寄存器）</h4><p>现在的访问流程是，获取数据页逻辑地址页码，去页表查询物理地址页码，根据物理地址页码查询内存或磁盘。</p>
 <p>这样若数据在内存中，实际上是访问了两次内存的，快表的出现就是为了加快数据访问的速度。</p>
@@ -296,7 +291,7 @@
 <p>局部性原理：所访问数据往往集中在连续的一片区域中。</p>
 </blockquote>
 <hr>
-<h2 id="Top命令"><a href="#Top命令" class="headerlink" title="Top命令"></a>Top命令</h2><h3 id="命令功能-1"><a href="#命令功能-1" class="headerlink" title="命令功能"></a>命令功能</h3><p>显示当前系统正在执行的进程的相关信息，包括进程ID、内存占用率、CPU占用率等</p>
+<h2 id="top"><a href="#top" class="headerlink" title="top"></a>top</h2><h3 id="命令功能"><a href="#命令功能" class="headerlink" title="命令功能"></a>命令功能</h3><p>显示当前系统正在执行的进程的相关信息，包括进程ID、内存占用率、CPU占用率等</p>
 <h3 id="命令参数-1"><a href="#命令参数-1" class="headerlink" title="命令参数"></a>命令参数</h3><ul>
 <li><p>-b 批处理</p>
 </li>
@@ -405,13 +400,6 @@
 <p>P 根据CPU使用百分比大小进行排序</p>
 <p>T 根据时间&#x2F;累计时间进行排序</p>
 <p>W 将当前设置写入~&#x2F;.toprc文件中</p>
-<hr>
-<h2 id="vmstat"><a href="#vmstat" class="headerlink" title="vmstat"></a>vmstat</h2><p>待完善</p>
-<hr>
-<h2 id="mpstat"><a href="#mpstat" class="headerlink" title="mpstat"></a>mpstat</h2><p>待完善</p>
-<hr>
-<h2 id="iostat"><a href="#iostat" class="headerlink" title="iostat"></a>iostat</h2><p>待完善</p>
-<hr>
 <h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p>《操作系统概念》</p>
 <p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/peida/archive/2012/12/24/2831353.html">竹子-博客 每天一个Linux命令系列</a></p>
 
